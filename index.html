@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🥐 Mister Wheel 帳本</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf8f4;--sf:#fff;--sf2:#f5f1eb;--bd:#e5ddd0;--bd2:#cfc0a8;
+  --tx:#2a2010;--tx2:#7a6852;--tx3:#a89070;
+  --ac:#c47820;--acl:#fef0e0;--acd:#9a5c10;
+  --gn:#2a7a46;--gnb:#e8f5ee;
+  --rd:#c03030;--rdb:#fcecea;
+  --or:#d08010;--orb:#fef3e0;
+  --bl:#1a5fa8;--blb:#e8f0fc;
+  --r:10px;--rs:6px;--rx:4px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans TC',system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;}
+.ovl{position:fixed;inset:0;z-index:300;background:rgba(42,32,16,.82);display:flex;align-items:center;justify-content:center;padding:16px;}
+.setup-box{background:var(--sf);border-radius:14px;padding:24px 20px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;}
+.setup-box h2{font-size:19px;color:var(--ac);margin-bottom:6px;}
+.step-box{background:var(--sf2);border-radius:var(--rs);padding:11px 14px;font-size:12.5px;color:var(--tx2);line-height:2;margin:10px 0;}
+.step-box b{color:var(--tx);}
+.hdr{background:var(--sf);border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:16px;font-weight:700;color:var(--ac);}
+.hdr-r{display:flex;align-items:center;gap:8px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--tx3);transition:background .3s;cursor:default;}
+.dot.ok{background:var(--gn);}.dot.saving{background:var(--or);}.dot.err{background:var(--rd);}
+.tabs{background:var(--sf);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:49px;z-index:99;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:none;padding:10px 14px;font-size:12px;font-weight:700;color:var(--tx2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;user-select:none;letter-spacing:.2px;}
+.tab.active{color:var(--ac);border-bottom-color:var(--ac);}
+.tab:hover:not(.active){color:var(--tx);}
+.pg{display:none;padding:14px;max-width:780px;margin:0 auto;padding-bottom:60px;overflow-x:hidden;}
+.pg.active{display:block;}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:12px;}
+.ch{padding:9px 14px;background:var(--sf2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.ct{font-size:13px;font-weight:700;color:var(--tx);}
+.cb{padding:12px 14px;}
+.mrow{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+.mc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;}
+.ml{font-size:11px;color:var(--tx2);font-weight:700;letter-spacing:.3px;margin-bottom:2px;}
+.mv{font-size:19px;font-weight:700;}
+.ms{font-size:11px;color:var(--tx3);margin-top:1px;}
+.g{color:var(--gn);}.r{color:var(--rd);}.o{color:var(--or);}.a{color:var(--ac);}.b{color:var(--bl);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;padding:7px 9px;font-size:11px;font-weight:700;color:var(--tx3);background:var(--sf2);border-bottom:1px solid var(--bd);letter-spacing:.3px;white-space:nowrap;}
+.tbl td{padding:8px 9px;border-bottom:1px solid var(--bd);vertical-align:middle;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#faf6f0;}
+.tbl input{width:100%;border:1px solid transparent;border-radius:var(--rx);padding:4px 6px;font-size:13px;background:transparent;color:var(--tx);outline:none;font-family:inherit;}
+.tbl input:focus{border-color:var(--ac);background:#fffcf6;}
+.tbl input[type=number]{text-align:right;}
+.tbl .name-cell{white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.fr{display:flex;gap:8px;flex-wrap:wrap;}
+.frow{margin-bottom:10px;}
+.frow .fl{margin-bottom:4px;}
+.frow .fi{width:100%;}
+.cb [style*="display:grid"] > div{min-width:0;}
+.cb input,.cb .fi{min-width:0;width:100%;}
+.ff{flex:1;min-width:80px;}
+.fl{font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:3px;letter-spacing:.2px;}
+.fi{width:100%;border:1px solid var(--bd2);border-radius:var(--rs);padding:7px 10px;font-size:14px;color:var(--tx);background:var(--sf);outline:none;font-family:inherit;transition:border .15s;}
+.fi:focus{border-color:var(--ac);}
+.fi[type=number]{text-align:right;}
+select.fi{cursor:pointer;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:7px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.bp{background:var(--ac);color:#fff;}.bp:hover{background:var(--acd);}
+.bs{background:var(--sf2);color:var(--tx2);border:1px solid var(--bd2);}.bs:hover{background:var(--bd);color:var(--tx);}
+.bsm{padding:5px 10px;font-size:12px;}
+.dbtn{background:none;border:none;color:var(--tx3);cursor:pointer;padding:3px 7px;border-radius:4px;font-size:15px;line-height:1;}
+.dbtn:hover{color:var(--rd);background:var(--rdb);}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+.tg{background:var(--gnb);color:var(--gn);}
+.to{background:var(--orb);color:var(--or);}
+.tgr{background:var(--sf2);color:var(--tx3);}
+.al{border-radius:var(--rs);padding:9px 13px;font-size:13px;margin-bottom:10px;line-height:1.7;}
+.ali{background:var(--blb);color:var(--bl);border-left:3px solid var(--bl);}
+.alw{background:var(--orb);color:var(--or);border-left:3px solid var(--or);}
+.rb{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;}
+.rsh{font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.8px;padding-bottom:8px;border-bottom:1px solid var(--bd);margin-bottom:6px;}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;}
+.rr.i{padding-left:14px;font-size:13px;color:var(--tx2);}
+.rr.st{border-top:1px solid var(--bd2);margin-top:5px;padding-top:9px;font-weight:700;}
+.rr.gr{border-top:2px solid var(--bd2);margin-top:8px;padding-top:10px;font-weight:700;font-size:17px;}
+.rn{font-variant-numeric:tabular-nums;}
+.rpos{color:var(--gn);font-weight:700;}
+.rneg{color:var(--rd);font-weight:700;}
+.sep{height:1px;background:var(--bd);margin:8px 0;}
+.rsv{background:#fffaee;border:1.5px solid #f0d060;border-radius:var(--r);padding:14px 16px;margin-top:12px;}
+.rsv-t{font-size:13px;font-weight:700;color:var(--or);margin-bottom:10px;}
+.rsv-r{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px solid #f0e090;}
+.rsv-r:last-of-type{border-bottom:none;}
+.rsv-tot{display:flex;justify-content:space-between;padding-top:10px;margin-top:6px;border-top:2px solid #e0c040;font-weight:700;font-size:15px;}
+.empty{text-align:center;padding:24px;color:var(--tx3);font-size:13px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2a2010;color:#fff;padding:9px 20px;border-radius:24px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.right{text-align:right;}.bold{font-weight:700;}.sm{font-size:12px;}.muted{color:var(--tx2);}.fw{width:100%;}.mt8{margin-top:8px;}
+.tfoot-row{padding:8px 14px;background:var(--sf2);border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;}
+@media(min-width:560px){.mrow{grid-template-columns:repeat(4,1fr);}.pg{padding:18px;padding-bottom:60px;}}
+</style>
+</head>
+<body>
+
+<!-- SETUP OVERLAY -->
+<div class="ovl" id="setupOvl">
+  <div class="setup-box">
+    <h2>🥐 Mister Wheel 帳本</h2>
+    <p class="sm muted" style="margin-bottom:12px;line-height:1.7">連線 Google Sheets 後，資料自動雲端同步。合夥人、會計都可以隨時查看。也可以暫時跳過，使用本機儲存。</p>
+    <div class="ff" style="margin-bottom:16px">
+      <div class="fl">Google Apps Script 網址</div>
+      <input class="fi" id="cfg-url" type="url" placeholder="https://script.google.com/macros/s/...">
+    </div>
+    <div class="step-box">
+      <b>第一次設定 — Google Sheets 連線步驟：</b><br>
+      1. 新建一個 Google Sheets，隨意命名<br>
+      2. 點上方「擴充功能」→「Apps Script」<br>
+      3. 清除所有內容，貼上 <b>apps-script.gs</b> 全部程式碼<br>
+      4. 點「部署」→「新增部署作業」<br>
+      &nbsp;&nbsp;類型：網路應用程式 / 執行身分：我 / 存取：所有人<br>
+      5. 部署 → 授權 → 複製網址貼到上方
+    </div>
+    <button class="btn bp fw" onclick="saveConfig()">確認，開始使用 →</button>
+    <div style="text-align:center;margin-top:10px">
+      <span class="sm muted" style="cursor:pointer;text-decoration:underline" onclick="skipSetup()">暫時跳過，使用本機儲存</span>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">🥐 Mister Wheel</div>
+  <div class="hdr-r">
+    <select class="fi" id="monthSel" style="padding:4px 8px;font-size:13px" onchange="onMonthChange()"></select>
+    <div class="dot" id="syncDot" title="同步狀態"></div>
+    <button class="btn bs bsm" onclick="showSetup()">⚙</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="gotoTab(0)">📊 每日營收</div>
+  <div class="tab" onclick="gotoTab(1)">📦 庫存盤點</div>
+  <div class="tab" onclick="gotoTab(2)">🛒 採購記錄</div>
+  <div class="tab" onclick="gotoTab(3)">💸 費用管理</div>
+  <div class="tab" onclick="gotoTab(4)">📋 月度報表</div>
+  <div class="tab" onclick="gotoTab(5)">🏦 銀行帳目</div>
+</div>
+
+<!-- ═══ PAGE 0: 每日營收 ═══ -->
+<div class="pg active" id="p0">
+  <div class="card">
+    <div class="ch"><div class="ct">新增每日營收</div></div>
+    <div class="cb">
+      <div class="frow"><div class="fl">日期</div><input class="fi" type="date" id="r-date"></div>
+      <div class="frow"><div class="fl">Net Sales（未稅）</div><input class="fi" type="number" id="r-net" placeholder="0.00" step="0.01" oninput="autoCalc()"></div>
+      <div class="frow"><div class="fl">Tax（HST 代收，自動計算）</div><input class="fi" type="number" id="r-tax" placeholder="填入 Net Sales 後自動帶入" step="0.01"></div>
+      <div class="frow"><div class="fl">POS Sales（計算 0.5% 手續費）</div><input class="fi" type="number" id="r-pos" placeholder="0.00" step="0.01"></div>
+      <div class="frow"><div class="fl">Online Sales（計算 2% 手續費）</div><input class="fi" type="number" id="r-online" placeholder="0.00" step="0.01"></div>
+      <div style="margin:8px 0 4px">
+        <span id="det-toggle" class="sm" style="color:var(--bl);cursor:pointer;font-weight:700" onclick="toggleRevDetail()">▶ 詳細收入（信用卡 / 現金 / Fantuan / Uber Eats）</span>
+      </div>
+      <div id="rev-detail" style="display:none">
+        <div class="frow"><div class="fl">信用卡</div><input class="fi" type="number" id="r-card" placeholder="0.00" step="0.01"></div>
+        <div class="frow"><div class="fl">現金</div><input class="fi" type="number" id="r-cash" placeholder="0.00" step="0.01"></div>
+        <div class="frow"><div class="fl">Fantuan</div><input class="fi" type="number" id="r-fantuan" placeholder="0.00" step="0.01"></div>
+        <div class="frow"><div class="fl">Uber Eats</div><input class="fi" type="number" id="r-uber" placeholder="0.00" step="0.01"></div>
+        <div class="al ali sm" style="margin:6px 0 2px">💡 Fantuan / Uber Eats 抽成已在 Net Sales 中扣除，此欄僅供核對。</div>
+      </div>
+      <div class="frow"><div class="fl">Tips（月底發給員工，不計入損益）</div><input class="fi" type="number" id="r-tips" placeholder="0.00" step="0.01"></div>
+      <div style="margin-top:10px"><button class="btn bp fw" onclick="addRevenue()">＋ 新增</button></div>
+    </div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">本月 NET SALES</div><div class="mv g" id="rm-net">$0</div></div>
+    <div class="mc"><div class="ml">HST 代收合計</div><div class="mv o" id="rm-tax">$0</div></div>
+    <div class="mc"><div class="ml">渠道手續費</div><div class="mv r" id="rm-fees">$0</div></div>
+    <div class="mc"><div class="ml">已記錄天數</div><div class="mv" id="rm-days">0 天</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">每日明細</div></div>
+    <div id="rev-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 1: 庫存盤點 ═══ -->
+<div class="pg" id="p1">
+  <div class="al ali">月初填「月初庫存」，月末盤點後填「月末庫存」。耗用成本 ＝ 月初 ＋ 採購（未稅）－ 月末。</div>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="btn fw" id="ibt-o" onclick="setInvPeriod('open')">月初庫存</button>
+    <button class="btn bs fw" id="ibt-c" onclick="setInvPeriod('close')">月末庫存</button>
+  </div>
+  <div class="card">
+    <div class="ch">
+      <div class="ct" id="inv-period-lbl">月初庫存</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn bs bsm" onclick="toggleAllCat()">展開／折疊全部</button>
+        <button class="btn bs bsm" onclick="addInvItem()">＋ 新增品項</button>
+      </div>
+    </div>
+    <div id="inv-body"></div>
+    <div class="tfoot-row"><span class="sm muted">本期庫存總值</span><span class="bold" id="inv-total">$0.00</span></div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">月初庫存</div><div class="mv a" id="im-open">$0</div></div>
+    <div class="mc"><div class="ml">月末庫存</div><div class="mv a" id="im-close">$0</div></div>
+    <div class="mc"><div class="ml">採購（未稅）</div><div class="mv" id="im-pur">$0</div></div>
+    <div class="mc"><div class="ml">原料耗用成本</div><div class="mv r" id="im-cogs">$0</div><div class="ms">月初＋採購－月末</div></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 2: 採購記錄 ═══ -->
+<div class="pg" id="p2">
+  <div class="card">
+    <div class="ch"><div class="ct">新增採購記錄</div></div>
+    <div class="cb">
+      <div class="frow"><div class="fl">日期</div><input class="fi" type="date" id="pu-date"></div>
+      <div class="frow"><div class="fl">說明</div><input class="fi" type="text" id="pu-desc" placeholder="例：T&T 麵粉補貨"></div>
+      <div class="frow"><div class="fl">金額</div><input class="fi" type="number" id="pu-amt" placeholder="0.00" step="0.01"></div>
+      <div class="frow" style="align-items:center">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--tx2);padding:4px 0">
+          <input type="checkbox" id="pu-hst" style="width:22px;height:22px;flex-shrink:0;cursor:pointer">
+          <span>此收據含 HST（非食材、清潔、包裝類）</span>
+        </label>
+      </div>
+      <div class="frow"><div class="fl">備註（選填）</div><input class="fi" type="text" id="pu-note" placeholder=""></div>
+      <div style="margin-top:10px"><button class="btn bp fw" onclick="addPurchase()">＋ 新增</button></div>
+    </div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">採購總額</div><div class="mv" id="pm-total">$0</div></div>
+    <div class="mc"><div class="ml">食材（免稅）</div><div class="mv g" id="pm-food">$0</div></div>
+    <div class="mc"><div class="ml">含HST採購</div><div class="mv o" id="pm-hst">$0</div></div>
+    <div class="mc"><div class="ml">ITC 可抵扣</div><div class="mv b" id="pm-itc">$0</div><div class="ms">向CRA申請退稅</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">採購記錄列表</div></div>
+    <div id="pur-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 3: 費用管理 ═══ -->
+<div class="pg" id="p3">
+  <div class="al alw">固定費用自動計算（租金依當月業績調整）。權利金按 Net Sales × 5% 自動帶入。</div>
+  <div class="card">
+    <div class="ch"><div class="ct">固定費用 ＆ 權利金（自動計算）</div></div>
+    <div class="scroll-x">
+      <table class="tbl" style="min-width:420px">
+        <thead><tr>
+          <th style="min-width:110px">項目</th>
+          <th style="text-align:right;min-width:90px">未稅金額</th>
+          <th style="text-align:right;min-width:80px;color:var(--bl)">HST/ITC</th>
+          <th style="text-align:right;min-width:90px">含稅合計</th>
+          <th style="min-width:100px">備註</th>
+        </tr></thead>
+        <tbody id="fixed-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch">
+      <div class="ct">人事費用</div>
+    </div>
+    <div class="cb">
+      <div class="frow"><div class="fl">說明</div><input class="fi" type="text" id="st-desc" placeholder="例：員工薪資（含雇主CPP/EI）"></div>
+      <div class="frow"><div class="fl">金額</div><input class="fi" type="number" id="st-amt" placeholder="0.00" step="0.01"></div>
+      <div style="margin-top:8px"><button class="btn bp fw" onclick="addStaff()">＋ 新增</button></div>
+    </div>
+    <div id="staff-list"></div>
+    <div class="tfoot-row"><span class="sm muted">人事合計</span><span class="bold r" id="staff-total">$0.00</span></div>
+  </div>
+  <div class="card">
+    <div class="ch">
+      <div class="ct">雜支 / 其他</div>
+    </div>
+    <div class="cb">
+      <div class="frow"><div class="fl">說明</div><input class="fi" type="text" id="mx-desc" placeholder="例：加油、維修、耗材"></div>
+      <div class="frow"><div class="fl">金額</div><input class="fi" type="number" id="mx-amt" placeholder="0.00" step="0.01"></div>
+      <div class="frow" style="align-items:center">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--tx2);padding:4px 0">
+          <input type="checkbox" id="mx-hst" style="width:22px;height:22px;flex-shrink:0;cursor:pointer">
+          <span>此收據含 HST</span>
+        </label>
+      </div>
+      <div style="margin-top:8px"><button class="btn bp fw" onclick="addMisc()">＋ 新增</button></div>
+    </div>
+    <div id="misc-list"></div>
+    <div class="tfoot-row"><span class="sm muted">雜支合計（未稅）</span><span class="bold r" id="misc-total">$0.00</span></div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">固定費用（未稅）</div><div class="mv r" id="em-fixed">$0</div></div>
+    <div class="mc"><div class="ml">人事費用</div><div class="mv r" id="em-staff">$0</div></div>
+    <div class="mc"><div class="ml">雜支（未稅）</div><div class="mv r" id="em-misc">$0</div></div>
+    <div class="mc"><div class="ml">ITC 合計</div><div class="mv b" id="em-itc">$0</div><div class="ms">固定費用＋雜支HST</div></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 4: 月度報表 ═══ -->
+<div class="pg" id="p4">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:16px;font-weight:700" id="rpt-title">月度損益報表</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn bs bsm" onclick="buildReport()">🔄 重算</button>
+      <button class="btn bp bsm" onclick="exportPDF()">📄 匯出PDF</button>
+    </div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">未稅 Net Sales</div><div class="mv g" id="rpt-rev">$0</div></div>
+    <div class="mc"><div class="ml">原料耗用</div><div class="mv r" id="rpt-cogs">$0</div></div>
+    <div class="mc"><div class="ml">費用合計</div><div class="mv r" id="rpt-exp">$0</div></div>
+    <div class="mc"><div class="ml">本月淨利</div><div class="mv" id="rpt-profit">$0</div></div>
+  </div>
+  <div class="rb">
+    <div class="rsh">▌ 損益明細</div>
+    <div class="rr"><span>未稅 Net Sales</span><span class="rn rpos" id="d-rev">$0</span></div>
+    <div class="rr i"><span>（－）POS 手續費 0.5%</span><span class="rn rneg" id="d-pos-fee">$0</span></div>
+    <div class="rr i"><span>（－）Online 手續費 2%</span><span class="rn rneg" id="d-online-fee">$0</span></div>
+    <div class="rr st"><span>＝ 扣費後淨收入</span><span class="rn" id="d-net2">$0</span></div>
+    <div class="sep"></div>
+    <div class="rr" style="color:var(--tx2)"><span>（－）原料耗用成本</span><span></span></div>
+    <div class="rr i"><span>月初庫存</span><span class="rn" id="d-open">$0</span></div>
+    <div class="rr i"><span>＋ 採購（未稅）</span><span class="rn" id="d-pur">$0</span></div>
+    <div class="rr i"><span>－ 月末庫存</span><span class="rn" id="d-close">$0</span></div>
+    <div class="rr st"><span>＝ 原料耗用</span><span class="rn rneg" id="d-cogs">$0</span></div>
+    <div class="sep"></div>
+    <div class="rr" style="color:var(--tx2)"><span>（－）費用支出（未稅）</span><span></span></div>
+    <div class="rr i"><span>租金</span><span class="rn" id="d-rent">$0</span></div>
+    <div class="rr i"><span>人事費用</span><span class="rn" id="d-staff2">$0</span></div>
+    <div class="rr i"><span>電冰箱承租</span><span class="rn">$50.00</span></div>
+    <div class="rr i"><span>停車費（未稅）</span><span class="rn">$168.14</span></div>
+    <div class="rr i"><span>網路費</span><span class="rn">$40.00</span></div>
+    <div class="rr i"><span>門店保費（未稅）</span><span class="rn">$155.75</span></div>
+    <div class="rr i"><span>銀行手續費</span><span class="rn">$10.00</span></div>
+    <div class="rr i"><span>POS 系統費（未稅）</span><span class="rn">$178.76</span></div>
+    <div class="rr i"><span>雜支（未稅）</span><span class="rn" id="d-misc">$0</span></div>
+    <div class="rr st"><span>＝ 費用合計</span><span class="rn rneg" id="d-exp">$0</span></div>
+    <div class="sep"></div>
+    <div class="rr st"><span>營業利潤</span><span class="rn" id="d-op">$0</span></div>
+    <div class="rr i"><span>（－）5% 品牌權利金</span><span class="rn rneg" id="d-roy">$0</span></div>
+    <div class="rr gr"><span>本月淨利（虧損）</span><span class="rn" id="d-profit">$0</span></div>
+  </div>
+  <div class="rb">
+    <div class="rsh">▌ HST 稅務對賬</div>
+    <div class="rr"><span>客戶 HST 代收</span><span class="rn rpos" id="d-hst-c">$0</span></div>
+    <div class="rr" style="color:var(--tx2)"><span>（－）ITC 可抵扣</span><span></span></div>
+    <div class="rr i"><span>採購 ITC</span><span class="rn" id="d-itc-pur">$0</span></div>
+    <div class="rr i"><span>固定費用 ITC</span><span class="rn" id="d-itc-fix">$0</span></div>
+    <div class="rr i"><span>雜支 ITC</span><span class="rn" id="d-itc-misc">$0</span></div>
+    <div class="rr st"><span>應交 CRA 淨 HST</span><span class="rn rneg" id="d-hst-net">$0</span></div>
+  </div>
+  <div class="rsv">
+    <div class="rsv-t">⚠️ 本月應預留款項</div>
+    <div class="rsv-r"><span>HST 應交 CRA</span><span class="rn bold" id="rsv-hst">$0</span></div>
+    <div class="rsv-r"><span>5% 品牌權利金</span><span class="rn bold" id="rsv-roy">$0</span></div>
+    <div class="rsv-r" id="rsv-rent-row" style="display:none"><span>🏠 租金補繳（業績超 $20,000）</span><span class="rn bold r" id="rsv-rent-extra">$0</span></div>
+    <div class="rsv-tot"><span>合計需預留</span><span class="rn o" id="rsv-total">$0</span></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 5: 銀行帳目 ═══ -->
+<div class="pg" id="p5">
+  <div class="card">
+    <div class="ch"><div class="ct">新增銀行交易</div></div>
+    <div class="cb">
+      <div class="al ali sm" style="margin-bottom:10px">💡 <b>快速貼上（免費）：</b>從網銀複製一行文字直接貼上，自動解析日期與金額。</div>
+      <div class="frow">
+        <div class="fl">貼上網銀交易文字</div>
+        <div style="display:flex;gap:6px">
+          <input class="fi" type="text" id="bk-paste" placeholder="Mar 25, 2026  SNAPPY2804 EXP  807.18  $27,473.70" style="flex:1;font-size:13px">
+          <button class="btn bs" style="white-space:nowrap" onclick="parseBankPaste()">解析</button>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--bd);margin:10px 0 8px;padding-top:8px">
+        <div class="sm muted" style="margin-bottom:8px">或手動填寫：</div>
+        <div class="frow"><div class="fl">日期</div><input class="fi" type="date" id="bk-date"></div>
+        <div class="frow"><div class="fl">描述</div><input class="fi" type="text" id="bk-desc" placeholder="例：SNAPPY2804 EXP"></div>
+        <div class="frow"><div class="fl">存入 ($)</div><input class="fi" type="number" id="bk-dep" placeholder="0.00" step="0.01"></div>
+        <div class="frow"><div class="fl">支出 ($)</div><input class="fi" type="number" id="bk-wd" placeholder="0.00" step="0.01"></div>
+        <div class="frow"><div class="fl">餘額 ($)</div><input class="fi" type="number" id="bk-bal" placeholder="0.00" step="0.01"></div>
+        <div class="frow"><div class="fl">備註（核對用）</div><input class="fi" type="text" id="bk-note" placeholder="例：POS 3/25 結算、Costco 採購麵粉"></div>
+        <div style="margin-top:10px"><button class="btn bp fw" onclick="addBank()">＋ 新增</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">本月存入合計</div><div class="mv g" id="bm-dep">$0</div></div>
+    <div class="mc"><div class="ml">本月支出合計</div><div class="mv r" id="bm-wd">$0</div></div>
+    <div class="mc"><div class="ml">淨流入</div><div class="mv" id="bm-net">$0</div></div>
+    <div class="mc"><div class="ml">最新餘額</div><div class="mv b" id="bm-bal">-</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">核對摘要</div></div>
+    <div class="cb" id="bank-reconcile"><div class="sm muted">輸入交易後自動顯示核對結果</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">銀行交易明細</div></div>
+    <div id="bank-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════
+//  業務常數
+// ═══════════════════════════════
+const C = {
+  HST: 0.13,
+  ROYALTY: 0.05,
+  RENT_BASE_EX: 1000,
+  RENT_THRESHOLD: 20000,
+  RENT_PCT: 0.05,
+  FRIDGE_EX: 50,
+  PARKING_INC: 190,
+  INTERNET_EX: 40,
+  INSURANCE_INC: 176,
+  BANK_FEE: 10,
+  POS_SYS_INC: 202,
+  POS_FEE: 0.005,
+  ONLINE_FEE: 0.02,
+};
+
+const exHST = v => v / 1.13;
+const hstOf = v => v * 13 / 113;
+const N = v => { const x = parseFloat(v); return isNaN(x) ? 0 : x; };
+const fmt = v => '$' + Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+// ═══════════════════════════════
+//  狀態 & 儲存
+// ═══════════════════════════════
+let CFG = { url: '' };
+let curMonth = '';
+let D = {};
+let TEMPLATE_CACHE = null;
+
+function blankData() {
+  const items = getTemplateItems();
+  return {
+    revenues: [],
+    inventory: { open: items(), close: items() },
+    purchases: [],
+    staff: [],
+    misc: [],
+    bank: [],
+  };
+}
+
+function getTemplateItems() {
+  const src = TEMPLATE_CACHE || defaultItems();
+  return () => src.map(it => ({ id: uid(), name: it.name, unit: it.unit, price: it.price, qty: '', notes: it.notes || '' }));
+}
+
+function defaultItems() {
+  return [
+    // 冷藏冰箱
+    { name:'蛋白', unit:'瓶', price:'9.94', notes:'BAKER，每箱12瓶', category:'冷藏冰箱' },
+    { name:'蛋黃', unit:'瓶', price:'10.37', notes:'BAKER，每箱12瓶', category:'冷藏冰箱' },
+    { name:'麻糬', unit:'包', price:'2.40', notes:'莊記，每箱36包，5片/包', category:'冷藏冰箱' },
+    { name:'雞蛋', unit:'盤', price:'9.69', notes:'Costco，30顆/盤', category:'冷藏冰箱' },
+    { name:'鮮奶油', unit:'瓶', price:'6.49', notes:'WC Richmond，1000g/瓶', category:'冷藏冰箱' },
+    { name:'無鹽奶油', unit:'塊', price:'6.99', notes:'Metro，454g/塊', category:'冷藏冰箱' },
+    { name:'Cream Cheese', unit:'盒', price:'', notes:'Costco', category:'冷藏冰箱' },
+    { name:'榴槤', unit:'包', price:'42.00', notes:'莊記，1000g/包', category:'冷藏冰箱' },
+    // 冷凍/倉庫
+    { name:'麵粉(PM)', unit:'袋', price:'18.55', notes:'Makers', category:'冷凍/倉庫' },
+    { name:'全脂奶粉', unit:'袋', price:'276.16', notes:'Makers', category:'冷凍/倉庫' },
+    { name:'糖', unit:'袋', price:'30.18', notes:'Makers', category:'冷凍/倉庫' },
+    { name:'蔬菜油', unit:'桶', price:'31.69', notes:'Costco', category:'冷凍/倉庫' },
+    { name:'牛奶', unit:'包', price:'6.89', notes:'Costco', category:'冷凍/倉庫' },
+    { name:'玉米粉', unit:'包', price:'7.99', notes:'', category:'冷凍/倉庫' },
+    { name:'玉米醬罐頭', unit:'罐', price:'3.99', notes:'No Frills', category:'冷凍/倉庫' },
+    { name:'玉米粒罐頭', unit:'罐', price:'1.50', notes:'No Frills', category:'冷凍/倉庫' },
+    { name:'鷹牌煉乳', unit:'罐', price:'3.99', notes:'Winco', category:'冷凍/倉庫' },
+    { name:'開心果醬', unit:'罐', price:'164.23', notes:'MVF', category:'冷凍/倉庫' },
+    { name:'開心果粒', unit:'包', price:'21.99', notes:'Costco', category:'冷凍/倉庫' },
+    { name:'巧克力豆', unit:'包', price:'74.89', notes:'MVF', category:'冷凍/倉庫' },
+    { name:'可可粉', unit:'包', price:'42.89', notes:'MVF', category:'冷凍/倉庫' },
+    { name:'抹茶（達利）', unit:'包', price:'8.99', notes:'Winco', category:'冷凍/倉庫' },
+    { name:'抹茶（ELAN）', unit:'罐', price:'27.54', notes:'Costco Elan', category:'冷凍/倉庫' },
+    { name:'杏仁片', unit:'包', price:'11.99', notes:'WC Richmond', category:'冷凍/倉庫' },
+    { name:'杏仁條', unit:'包', price:'3.50', notes:'PC', category:'冷凍/倉庫' },
+    { name:'黑芝麻', unit:'包', price:'4.79', notes:'Fresh Way', category:'冷凍/倉庫' },
+    { name:'白芝麻', unit:'包', price:'4.79', notes:'Fresh Way', category:'冷凍/倉庫' },
+    { name:'葵瓜子', unit:'包', price:'5.49', notes:'WC Richmond', category:'冷凍/倉庫' },
+    { name:'南瓜子', unit:'包', price:'11.99', notes:'Costco', category:'冷凍/倉庫' },
+    { name:'楓糖（小）', unit:'罐', price:'17.50', notes:'Costco', category:'冷凍/倉庫' },
+    { name:'楓糖漿（大）', unit:'罐', price:'89.99', notes:'WC Richmond', category:'冷凍/倉庫' },
+    { name:'冬瓜磚', unit:'塊', price:'4.99', notes:'國華', category:'冷凍/倉庫' },
+    { name:'香草醬', unit:'罐', price:'56.00', notes:'', category:'冷凍/倉庫' },
+    // 茶葉
+    { name:'金萱茶', unit:'包', price:'25.00', notes:'不貳光', category:'茶葉' },
+    { name:'18號紅玉', unit:'包', price:'25.00', notes:'不貳光', category:'茶葉' },
+    { name:'凍頂烏龍', unit:'包', price:'25.00', notes:'不貳光', category:'茶葉' },
+    { name:'桂花烏龍', unit:'包', price:'25.00', notes:'不貳光', category:'茶葉' },
+    { name:'泰式奶茶（茶葉）', unit:'包', price:'6.00', notes:'金樂客', category:'茶葉' },
+    { name:'伯爵茶', unit:'盒', price:'12.49', notes:'Costco 144包/盒', category:'茶葉' },
+    // 莊記進口
+    { name:'芋頭內餡（莊記）', unit:'箱', price:'164.45', notes:'USD$115/箱', category:'莊記進口' },
+    { name:'內餡粉（莊記）', unit:'箱', price:'429.00', notes:'USD$300/箱', category:'莊記進口' },
+    { name:'麵漿粉（莊記）', unit:'箱', price:'271.70', notes:'USD$190/箱，81kg/箱', category:'莊記進口' },
+    { name:'紅豆餡（莊記）', unit:'箱', price:'54.34', notes:'USD$38/箱', category:'莊記進口' },
+    { name:'芝麻餡（莊記）', unit:'箱', price:'72.93', notes:'USD$51/箱', category:'莊記進口' },
+    { name:'草莓醬（莊記）', unit:'罐', price:'', notes:'莊記', category:'莊記進口' },
+    { name:'麻糬（莊記）', unit:'箱', price:'', notes:'莊記', category:'莊記進口' },
+    // 包裝耗材
+    { name:'單顆紙袋', unit:'箱', price:'123.27', notes:'USD$86.20/箱', category:'包裝耗材' },
+    { name:'小點袋', unit:'箱', price:'98.67', notes:'USD$69.00/箱', category:'包裝耗材' },
+    { name:'大點袋', unit:'箱', price:'111.00', notes:'USD$77.63/箱', category:'包裝耗材' },
+    { name:'十人盒', unit:'箱', price:'203.42', notes:'USD$142.25/箱', category:'包裝耗材' },
+    { name:'單人盒', unit:'箱', price:'414.70', notes:'USD$290.00/箱', category:'包裝耗材' },
+    { name:'雙人盒紙襯', unit:'箱', price:'436.15', notes:'USD$305.00/箱', category:'包裝耗材' },
+    { name:'手套', unit:'箱', price:'1.13', notes:'240雙/箱', category:'包裝耗材' },
+    { name:'口罩', unit:'包', price:'30.60', notes:'2000PCS/包', category:'包裝耗材' },
+    { name:'16oz Cup', unit:'條', price:'4.99', notes:'WC Richmond', category:'包裝耗材' },
+    { name:'16oz Lid', unit:'條', price:'1.99', notes:'WC Richmond', category:'包裝耗材' },
+    { name:'16oz 瓶子', unit:'個', price:'2.00', notes:'', category:'包裝耗材' },
+    { name:'透明一杯袋', unit:'包', price:'5.50', notes:'松盛，100個/包', category:'包裝耗材' },
+    { name:'粗吸管', unit:'包', price:'3.96', notes:'金樂客，2000支/包', category:'包裝耗材' },
+    { name:'細吸管', unit:'盒', price:'13.55', notes:'WC Richmond/松盛', category:'包裝耗材' },
+    { name:'餐巾紙', unit:'包', price:'6.00', notes:'', category:'包裝耗材' },
+    { name:'紙捲', unit:'捲', price:'13.00', notes:'', category:'包裝耗材' },
+  ];
+}
+
+// ═══════════════════════════════
+//  本機儲存
+// ═══════════════════════════════
+const lsKey = m => 'mw2_' + m.replace('-', '_');
+function saveLocal() { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); }
+function loadLocal() { const r = localStorage.getItem(lsKey(curMonth)); D = r ? JSON.parse(r) : blankData(); }
+function saveCFG() { localStorage.setItem('mw2_cfg', JSON.stringify(CFG)); }
+function loadCFG() {
+  const r = localStorage.getItem('mw2_cfg'); if (r) CFG = JSON.parse(r);
+  const t = localStorage.getItem('mw2_template'); if (t) TEMPLATE_CACHE = JSON.parse(t);
+}
+
+// ═══════════════════════════════
+//  Google Sheets 同步
+// ═══════════════════════════════
+let syncTmr = null;
+function scheduleSave() { saveLocal(); clearTimeout(syncTmr); syncTmr = setTimeout(syncUp, 2500); }
+
+async function syncUp() {
+  if (!CFG.url) return;
+  setDot('saving');
+  try {
+    const r = await fetch(CFG.url, { method: 'POST', body: JSON.stringify({ action: 'saveMonth', month: curMonth, data: D }) });
+    const j = await r.json();
+    j.ok ? setDot('ok') : (() => { throw new Error(j.error); })();
+  } catch (e) { setDot('err'); }
+}
+
+async function syncDown() {
+  if (!CFG.url) return;
+  setDot('saving');
+  try {
+    const [tRes, dRes] = await Promise.all([
+      fetch(CFG.url + '?action=template'),
+      fetch(CFG.url + '?action=month&month=' + curMonth),
+    ]);
+    const tJson = await tRes.json();
+    const dJson = await dRes.json();
+    if (tJson.ok && tJson.items && tJson.items.length) {
+      TEMPLATE_CACHE = tJson.items;
+      localStorage.setItem('mw2_template', JSON.stringify(TEMPLATE_CACHE));
+    }
+    if (dJson.ok && dJson.data) { D = dJson.data; saveLocal(); }
+    setDot('ok');
+  } catch (e) { setDot('err'); }
+}
+
+function setDot(s) {
+  const el = document.getElementById('syncDot');
+  el.className = 'dot ' + s;
+  el.title = { ok: '已同步', saving: '同步中...', err: '同步失敗（本地已儲存）' }[s] || '';
+}
+
+// ═══════════════════════════════
+//  導航
+// ═══════════════════════════════
+function gotoTab(i) {
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+  document.querySelectorAll('.pg').forEach((p, j) => p.classList.toggle('active', i === j));
+  if (i === 4) buildReport();
+}
+
+function initMonthSel() {
+  const sel = document.getElementById('monthSel');
+  sel.innerHTML = '';
+  const now = new Date();
+  for (let i = 0; i < 13; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const v = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    const lbl = d.getFullYear() + '年' + (d.getMonth() + 1) + '月';
+    sel.appendChild(Object.assign(document.createElement('option'), { value: v, textContent: lbl }));
+  }
+  curMonth = sel.value;
+}
+
+function onMonthChange() {
+  curMonth = document.getElementById('monthSel').value;
+  loadLocal();
+  renderAll();
+  if (CFG.url) syncDown().then(() => renderAll());
+}
+
+// ═══════════════════════════════
+//  每日營收
+// ═══════════════════════════════
+function autoCalc() {
+  const net = N(document.getElementById('r-net').value);
+  if (net > 0) document.getElementById('r-tax').value = (net * 0.13).toFixed(2);
+}
+
+function toggleRevDetail() {
+  const d = document.getElementById('rev-detail');
+  const t = document.getElementById('det-toggle');
+  const open = d.style.display === 'none';
+  d.style.display = open ? 'block' : 'none';
+  t.textContent = (open ? '▼' : '▶') + ' 收入明細（信用卡 / 現金 / Fantuan / Uber Eats）';
+}
+
+function addRevenue() {
+  const date = document.getElementById('r-date').value;
+  const net  = N(document.getElementById('r-net').value);
+  const tax  = N(document.getElementById('r-tax').value);
+  const tips = N(document.getElementById('r-tips').value);
+  const pos  = N(document.getElementById('r-pos').value);
+  const onl  = N(document.getElementById('r-online').value);
+  const card = N(document.getElementById('r-card').value);
+  const cash = N(document.getElementById('r-cash').value);
+  const fan  = N(document.getElementById('r-fantuan').value);
+  const uber = N(document.getElementById('r-uber').value);
+  if (!net) { toast('請填寫 Net Sales'); return; }
+  const entry = { date, net, tax, tips, pos, onl, card, cash, fan, uber };
+  const idx = D.revenues.findIndex(r => r.date === date);
+  if (idx >= 0) { D.revenues[idx] = entry; toast('已更新 ' + date); }
+  else { D.revenues.push(entry); toast('已新增'); }
+  D.revenues.sort((a, b) => a.date.localeCompare(b.date));
+  scheduleSave(); renderRevenue(); updateInvMetrics();
+  ['r-net','r-tax','r-tips','r-pos','r-online','r-card','r-cash','r-fantuan','r-uber'].forEach(id => document.getElementById(id).value = '');
+}
+
+function removeRevenue(i) { D.revenues.splice(i, 1); scheduleSave(); renderRevenue(); updateInvMetrics(); }
+
+function renderRevenue() {
+  const totNet  = D.revenues.reduce((s, r) => s + N(r.net), 0);
+  const totTax  = D.revenues.reduce((s, r) => s + N(r.tax), 0);
+  const totFees = D.revenues.reduce((s, r) => s + N(r.pos) * C.POS_FEE + N(r.onl) * C.ONLINE_FEE, 0);
+  s2('rm-net', fmt(totNet), 'mv g');
+  s2('rm-tax', fmt(totTax), 'mv o');
+  s2('rm-fees', fmt(totFees), 'mv r');
+  document.getElementById('rm-days').textContent = D.revenues.length + ' 天';
+
+  const list = document.getElementById('rev-list');
+  if (!D.revenues.length) { list.innerHTML = '<div class="empty">尚無記錄</div>'; return; }
+
+  let sumCard=0,sumCash=0,sumOnl=0,sumFan=0,sumUber=0,sumNet=0,sumTax=0,sumFee=0,sumTotal=0;
+  D.revenues.forEach(r => {
+    const fee = N(r.pos)*C.POS_FEE + N(r.onl)*C.ONLINE_FEE;
+    sumCard+=N(r.card); sumCash+=N(r.cash); sumOnl+=N(r.onl);
+    sumFan+=N(r.fan); sumUber+=N(r.uber); sumNet+=N(r.net);
+    sumTax+=N(r.tax); sumFee+=fee; sumTotal+=(N(r.net)-fee);
+  });
+
+  let html = `<div class="scroll-x"><table class="tbl" style="min-width:650px"><thead><tr>
+    <th style="min-width:90px">日期</th><th style="text-align:right;min-width:75px">信用卡</th><th style="text-align:right">現金</th>
+    <th style="text-align:right">Online</th><th style="text-align:right">Fantuan</th><th style="text-align:right">Uber Eats</th>
+    <th style="text-align:right">HST</th><th style="text-align:right">手續費</th>
+    <th style="text-align:right">Net Sales</th><th style="text-align:right">本日合計</th><th></th>
+  </tr></thead><tbody>`;
+
+  D.revenues.forEach((r, idx) => {
+    const fee = N(r.pos)*C.POS_FEE + N(r.onl)*C.ONLINE_FEE;
+    const dayTotal = N(r.net) - fee;
+    html += `<tr>
+      <td style="color:var(--tx2);white-space:nowrap">${r.date}</td>
+      <td style="text-align:right">${N(r.card) ? fmt(r.card) : '-'}</td>
+      <td style="text-align:right">${N(r.cash) ? fmt(r.cash) : '-'}</td>
+      <td style="text-align:right">${N(r.onl) ? fmt(r.onl) : '-'}</td>
+      <td style="text-align:right">${N(r.fan) ? fmt(r.fan) : '-'}</td>
+      <td style="text-align:right">${N(r.uber) ? fmt(r.uber) : '-'}</td>
+      <td style="text-align:right;color:var(--or)">${fmt(r.tax)}</td>
+      <td style="text-align:right;color:var(--rd)">${fmt(fee)}</td>
+      <td style="text-align:right;font-weight:700">${fmt(r.net)}</td>
+      <td style="text-align:right;font-weight:700;color:var(--gn)">${fmt(dayTotal)}</td>
+      <td><button class="dbtn" onclick="removeRevenue(${idx})">✕</button></td>
+    </tr>`;
+  });
+
+  html += `<tr style="background:var(--sf2);font-weight:700;border-top:2px solid var(--bd2)">
+    <td>本月合計</td>
+    <td style="text-align:right">${sumCard?fmt(sumCard):'-'}</td>
+    <td style="text-align:right">${sumCash?fmt(sumCash):'-'}</td>
+    <td style="text-align:right">${sumOnl?fmt(sumOnl):'-'}</td>
+    <td style="text-align:right">${sumFan?fmt(sumFan):'-'}</td>
+    <td style="text-align:right">${sumUber?fmt(sumUber):'-'}</td>
+    <td style="text-align:right;color:var(--or)">${fmt(sumTax)}</td>
+    <td style="text-align:right;color:var(--rd)">${fmt(sumFee)}</td>
+    <td style="text-align:right;color:var(--ac)">${fmt(sumNet)}</td>
+    <td style="text-align:right;color:var(--gn)">${fmt(sumTotal)}</td>
+    <td></td>
+  </tr></tbody></table></div>`;
+  list.innerHTML = html;
+}
+
+// ═══════════════════════════════
+//  庫存盤點
+// ═══════════════════════════════
+let invPd = 'open';
+let catOpen = {};
+
+function setInvPeriod(p) {
+  invPd = p;
+  const isO = p === 'open';
+  const bo = document.getElementById('ibt-o');
+  const bc = document.getElementById('ibt-c');
+  bo.className = 'btn fw' + (isO ? '' : ' bs');
+  bo.style.cssText = isO ? 'background:var(--ac);color:#fff' : '';
+  bc.className = 'btn fw' + (isO ? ' bs' : '');
+  bc.style.cssText = isO ? '' : 'background:var(--ac);color:#fff';
+  document.getElementById('inv-period-lbl').textContent = isO ? '月初庫存' : '月末庫存';
+  renderInventory();
+}
+
+function addInvItem() {
+  D.inventory[invPd].push({ id: uid(), name: '', unit: '', price: '', qty: '', notes: '', category: '其他' });
+  catOpen['其他'] = true; // 自動展開「其他」分類
+  scheduleSave(); renderInventory();
+}
+
+function removeInvItem(i) { D.inventory[invPd].splice(i, 1); scheduleSave(); renderInventory(); }
+function updInv(i, f, v) { D.inventory[invPd][i][f] = v; scheduleSave(); renderInventory(); }
+
+function invTotal(p) {
+  return (D.inventory[p]||[]).reduce((s, it) => { const a = N(it.price)*N(it.qty); return s + (isNaN(a)?0:a); }, 0);
+}
+
+function toggleCat(cat) { catOpen[cat] = !catOpen[cat]; renderInventory(); }
+function toggleAllCat() {
+  const cats = [...new Set((D.inventory[invPd]||[]).map(it => it.category||'其他'))];
+  const anyOpen = cats.some(c => catOpen[c]);
+  cats.forEach(c => catOpen[c] = !anyOpen);
+  renderInventory();
+}
+
+function renderInventory() {
+  if (!D.inventory) D.inventory = { open: getTemplateItems()(), close: getTemplateItems()() };
+  const items = D.inventory[invPd] || [];
+  const catOrder = ['冷藏冰箱','冷凍/倉庫','茶葉','莊記進口','包裝耗材','其他'];
+  const groups = {};
+  items.forEach((it, i) => {
+    const cat = it.category || '其他';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push({ it, i });
+  });
+  const catColors = {'冷藏冰箱':'#e0f2fe','冷凍/倉庫':'#f0fdf4','茶葉':'#fef9c3','莊記進口':'#fef3c7','包裝耗材':'#f3e8ff','其他':'#f5f5f5'};
+  const catIcons  = {'冷藏冰箱':'🧊','冷凍/倉庫':'❄️','茶葉':'🍵','莊記進口':'📦','包裝耗材':'🛍','其他':'📋'};
+  const allCats = catOrder.filter(c => groups[c]).concat(Object.keys(groups).filter(c => !catOrder.includes(c)));
+
+  let html = '';
+  allCats.forEach(cat => {
+    const entries = groups[cat];
+    const open = !!catOpen[cat];
+    const catTotal = entries.reduce((s, {it}) => { const a = N(it.price)*N(it.qty); return s+(isNaN(a)?0:a); }, 0);
+    const filled = entries.filter(({it}) => N(it.qty) > 0).length;
+    const bg = catColors[cat] || '#f5f5f5';
+    const icon = catIcons[cat] || '📋';
+    html += `<div style="border-bottom:1px solid var(--bd)">
+      <div onclick="toggleCat('${cat}')" style="padding:10px 14px;cursor:pointer;background:${bg};display:flex;align-items:center;justify-content:space-between;user-select:none">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">${icon}</span>
+          <span style="font-weight:700;font-size:13px">${cat}</span>
+          <span style="font-size:11px;color:var(--tx3)">${entries.length}項${filled>0?' · '+filled+'項已填':''}${catTotal>0?' · '+fmt(catTotal):''}</span>
+        </div>
+        <span style="color:var(--tx3)">${open?'▲':'▼'}</span>
+      </div>`;
+    if (open) {
+      html += `<div class="scroll-x"><table class="tbl" style="min-width:500px"><thead><tr>
+        <th style="min-width:120px">品項名稱</th>
+        <th style="min-width:52px">單位</th>
+        <th style="min-width:85px;text-align:right">單價($)</th>
+        <th style="min-width:70px;text-align:right">數量</th>
+        <th style="min-width:90px;text-align:right">小計</th>
+        <th style="min-width:130px">備註</th>
+        <th style="min-width:40px"></th>
+      </tr></thead><tbody>`;
+      entries.forEach(({it, i}) => {
+        const amt = N(it.price)*N(it.qty);
+        const show = it.price && it.qty ? fmt(amt) : '-';
+        html += `<tr>
+          <td style="white-space:nowrap"><input type="text" value="${esc(it.name)}" placeholder="品項名稱" style="min-width:110px" onchange="updInv(${i},'name',this.value)"></td>
+          <td><input type="text" value="${esc(it.unit)}" placeholder="" style="width:48px" onchange="updInv(${i},'unit',this.value)"></td>
+          <td><input type="number" value="${it.price}" placeholder="0.00" step="0.01" style="width:80px" onchange="updInv(${i},'price',this.value)"></td>
+          <td><input type="number" value="${it.qty}" placeholder="0" min="0" step="1" style="width:65px" oninput="this.value=Math.max(0,Math.floor(+this.value||0))" onchange="updInv(${i},'qty',this.value)"></td>
+          <td style="text-align:right;color:var(--tx2);white-space:nowrap">${show}</td>
+          <td><input type="text" value="${esc(it.notes||'')}" placeholder="備註" style="min-width:110px" onchange="updInv(${i},'notes',this.value)"></td>
+          <td><button class="dbtn" onclick="removeInvItem(${i})" title="刪除此品項">✕</button></td>
+        </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+    html += `</div>`;
+  });
+
+  document.getElementById('inv-body').innerHTML = html;
+  document.getElementById('inv-total').textContent = fmt(invTotal(invPd));
+  updateInvMetrics();
+}
+
+function updateInvMetrics() {
+  const open   = invTotal('open');
+  const close  = invTotal('close');
+  const purEx  = (D.purchases||[]).reduce((s,p)=>{ const a=N(p.amt); return s+(p.hasHST?exHST(a):a); }, 0);
+  const cogs   = open + purEx - close;
+  document.getElementById('im-open').textContent = fmt(open);
+  document.getElementById('im-close').textContent = fmt(close);
+  document.getElementById('im-pur').textContent = fmt(purEx);
+  document.getElementById('im-cogs').textContent = fmt(cogs);
+}
+
+// ═══════════════════════════════
+//  採購記錄
+// ═══════════════════════════════
+function addPurchase() {
+  const date   = document.getElementById('pu-date').value;
+  const desc   = document.getElementById('pu-desc').value.trim();
+  const amt    = N(document.getElementById('pu-amt').value);
+  const hasHST = document.getElementById('pu-hst').checked;
+  const note   = document.getElementById('pu-note').value.trim();
+  if (!desc || !amt) { toast('請填寫說明和金額'); return; }
+  if (!D.purchases) D.purchases = [];
+  D.purchases.push({ id: uid(), date, desc, amt, hasHST, note });
+  D.purchases.sort((a, b) => a.date.localeCompare(b.date));
+  scheduleSave(); renderPurchases(); updateInvMetrics();
+  ['pu-desc','pu-amt','pu-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pu-hst').checked = false;
+  toast('採購已新增');
+}
+
+function removePurchase(i) { D.purchases.splice(i, 1); scheduleSave(); renderPurchases(); updateInvMetrics(); }
+
+function renderPurchases() {
+  if (!D.purchases) D.purchases = [];
+  let total=0, food=0, hstTot=0, itc=0;
+  D.purchases.forEach(p => {
+    const a = N(p.amt); total += a;
+    if (p.hasHST) { hstTot += a; itc += hstOf(a); } else { food += a; }
+  });
+  document.getElementById('pm-total').textContent = fmt(total);
+  document.getElementById('pm-food').textContent  = fmt(food);
+  document.getElementById('pm-hst').textContent   = fmt(hstTot);
+  document.getElementById('pm-itc').textContent   = fmt(itc);
+
+  const list = document.getElementById('pur-list');
+  if (!D.purchases.length) { list.innerHTML = '<div class="empty">尚無採購記錄</div>'; return; }
+  let html = `<div class="scroll-x"><table class="tbl" style="min-width:500px"><thead><tr>
+    <th style="min-width:90px">日期</th><th style="min-width:130px">說明</th><th style="text-align:right">金額</th>
+    <th style="text-align:center">HST</th><th style="text-align:right">ITC</th><th>備註</th><th></th>
+  </tr></thead><tbody>`;
+  D.purchases.forEach((p, i) => {
+    const itcAmt = p.hasHST ? hstOf(N(p.amt)) : 0;
+    html += `<tr>
+      <td style="color:var(--tx2);white-space:nowrap">${p.date||'-'}</td>
+      <td>${esc(p.desc)}</td>
+      <td style="text-align:right;font-weight:700">${fmt(N(p.amt))}</td>
+      <td style="text-align:center">${p.hasHST?'<span class="tag to">有HST</span>':'<span class="tag tgr">免稅</span>'}</td>
+      <td style="text-align:right;color:var(--bl)">${p.hasHST?fmt(itcAmt):'-'}</td>
+      <td style="font-size:12px;color:var(--tx3)">${esc(p.note||'')}</td>
+      <td><button class="dbtn" onclick="removePurchase(${i})">✕</button></td>
+    </tr>`;
+  });
+  list.innerHTML = html + '</tbody></table></div>';
+}
+
+// ═══════════════════════════════
+//  費用管理
+// ═══════════════════════════════
+function getFixedData() {
+  const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
+  const rentEx   = netSales < C.RENT_THRESHOLD ? C.RENT_BASE_EX : netSales * C.RENT_PCT;
+  const royalty  = netSales * C.ROYALTY;
+  const rows = [
+    { label:'租金', ex:rentEx, hst:rentEx*C.HST, note: netSales>=C.RENT_THRESHOLD?'業績≥$20,000，按5%計算':'固定$1,000未稅' },
+    { label:'電冰箱承租', ex:C.FRIDGE_EX, hst:C.FRIDGE_EX*C.HST, note:'' },
+    { label:'停車費', ex:exHST(C.PARKING_INC), hst:hstOf(C.PARKING_INC), note:'含稅$190' },
+    { label:'網路費', ex:C.INTERNET_EX, hst:C.INTERNET_EX*C.HST, note:'' },
+    { label:'門店保費', ex:exHST(C.INSURANCE_INC), hst:hstOf(C.INSURANCE_INC), note:'含稅$176' },
+    { label:'銀行手續費', ex:C.BANK_FEE, hst:0, note:'金融服務免HST' },
+    { label:'POS 系統費', ex:exHST(C.POS_SYS_INC), hst:hstOf(C.POS_SYS_INC), note:'含稅$202' },
+    { label:'🏷 品牌權利金 5%', ex:royalty, hst:0, note:'Net Sales×5%，自動計算', isRoyalty:true },
+  ];
+  const totalEx  = rows.reduce((s,r) => s+r.ex, 0);
+  const totalITC = rows.reduce((s,r) => s+r.hst, 0);
+  const rentExtraInc = netSales>=C.RENT_THRESHOLD ? (netSales*C.RENT_PCT - C.RENT_BASE_EX)*1.13 : 0;
+  return { rows, totalEx, totalITC, rentEx, royalty, rentExtraInc };
+}
+
+function renderFixedExpenses() {
+  const { rows, totalEx, totalITC } = getFixedData();
+  let html = '';
+  rows.forEach(r => {
+    html += `<tr style="${r.isRoyalty?'background:#fff8ed;':''}">
+      <td style="white-space:nowrap;${r.isRoyalty?'color:var(--or);font-weight:700;':''}">${r.label}</td>
+      <td style="text-align:right;${r.isRoyalty?'color:var(--or);font-weight:700;':''}">${fmt(r.ex)}</td>
+      <td style="text-align:right;color:var(--bl)">${r.hst>0?fmt(r.hst):'-'}</td>
+      <td style="text-align:right;font-weight:700">${fmt(r.ex+r.hst)}</td>
+      <td style="font-size:12px;color:var(--tx3);white-space:nowrap">${r.note}</td>
+    </tr>`;
+  });
+  html += `<tr style="font-weight:700;background:var(--sf2)">
+    <td>合計</td><td style="text-align:right">${fmt(totalEx)}</td>
+    <td style="text-align:right;color:var(--bl)">${fmt(totalITC)}</td>
+    <td style="text-align:right">${fmt(totalEx+totalITC)}</td><td></td>
+  </tr>`;
+  document.getElementById('fixed-body').innerHTML = html;
+
+  const staffTot = (D.staff||[]).reduce((s,x) => s+N(x.amt), 0);
+  const miscEx   = (D.misc||[]).reduce((s,x) => s+(x.hasHST?exHST(N(x.amt)):N(x.amt)), 0);
+  const miscITC  = (D.misc||[]).reduce((s,x) => s+(x.hasHST?hstOf(N(x.amt)):0), 0);
+  document.getElementById('em-fixed').textContent = fmt(totalEx);
+  document.getElementById('em-staff').textContent = fmt(staffTot);
+  document.getElementById('em-misc').textContent  = fmt(miscEx);
+  document.getElementById('em-itc').textContent   = fmt(totalITC + miscITC);
+}
+
+function addStaff() {
+  const desc = document.getElementById('st-desc').value.trim() || '人事費用';
+  const amt  = N(document.getElementById('st-amt').value);
+  if (!amt) { toast('請填寫金額'); return; }
+  if (!D.staff) D.staff = [];
+  D.staff.push({ id: uid(), desc, amt });
+  scheduleSave(); renderStaff();
+  document.getElementById('st-desc').value = '';
+  document.getElementById('st-amt').value  = '';
+}
+function removeStaff(i) { D.staff.splice(i, 1); scheduleSave(); renderStaff(); }
+function renderStaff() {
+  const total = (D.staff||[]).reduce((s,x) => s+N(x.amt), 0);
+  if (!(D.staff||[]).length) { document.getElementById('staff-list').innerHTML = '<div class="empty">尚無人事費用</div>'; }
+  else {
+    let html = '<div style="overflow-x:auto"><table class="tbl"><tbody>';
+    D.staff.forEach((x,i) => {
+      html += `<tr><td>${esc(x.desc)}</td><td style="text-align:right;font-weight:700">${fmt(N(x.amt))}</td><td><button class="dbtn" onclick="removeStaff(${i})">✕</button></td></tr>`;
+    });
+    document.getElementById('staff-list').innerHTML = html + '</tbody></table></div>';
+  }
+  document.getElementById('staff-total').textContent = fmt(total);
+  renderFixedExpenses();
+}
+
+function addMisc() {
+  const desc   = document.getElementById('mx-desc').value.trim();
+  const amt    = N(document.getElementById('mx-amt').value);
+  const hasHST = document.getElementById('mx-hst').checked;
+  if (!desc || !amt) { toast('請填寫說明和金額'); return; }
+  if (!D.misc) D.misc = [];
+  D.misc.push({ id: uid(), desc, amt, hasHST });
+  scheduleSave(); renderMisc();
+  document.getElementById('mx-desc').value = '';
+  document.getElementById('mx-amt').value  = '';
+  document.getElementById('mx-hst').checked = false;
+}
+function removeMisc(i) { D.misc.splice(i, 1); scheduleSave(); renderMisc(); }
+function renderMisc() {
+  const totalEx = (D.misc||[]).reduce((s,x) => s+(x.hasHST?exHST(N(x.amt)):N(x.amt)), 0);
+  if (!(D.misc||[]).length) { document.getElementById('misc-list').innerHTML = '<div class="empty">尚無雜支記錄</div>'; }
+  else {
+    let html = '<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>說明</th><th style="text-align:right">金額</th><th style="text-align:center">HST</th><th style="text-align:right">未稅</th><th></th></tr></thead><tbody>';
+    D.misc.forEach((x,i) => {
+      const ex = x.hasHST ? exHST(N(x.amt)) : N(x.amt);
+      html += `<tr><td>${esc(x.desc)}</td><td style="text-align:right">${fmt(N(x.amt))}</td><td style="text-align:center">${x.hasHST?'<span class="tag to">有</span>':'<span class="tag tgr">無</span>'}</td><td style="text-align:right;font-weight:700">${fmt(ex)}</td><td><button class="dbtn" onclick="removeMisc(${i})">✕</button></td></tr>`;
+    });
+    document.getElementById('misc-list').innerHTML = html + '</tbody></table></div>';
+  }
+  document.getElementById('misc-total').textContent = fmt(totalEx);
+  renderFixedExpenses();
+}
+
+// ═══════════════════════════════
+//  月度報表
+// ═══════════════════════════════
+
+// ═══════════════════════════════
+//  匯出 PDF
+// ═══════════════════════════════
+function exportPDF() {
+  buildReport();
+  const [yr, mo] = curMonth.split('-');
+  const title = yr + '年' + parseInt(mo) + '月 — Mister Wheel 月度報表';
+
+  // 取得所有數據
+  const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
+  const hstColl  = (D.revenues||[]).reduce((s,r) => s+N(r.tax), 0);
+  const posFees  = (D.revenues||[]).reduce((s,r) => s+N(r.pos)*C.POS_FEE, 0);
+  const onlFees  = (D.revenues||[]).reduce((s,r) => s+N(r.onl)*C.ONLINE_FEE, 0);
+  const net2     = netSales - posFees - onlFees;
+  const openInv  = invTotal('open');
+  const closeInv = invTotal('close');
+  const purEx    = (D.purchases||[]).reduce((s,p) => { const a=N(p.amt); return s+(p.hasHST?exHST(a):a); }, 0);
+  const cogs     = openInv + purEx - closeInv;
+  const { totalEx:fixedEx, totalITC:fixedITC, rentEx, royalty, rentExtraInc } = getFixedData();
+  const staffTot = (D.staff||[]).reduce((s,x) => s+N(x.amt), 0);
+  const miscEx   = (D.misc||[]).reduce((s,x) => s+(x.hasHST?exHST(N(x.amt)):N(x.amt)), 0);
+  const miscITC  = (D.misc||[]).reduce((s,x) => s+(x.hasHST?hstOf(N(x.amt)):0), 0);
+  const purITC   = (D.purchases||[]).reduce((s,p) => s+(p.hasHST?hstOf(N(p.amt)):0), 0);
+  const totExpEx = fixedEx - royalty + staffTot + miscEx;
+  const opProfit = net2 - cogs - totExpEx;
+  const netProfit= opProfit - royalty;
+  const hstNet   = hstColl - fixedITC - miscITC - purITC;
+  const days     = (D.revenues||[]).length;
+
+  const pnl = (label, val, type='', indent=false) => {
+    const color = type==='pos'?'#2a7a46':type==='neg'?'#c03030':type==='sub'?'#7a6852':'#2a2010';
+    const weight = type===''||type==='pos'||type==='neg' ? '600' : '400';
+    const pl = indent ? '20px' : '0';
+    return `<tr>
+      <td style="padding:5px 0 5px ${pl};color:${color};font-weight:${weight};font-size:13px">${label}</td>
+      <td style="text-align:right;padding:5px 0;color:${color};font-weight:${weight};font-size:13px;font-variant-numeric:tabular-nums">${val}</td>
+    </tr>`;
+  };
+  const divider = `<tr><td colspan="2"><div style="height:1px;background:#e5ddd0;margin:4px 0"></div></td></tr>`;
+  const spacer  = `<tr><td colspan="2" style="height:6px"></td></tr>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<style>
+  @page { margin: 15mm 18mm; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;color:#2a2010;font-size:13px;line-height:1.6;background:#fff;}
+  .page{max-width:680px;margin:0 auto;}
+  .hdr{border-bottom:3px solid #c47820;padding-bottom:12px;margin-bottom:20px;}
+  .logo{font-size:22px;font-weight:700;color:#c47820;margin-bottom:2px;}
+  .sub{font-size:12px;color:#7a6852;}
+  .period{font-size:15px;font-weight:700;color:#2a2010;}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+  .kpi{background:#faf8f4;border:1px solid #e5ddd0;border-radius:8px;padding:10px 12px;}
+  .kpi-l{font-size:10px;font-weight:700;color:#7a6852;letter-spacing:.5px;margin-bottom:3px;}
+  .kpi-v{font-size:18px;font-weight:700;}
+  .g{color:#2a7a46;}.r{color:#c03030;}.o{color:#d08010;}.b{color:#1a5fa8;}
+  .section{margin-bottom:18px;}
+  .sec-title{font-size:11px;font-weight:700;color:#7a6852;letter-spacing:1px;padding:6px 0;border-bottom:2px solid #c47820;margin-bottom:8px;}
+  table{width:100%;border-collapse:collapse;}
+  .rsv{background:#fffaee;border:1.5px solid #f0d060;border-radius:8px;padding:14px;margin-bottom:18px;}
+  .rsv-t{font-size:12px;font-weight:700;color:#d08010;margin-bottom:8px;}
+  .rsv-r{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid #f0e090;}
+  .rsv-r:last-of-type{border-bottom:none;}
+  .rsv-tot{display:flex;justify-content:space-between;padding-top:8px;margin-top:6px;border-top:2px solid #e0c040;font-weight:700;font-size:14px;}
+  .footer{text-align:center;font-size:10px;color:#a89070;border-top:1px solid #e5ddd0;padding-top:10px;margin-top:20px;}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hdr">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <div class="logo">🥐 Mister Wheel</div>
+        <div class="sub">Ontario, Canada · 月度營運報表</div>
+      </div>
+      <div style="text-align:right">
+        <div class="period">${yr}年${parseInt(mo)}月</div>
+        <div class="sub">報表日期：${new Date().toLocaleDateString('zh-TW')} · 已記錄 ${days} 天</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="kpi"><div class="kpi-l">NET SALES</div><div class="kpi-v g">${fmt(netSales)}</div></div>
+    <div class="kpi"><div class="kpi-l">費用合計</div><div class="kpi-v r">${fmt(totExpEx)}</div></div>
+    <div class="kpi"><div class="kpi-l">本月淨利</div><div class="kpi-v ${netProfit>=0?'g':'r'}">${fmt(netProfit)}</div></div>
+    <div class="kpi"><div class="kpi-l">HST 代收</div><div class="kpi-v o">${fmt(hstColl)}</div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">損益明細</div>
+    <table>
+      ${pnl('未稅 Net Sales', fmt(netSales), 'pos')}
+      ${pnl('（－）POS 手續費 0.5%', fmt(posFees), 'sub', true)}
+      ${pnl('（－）Online 手續費 2%', fmt(onlFees), 'sub', true)}
+      ${divider}
+      ${pnl('＝ 扣費後淨收入', fmt(net2))}
+      ${spacer}
+      ${pnl('（－）原料耗用成本', '', 'sub')}
+      ${pnl('月初庫存', fmt(openInv), 'sub', true)}
+      ${pnl('＋ 採購（未稅）', fmt(purEx), 'sub', true)}
+      ${pnl('－ 月末庫存', fmt(closeInv), 'sub', true)}
+      ${divider}
+      ${pnl('＝ 原料耗用', fmt(cogs), 'neg')}
+      ${spacer}
+      ${pnl('（－）費用支出', '', 'sub')}
+      ${pnl('租金', fmt(rentEx), 'sub', true)}
+      ${pnl('人事費用', fmt(staffTot), 'sub', true)}
+      ${pnl('電冰箱承租', '$50.00', 'sub', true)}
+      ${pnl('停車費（未稅）', '$168.14', 'sub', true)}
+      ${pnl('網路費', '$40.00', 'sub', true)}
+      ${pnl('門店保費（未稅）', '$155.75', 'sub', true)}
+      ${pnl('銀行手續費', '$10.00', 'sub', true)}
+      ${pnl('POS 系統費（未稅）', '$178.76', 'sub', true)}
+      ${pnl('雜支（未稅）', fmt(miscEx), 'sub', true)}
+      ${divider}
+      ${pnl('＝ 費用合計', fmt(totExpEx), 'neg')}
+      ${spacer}
+      ${pnl('營業利潤', fmt(opProfit), opProfit>=0?'pos':'neg')}
+      ${pnl('（－）5% 品牌權利金', fmt(royalty), 'sub', true)}
+      ${divider}
+      <tr><td style="padding:8px 0;font-size:16px;font-weight:700;color:${netProfit>=0?'#2a7a46':'#c03030'}">本月淨利（虧損）</td>
+          <td style="text-align:right;padding:8px 0;font-size:16px;font-weight:700;color:${netProfit>=0?'#2a7a46':'#c03030'};font-variant-numeric:tabular-nums">${fmt(netProfit)}</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">HST 稅務對賬</div>
+    <table>
+      ${pnl('客戶 HST 代收', fmt(hstColl), 'pos')}
+      ${pnl('（－）採購 ITC', fmt(purITC), 'sub', true)}
+      ${pnl('（－）固定費用 ITC', fmt(fixedITC), 'sub', true)}
+      ${pnl('（－）雜支 ITC', fmt(miscITC), 'sub', true)}
+      ${divider}
+      ${pnl('＝ 應交 CRA 淨 HST', fmt(hstNet), 'neg')}
+    </table>
+  </div>
+
+  <div class="rsv">
+    <div class="rsv-t">⚠️ 本月應預留款項（請轉入專用帳戶）</div>
+    <div class="rsv-r"><span>HST 應交 CRA</span><span style="font-weight:700">${fmt(hstNet)}</span></div>
+    <div class="rsv-r"><span>5% 品牌權利金</span><span style="font-weight:700">${fmt(royalty)}</span></div>
+    ${rentExtraInc>0 ? `<div class="rsv-r"><span>🏠 租金補繳（業績超 $20,000）</span><span style="font-weight:700;color:#c03030">${fmt(rentExtraInc)}</span></div>` : ''}
+    <div class="rsv-tot"><span>合計需預留</span><span style="color:#d08010">${fmt(hstNet+royalty+rentExtraInc)}</span></div>
+  </div>
+
+  <div class="footer">
+    此報表由 Mister Wheel 帳本自動生成 · ${new Date().toLocaleString('zh-TW')}
+  </div>
+</div>
+<script>window.onload=function(){window.print();}<\/script>
+</body>
+</html>`;
+
+  // iOS Safari 相容：用 Blob + Object URL 開啟
+  try {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.target   = '_blank';
+    a.rel      = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch(e) {
+    // 降級方案：直接用 data URL
+    const encoded = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+    window.location.href = encoded;
+  }
+}
+
+function buildReport() {
+  const [yr,mo] = curMonth.split('-');
+  document.getElementById('rpt-title').textContent = yr+'年'+parseInt(mo)+'月 損益報表';
+
+  const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
+  const hstColl  = (D.revenues||[]).reduce((s,r) => s+N(r.tax), 0);
+  const posFees  = (D.revenues||[]).reduce((s,r) => s+N(r.pos)*C.POS_FEE, 0);
+  const onlFees  = (D.revenues||[]).reduce((s,r) => s+N(r.onl)*C.ONLINE_FEE, 0);
+  const totFees  = posFees + onlFees;
+  const net2     = netSales - totFees;
+
+  const openInv  = invTotal('open');
+  const closeInv = invTotal('close');
+  const purEx    = (D.purchases||[]).reduce((s,p) => { const a=N(p.amt); return s+(p.hasHST?exHST(a):a); }, 0);
+  const cogs     = openInv + purEx - closeInv;
+
+  const { rows, totalEx:fixedEx, totalITC:fixedITC, rentEx, royalty, rentExtraInc } = getFixedData();
+  const staffTot = (D.staff||[]).reduce((s,x) => s+N(x.amt), 0);
+  const miscEx   = (D.misc||[]).reduce((s,x) => s+(x.hasHST?exHST(N(x.amt)):N(x.amt)), 0);
+  const miscITC  = (D.misc||[]).reduce((s,x) => s+(x.hasHST?hstOf(N(x.amt)):0), 0);
+  const purITC   = (D.purchases||[]).reduce((s,p) => s+(p.hasHST?hstOf(N(p.amt)):0), 0);
+
+  // 費用合計（不含權利金）
+  const totExpEx = fixedEx - royalty + staffTot + miscEx;
+  const opProfit = net2 - cogs - totExpEx;
+  const netProfit= opProfit - royalty;
+  const totITC   = fixedITC + miscITC + purITC;
+  const hstNet   = hstColl - totITC;
+
+  s2('rpt-rev',    fmt(netSales), 'mv g');
+  s2('rpt-cogs',   fmt(cogs),    'mv r');
+  s2('rpt-exp',    fmt(totExpEx),'mv r');
+  s2('rpt-profit', fmt(netProfit), 'mv '+(netProfit>=0?'g':'r'));
+
+  sv('d-rev',      fmt(netSales),    'rn rpos');
+  sv('d-pos-fee',  fmt(posFees),     'rn rneg');
+  sv('d-online-fee',fmt(onlFees),    'rn rneg');
+  sv('d-net2',     fmt(net2),        'rn '+(net2>=0?'rpos':'rneg'));
+  sv('d-open',     fmt(openInv),     'rn');
+  sv('d-pur',      fmt(purEx),       'rn');
+  sv('d-close',    fmt(closeInv),    'rn');
+  sv('d-cogs',     fmt(cogs),        'rn rneg');
+  sv('d-rent',     fmt(rentEx),      'rn');
+  sv('d-staff2',   fmt(staffTot),    'rn');
+  sv('d-misc',     fmt(miscEx),      'rn');
+  sv('d-exp',      fmt(totExpEx),    'rn rneg');
+  sv('d-op',       fmt(opProfit),    'rn '+(opProfit>=0?'rpos':'rneg'));
+  sv('d-roy',      fmt(royalty),     'rn rneg');
+  sv('d-profit',   fmt(netProfit),   'rn '+(netProfit>=0?'rpos':'rneg'));
+  sv('d-hst-c',    fmt(hstColl),     'rn rpos');
+  sv('d-itc-pur',  fmt(purITC),      'rn');
+  sv('d-itc-fix',  fmt(fixedITC),    'rn');
+  sv('d-itc-misc', fmt(miscITC),     'rn');
+  sv('d-hst-net',  fmt(hstNet),      'rn rneg');
+
+  sv('rsv-hst',    fmt(hstNet),      'rn bold');
+  sv('rsv-roy',    fmt(royalty),     'rn bold');
+  const rentRow = document.getElementById('rsv-rent-row');
+  if (rentExtraInc > 0) {
+    rentRow.style.display = 'flex';
+    sv('rsv-rent-extra', fmt(rentExtraInc), 'rn bold r');
+  } else { rentRow.style.display = 'none'; }
+  sv('rsv-total', fmt(hstNet + royalty + rentExtraInc), 'rn o');
+}
+
+// ═══════════════════════════════
+//  銀行帳目
+// ═══════════════════════════════
+function parseBankPaste() {
+  const raw = document.getElementById('bk-paste').value.trim();
+  if (!raw) { toast('請先貼上交易文字'); return; }
+  let date = '';
+  const dm = raw.match(/([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})|(\d{4}[-\/]\d{1,2}[-\/]\d{1,2})/);
+  if (dm) { const p = new Date(dm[0]); if (!isNaN(p)) date = p.getFullYear()+'-'+String(p.getMonth()+1).padStart(2,'0')+'-'+String(p.getDate()).padStart(2,'0'); }
+  const nums = [...raw.matchAll(/\$?([\d,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(/,/g,'')));
+  const bal = nums.length > 0 ? nums[nums.length-1] : 0;
+  const txAmt = nums.length > 1 ? nums[nums.length-2] : (nums.length===1 ? nums[0] : 0);
+  const isWd = /withdraw|payment|costco|chuangs|e-tfr|send|metro|frills|freshway|kingleke|travelers|snappydebit/i.test(raw);
+  let desc = raw.replace(/([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})|(\d{4}[-\/]\d{1,2}[-\/]\d{1,2})/g,'').replace(/\$?([\d,]+\.\d{2})/g,'').replace(/\s+/g,' ').trim();
+  document.getElementById('bk-date').value = date || document.getElementById('bk-date').value;
+  document.getElementById('bk-desc').value = desc;
+  document.getElementById('bk-dep').value  = isWd ? '' : (txAmt||'');
+  document.getElementById('bk-wd').value   = isWd ? (txAmt||'') : '';
+  document.getElementById('bk-bal').value  = bal || '';
+  document.getElementById('bk-paste').value = '';
+  toast('✅ 已解析，請確認後按＋新增');
+}
+
+function addBank() {
+  const date = document.getElementById('bk-date').value;
+  const desc = document.getElementById('bk-desc').value.trim();
+  const dep  = N(document.getElementById('bk-dep').value);
+  const wd   = N(document.getElementById('bk-wd').value);
+  const bal  = document.getElementById('bk-bal').value;
+  const note = document.getElementById('bk-note').value.trim();
+  if (!desc) { toast('請填寫交易描述'); return; }
+  if (!dep && !wd) { toast('請填寫存入或支出金額'); return; }
+  if (!D.bank) D.bank = [];
+  D.bank.push({ id: uid(), date, desc, dep, wd, bal: bal||'', note });
+  D.bank.sort((a,b) => a.date.localeCompare(b.date));
+  scheduleSave(); renderBank();
+  ['bk-desc','bk-dep','bk-wd','bk-bal','bk-note'].forEach(id => document.getElementById(id).value = '');
+  toast('已新增');
+}
+
+function removeBank(i) { D.bank.splice(i,1); scheduleSave(); renderBank(); }
+
+function renderBank() {
+  if (!D.bank) D.bank = [];
+  const totDep = D.bank.reduce((s,x) => s+N(x.dep), 0);
+  const totWd  = D.bank.reduce((s,x) => s+N(x.wd), 0);
+  const net    = totDep - totWd;
+  const lastBal = [...D.bank].reverse().find(x => x.bal);
+  document.getElementById('bm-dep').textContent = fmt(totDep);
+  document.getElementById('bm-wd').textContent  = fmt(totWd);
+  s2('bm-net', fmt(net), 'mv '+(net>=0?'g':'r'));
+  document.getElementById('bm-bal').textContent = lastBal ? '$'+parseFloat(lastBal.bal).toLocaleString('en',{minimumFractionDigits:2}) : '-';
+
+  const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
+  const hstColl  = (D.revenues||[]).reduce((s,r) => s+N(r.tax), 0);
+  const rec = document.getElementById('bank-reconcile');
+  if (D.bank.length > 0) {
+    const diff = totDep - (netSales + hstColl);
+    rec.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="mc"><div class="ml">帳本 Net Sales + HST</div><div class="mv sm">${fmt(netSales+hstColl)}</div></div>
+      <div class="mc"><div class="ml">銀行存入合計</div><div class="mv sm">${fmt(totDep)}</div></div>
+      <div class="mc"><div class="ml">差異（存入 — 帳本收入）</div><div class="mv ${Math.abs(diff)<1?'g':'r'} sm">${diff>=0?'+':''}${fmt(diff)}</div></div>
+      <div class="mc"><div class="ml">銀行支出合計</div><div class="mv r sm">${fmt(totWd)}</div></div>
+    </div>
+    <div class="sm muted" style="margin-top:8px">💡 差異在 $1 以內屬正常（四捨五入）。差異較大請逐筆核對備註。</div>`;
+  } else { rec.innerHTML = '<div class="sm muted">輸入交易後自動顯示核對結果</div>'; }
+
+  const list = document.getElementById('bank-list');
+  if (!D.bank.length) { list.innerHTML = '<div class="empty">尚無銀行交易記錄</div>'; return; }
+  let html = `<div class="scroll-x"><table class="tbl" style="min-width:500px"><thead><tr>
+    <th style="min-width:90px">日期</th><th style="min-width:130px">描述</th><th style="text-align:right">存入</th>
+    <th style="text-align:right">支出</th><th style="text-align:right">餘額</th><th>備註</th><th></th>
+  </tr></thead><tbody>`;
+  D.bank.forEach((x,i) => {
+    html += `<tr>
+      <td style="color:var(--tx2);white-space:nowrap">${x.date||'-'}</td>
+      <td style="font-size:12px">${esc(x.desc)}</td>
+      <td style="text-align:right;color:var(--gn);font-weight:${x.dep?'700':'400'}">${x.dep?fmt(x.dep):'-'}</td>
+      <td style="text-align:right;color:var(--rd);font-weight:${x.wd?'700':'400'}">${x.wd?fmt(x.wd):'-'}</td>
+      <td style="text-align:right;color:var(--bl)">${x.bal?'$'+parseFloat(x.bal).toLocaleString('en',{minimumFractionDigits:2}):'-'}</td>
+      <td style="font-size:12px;color:var(--tx3)">${esc(x.note||'')}</td>
+      <td><button class="dbtn" onclick="removeBank(${i})">✕</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  list.innerHTML = html;
+}
+
+// ═══════════════════════════════
+//  設定
+// ═══════════════════════════════
+function showSetup() {
+  document.getElementById('cfg-url').value = CFG.url||'';
+  document.getElementById('setupOvl').style.display = 'flex';
+}
+function saveConfig() {
+  CFG.url = document.getElementById('cfg-url').value.trim();
+  saveCFG();
+  document.getElementById('setupOvl').style.display = 'none';
+  if (CFG.url) syncDown().then(() => renderAll());
+  toast('設定已儲存');
+}
+function skipSetup() {
+  document.getElementById('setupOvl').style.display = 'none';
+  toast('本機儲存模式');
+}
+
+// ═══════════════════════════════
+//  工具函式
+// ═══════════════════════════════
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2500);
+}
+function sv(id, txt, cls='') { const el=document.getElementById(id); if(el){el.textContent=txt;el.className=cls;} }
+function s2(id, txt, cls='') { const el=document.getElementById(id); if(el){el.textContent=txt;el.className=cls;} }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderAll() {
+  renderRevenue();
+  setInvPeriod(invPd);
+  renderPurchases();
+  renderStaff();
+  renderMisc();
+  renderFixedExpenses();
+  renderBank();
+}
+
+// ═══════════════════════════════
+//  初始化
+// ═══════════════════════════════
+function init() {
+  loadCFG();
+  initMonthSel();
+  loadLocal();
+  renderAll();
+  const today = new Date().toISOString().split('T')[0];
+  ['r-date','pu-date','bk-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
+  if (!CFG.url) {
+    document.getElementById('setupOvl').style.display = 'flex';
+  } else {
+    document.getElementById('setupOvl').style.display = 'none';
+    syncDown().then(() => renderAll());
+  }
+}
+
+init();
+</script>
+</body>
+</html>
