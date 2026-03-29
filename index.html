@@ -72,6 +72,7 @@ select.fi{cursor:pointer;}
 .bs{background:var(--sf2);color:var(--tx2);border:1px solid var(--bd2);}.bs:hover{background:var(--bd);color:var(--tx);}
 .bsm{padding:5px 10px;font-size:12px;}
 .dbtn{background:none;border:none;color:var(--tx3);cursor:pointer;padding:3px 7px;border-radius:4px;font-size:15px;line-height:1;}
+[onclick]{cursor:pointer;touch-action:manipulation;}
 .dbtn:hover{color:var(--rd);background:var(--rdb);}
 .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
 .tg{background:var(--gnb);color:var(--gn);}
@@ -189,7 +190,7 @@ select.fi{cursor:pointer;}
 <!-- ═══ PAGE 1: 庫存盤點 ═══ -->
 <div class="pg" id="p1">
   <div class="al ali">月初填「月初庫存」，月末盤點後填「月末庫存」。耗用成本 ＝ 月初 ＋ 採購（未稅）－ 月末。</div>
-  <div style="display:flex;gap:8px;margin-bottom:12px">
+  <div style="display:flex;gap:8px;margin-bottom:12px;touch-action:manipulation">
     <button class="btn fw" id="ibt-o" onclick="setInvPeriod('open')">月初庫存</button>
     <button class="btn bs fw" id="ibt-c" onclick="setInvPeriod('close')">月末庫存</button>
   </div>
@@ -773,7 +774,7 @@ function renderInventory() {
     const bg = catColors[cat] || '#f5f5f5';
     const icon = catIcons[cat] || '📋';
     html += `<div style="border-bottom:1px solid var(--bd)">
-      <div onclick="toggleCat('${cat}')" style="padding:10px 14px;cursor:pointer;background:${bg};display:flex;align-items:center;justify-content:space-between;user-select:none">
+      <div onclick="toggleCat('${cat}')" style="padding:10px 14px;cursor:pointer;background:${bg};display:flex;align-items:center;justify-content:space-between;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:16px">${icon}</span>
           <span style="font-weight:700;font-size:13px">${cat}</span>
