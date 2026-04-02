@@ -136,7 +136,7 @@ select.fi{cursor:pointer;}
   <div class="logo">🥐 Mister Wheel</div>
   <div class="hdr-r">
     <select class="fi" id="monthSel" style="padding:4px 8px;font-size:13px" onchange="onMonthChange()"></select>
-    <div class="dot" id="syncDot" title="同步狀態"></div>
+    <button class="btn bs bsm" id="saveBtn" onclick="manualSave()" style="font-size:12px">☁ 儲存</button>
     <button class="btn bs bsm" onclick="showSetup()">⚙</button>
   </div>
 </div>
@@ -546,6 +546,33 @@ function loadCFG() {
 // ═══════════════════════════════
 let syncTmr = null;
 function scheduleSave() { saveLocal(); clearTimeout(syncTmr); syncTmr = setTimeout(syncUp, 2500); }
+
+async function manualSave() {
+  const btn = document.getElementById('saveBtn');
+  if (!CFG.url) { toast('請先在 ⚙ 設定中填入 Google Sheets 網址'); return; }
+  btn.textContent = '⏳ 同步中...';
+  btn.style.color = 'var(--or)';
+  btn.disabled = true;
+  saveLocal();
+  try {
+    const r = await fetch(CFG.url, { method:'POST', body:JSON.stringify({ action:'saveMonth', month:curMonth, data:D }) });
+    const j = await r.json();
+    if (j.ok) {
+      btn.textContent = '✅ OK';
+      btn.style.color = 'var(--gn)';
+      setDot('ok');
+    } else { throw new Error(j.error); }
+  } catch(e) {
+    btn.textContent = '❌ 失敗';
+    btn.style.color = 'var(--rd)';
+    setDot('err');
+  }
+  btn.disabled = false;
+  setTimeout(() => {
+    btn.textContent = '☁ 儲存';
+    btn.style.color = '';
+  }, 2500);
+}
 
 async function syncUp() {
   if (!CFG.url) return;
