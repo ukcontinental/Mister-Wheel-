@@ -605,6 +605,7 @@ async function syncDown() {
 
 function setDot(s) {
   const el = document.getElementById('syncDot');
+  if (!el) return;
   el.className = 'dot ' + s;
   el.title = { ok: '已同步', saving: '同步中...', err: '同步失敗（本地已儲存）' }[s] || '';
 }
