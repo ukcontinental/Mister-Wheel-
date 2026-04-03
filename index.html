@@ -18,8 +18,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--tx);font-family:'Noto Sans TC',system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;}
-.ovl{position:fixed;inset:0;z-index:300;background:rgba(42,32,16,.82);display:flex;align-items:center;justify-content:center;padding:16px;-webkit-overflow-scrolling:touch;}
-.setup-box{background:var(--sf);border-radius:14px;padding:24px 20px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.ovl{position:fixed;inset:0;z-index:300;background:rgba(42,32,16,.82);display:flex;align-items:center;justify-content:center;padding:16px;}
+.setup-box{background:var(--sf);border-radius:14px;padding:24px 20px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;}
 .setup-box h2{font-size:19px;color:var(--ac);margin-bottom:6px;}
 .step-box{background:var(--sf2);border-radius:var(--rs);padding:11px 14px;font-size:12.5px;color:var(--tx2);line-height:2;margin:10px 0;}
 .step-box b{color:var(--tx);}
@@ -124,14 +124,11 @@ select.fi{cursor:pointer;}
       &nbsp;&nbsp;類型：網路應用程式 / 執行身分：我 / 存取：所有人<br>
       5. 部署 → 授權 → 複製網址貼到上方
     </div>
-    <button class="btn bp fw" id="btn-confirm" onclick="saveConfig()">確認，開始使用 →</button>
+    <button class="btn bp fw" onclick="saveConfig()">確認，開始使用 →</button>
     <div style="text-align:center;margin-top:10px">
-      <button class="btn bs fw" id="btn-skip" style="margin-top:4px" onclick="skipSetup()">暫時跳過，使用本機儲存</button>
+      <span class="sm muted" style="cursor:pointer;text-decoration:underline" onclick="skipSetup()">暫時跳過，使用本機儲存</span>
     </div>
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
-      <div class="sm muted" style="margin-bottom:8px;text-align:center">⚠️ 清除本機資料後從 Sheets 重新載入</div>
-      <button class="btn bs fw" id="btn-clear" style="color:var(--rd);border-color:var(--rd)" onclick="clearAndReload()">🗑 清除本月本機資料，重新從 Sheets 載入</button>
-    </div>
+
   </div>
 </div>
 
@@ -1363,11 +1360,7 @@ function saveConfig() {
   saveCFG();
   document.getElementById('setupOvl').style.display = 'none';
   toast('設定已儲存');
-  if (CFG.url) {
-    setTimeout(() => {
-      syncDown().then(() => renderAll()).catch(() => {});
-    }, 300);
-  }
+  if (CFG.url) syncDown().then(() => renderAll()).catch(() => {});
 }
 function skipSetup() {
   document.getElementById('setupOvl').style.display = 'none';
@@ -1398,24 +1391,6 @@ function renderAll() {
 }
 
 // ═══════════════════════════════
-//  清除本月資料並重新載入
-// ═══════════════════════════════
-function clearAndReload() {
-  if (!confirm('確定要清除「' + curMonth + '」的本機資料並從 Google Sheets 重新載入？
-
-此動作無法復原！')) return;
-  localStorage.removeItem(lsKey(curMonth));
-  document.getElementById('setupOvl').style.display = 'none';
-  D = blankData();
-  renderAll();
-  if (CFG.url) {
-    syncDown().then(() => { renderAll(); toast('✅ 已從 Sheets 重新載入'); });
-  } else {
-    toast('已清除本機資料');
-  }
-}
-
-// ═══════════════════════════════
 //  初始化
 // ═══════════════════════════════
 function init() {
@@ -1425,20 +1400,12 @@ function init() {
   renderAll();
   const today = new Date().toISOString().split('T')[0];
   ['r-date','pu-date','bk-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
-  document.getElementById('setupOvl').style.display = 'none';
-  if (CFG.url) {
+  if (!CFG.url) {
+    document.getElementById('setupOvl').style.display = 'flex';
+  } else {
+    document.getElementById('setupOvl').style.display = 'none';
     syncDown().then(() => renderAll()).catch(() => {});
   }
-  // Safari touch fix: bind all setup buttons via addEventListener
-  const bindBtn = (id, fn) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('click', fn);
-    el.addEventListener('touchend', function(e){ e.preventDefault(); fn(); });
-  };
-  bindBtn('btn-confirm', saveConfig);
-  bindBtn('btn-skip', skipSetup);
-  bindBtn('btn-clear', clearAndReload);
 }
 
 init();
