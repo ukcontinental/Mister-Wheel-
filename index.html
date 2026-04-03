@@ -1362,11 +1362,16 @@ function saveConfig() {
   CFG.url = document.getElementById('cfg-url').value.trim();
   saveCFG();
   document.getElementById('setupOvl').style.display = 'none';
-  if (CFG.url) syncDown().then(() => renderAll());
   toast('設定已儲存');
+  if (CFG.url) {
+    setTimeout(() => {
+      syncDown().then(() => renderAll()).catch(() => {});
+    }, 300);
+  }
 }
 function skipSetup() {
   document.getElementById('setupOvl').style.display = 'none';
+  renderAll();
   toast('本機儲存模式');
 }
 
@@ -1420,11 +1425,9 @@ function init() {
   renderAll();
   const today = new Date().toISOString().split('T')[0];
   ['r-date','pu-date','bk-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
-  if (!CFG.url) {
-    document.getElementById('setupOvl').style.display = 'flex';
-  } else {
-    document.getElementById('setupOvl').style.display = 'none';
-    syncDown().then(() => renderAll());
+  document.getElementById('setupOvl').style.display = 'none';
+  if (CFG.url) {
+    syncDown().then(() => renderAll()).catch(() => {});
   }
 }
 
