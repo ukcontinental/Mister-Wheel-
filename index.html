@@ -679,6 +679,29 @@ function addRevenue() {
 
 function removeRevenue(i) { D.revenues.splice(i, 1); scheduleSave(); renderRevenue(); updateInvMetrics(); }
 
+function editRevenue(i) {
+  const r = D.revenues[i];
+  document.getElementById('r-date').value    = r.date || '';
+  document.getElementById('r-net').value     = r.net  || '';
+  document.getElementById('r-tax').value     = r.tax  || '';
+  document.getElementById('r-pos').value     = r.pos  || '';
+  document.getElementById('r-online').value  = r.onl  || '';
+  document.getElementById('r-card').value    = r.card || '';
+  document.getElementById('r-cash').value    = r.cash || '';
+  document.getElementById('r-fantuan').value = r.fan  || '';
+  document.getElementById('r-uber').value    = r.uber || '';
+  document.getElementById('r-tips').value    = r.tips || '';
+  // 展開詳細明細
+  document.getElementById('rev-detail').style.display = 'block';
+  document.getElementById('det-toggle').textContent = '▼ 詳細收入（信用卡 / 現金 / Fantuan / Uber Eats）';
+  // 刪除原本那筆
+  D.revenues.splice(i, 1);
+  scheduleSave(); renderRevenue(); updateInvMetrics();
+  // 捲到頂部
+  window.scrollTo(0, 0);
+  toast('已載入 ' + r.date + '，修改後按「＋ 新增」儲存');
+}
+
 function renderRevenue() {
   const totNet  = D.revenues.reduce((s, r) => s + N(r.net), 0);
   const totTax  = D.revenues.reduce((s, r) => s + N(r.tax), 0);
@@ -720,7 +743,7 @@ function renderRevenue() {
       <td style="text-align:right;color:var(--rd)">${fmt(fee)}</td>
       <td style="text-align:right;font-weight:700">${fmt(r.net)}</td>
       <td style="text-align:right;font-weight:700;color:var(--gn)">${fmt(dayTotal)}</td>
-      <td><button class="dbtn" onclick="removeRevenue(${idx})">✕</button></td>
+      <td style="white-space:nowrap"><button class="dbtn" onclick="editRevenue(${idx})" title="編輯" style="color:var(--bl)">✎</button><button class="dbtn" onclick="removeRevenue(${idx})" title="刪除">✕</button></td>
     </tr>`;
   });
 
