@@ -18,8 +18,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--tx);font-family:'Noto Sans TC',system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;}
-.ovl{position:fixed;inset:0;z-index:300;background:rgba(42,32,16,.82);display:flex;align-items:center;justify-content:center;padding:16px;}
-.setup-box{background:var(--sf);border-radius:14px;padding:24px 20px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;}
+.ovl{position:fixed;inset:0;z-index:300;background:rgba(42,32,16,.82);display:flex;align-items:center;justify-content:center;padding:16px;-webkit-overflow-scrolling:touch;}
+.setup-box{background:var(--sf);border-radius:14px;padding:24px 20px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .setup-box h2{font-size:19px;color:var(--ac);margin-bottom:6px;}
 .step-box{background:var(--sf2);border-radius:var(--rs);padding:11px 14px;font-size:12.5px;color:var(--tx2);line-height:2;margin:10px 0;}
 .step-box b{color:var(--tx);}
@@ -67,7 +67,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Noto Sans TC',system-ui,s
 .fi:focus{border-color:var(--ac);}
 .fi[type=number]{text-align:right;}
 select.fi{cursor:pointer;}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:7px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:7px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .bp{background:var(--ac);color:#fff;}.bp:hover{background:var(--acd);}
 .bs{background:var(--sf2);color:var(--tx2);border:1px solid var(--bd2);}.bs:hover{background:var(--bd);color:var(--tx);}
 .bsm{padding:5px 10px;font-size:12px;}
@@ -124,13 +124,13 @@ select.fi{cursor:pointer;}
       &nbsp;&nbsp;類型：網路應用程式 / 執行身分：我 / 存取：所有人<br>
       5. 部署 → 授權 → 複製網址貼到上方
     </div>
-    <button class="btn bp fw" onclick="saveConfig()">確認，開始使用 →</button>
+    <button class="btn bp fw" id="btn-confirm" onclick="saveConfig()">確認，開始使用 →</button>
     <div style="text-align:center;margin-top:10px">
-      <span class="sm muted" style="cursor:pointer;text-decoration:underline" onclick="skipSetup()">暫時跳過，使用本機儲存</span>
+      <button class="btn bs fw" id="btn-skip" style="margin-top:4px" onclick="skipSetup()">暫時跳過，使用本機儲存</button>
     </div>
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
       <div class="sm muted" style="margin-bottom:8px;text-align:center">⚠️ 清除本機資料後從 Sheets 重新載入</div>
-      <button class="btn bs fw" style="color:var(--rd);border-color:var(--rd)" onclick="clearAndReload()">🗑 清除本月本機資料，重新從 Sheets 載入</button>
+      <button class="btn bs fw" id="btn-clear" style="color:var(--rd);border-color:var(--rd)" onclick="clearAndReload()">🗑 清除本月本機資料，重新從 Sheets 載入</button>
     </div>
   </div>
 </div>
@@ -1429,6 +1429,16 @@ function init() {
   if (CFG.url) {
     syncDown().then(() => renderAll()).catch(() => {});
   }
+  // Safari touch fix: bind all setup buttons via addEventListener
+  const bindBtn = (id, fn) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', fn);
+    el.addEventListener('touchend', function(e){ e.preventDefault(); fn(); });
+  };
+  bindBtn('btn-confirm', saveConfig);
+  bindBtn('btn-skip', skipSetup);
+  bindBtn('btn-clear', clearAndReload);
 }
 
 init();
