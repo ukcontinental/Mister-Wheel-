@@ -7,12 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#faf8f4;--sf:#fff;--sf2:#f5f1eb;--bd:#e5ddd0;--bd2:#cfc0a8;
-  --tx:#2a2010;--tx2:#7a6852;--tx3:#a89070;
-  --ac:#c47820;--acl:#fef0e0;--acd:#9a5c10;
-  --gn:#2a7a46;--gnb:#e8f5ee;
+  --bg:#f4f8f5;--sf:#fff;--sf2:#edf4ef;--bd:#c8dece;--bd2:#a8c8b0;
+  --tx:#1a2e20;--tx2:#4a7258;--tx3:#7aA088;
+  --ac:#2e7d52;--acl:#e8f5ee;--acd:#1a5c3a;
+  --gn:#1e6e3e;--gnb:#e0f2e9;
   --rd:#c03030;--rdb:#fcecea;
-  --or:#d08010;--orb:#fef3e0;
+  --or:#c47820;--orb:#fef3e0;
   --bl:#1a5fa8;--blb:#e8f0fc;
   --r:10px;--rs:6px;--rx:4px;
 }
@@ -201,6 +201,7 @@ select.fi{cursor:pointer;}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn bs bsm" onclick="toggleAllCat()">展開／折疊全部</button>
         <button class="btn bs bsm" onclick="copyFromMonth()">📋 從其他月份複製</button>
+        <button class="btn bs bsm" onclick="clearAllQty()" style="color:var(--rd);border-color:var(--rd)">🗑 數量全部清零</button>
         <button class="btn bs bsm" onclick="addInvItem()">＋ 新增品項</button>
       </div>
     </div>
@@ -1473,6 +1474,17 @@ async function copyFromMonth() {
   toast('✅ 已從 ' + opts[idx] + ' 複製 ' + srcInv.length + ' 筆庫存');
 }
 
+
+function clearAllQty() {
+  const label = invPd === 'open' ? '月初' : '月末';
+  const total = (D.inventory[invPd] || []).length;
+  if (!total) { toast('沒有庫存資料'); return; }
+  if (!confirm('確定要把「' + label + '庫存」的 ' + total + ' 個品項數量全部清零？\n\n單價和品項名稱不受影響。')) return;
+  D.inventory[invPd] = D.inventory[invPd].map(it => ({ ...it, qty: '' }));
+  scheduleSave();
+  renderInventory();
+  toast('✅ ' + total + ' 個品項數量已清零');
+}
 function renderAll() {
   renderRevenue();
   setInvPeriod(invPd);
