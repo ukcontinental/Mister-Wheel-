@@ -1411,12 +1411,11 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 async function copyFromMonth() {
   const months = [];
   const now = new Date();
-  // 包含未來3個月 + 過去12個月，排除當前月份
-  for (let i = -3; i <= 12; i++) {
-    if (i === 0) continue; // 跳過當前月份
+  // 包含未來3個月 + 過去12個月，排除帳本當前月份
+  for (let i = -3; i <= 15; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const v = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-    if (!months.includes(v)) months.push(v);
+    if (v !== curMonth && !months.includes(v)) months.push(v);
   }
   months.sort((a,b) => b.localeCompare(a)); // 由新到舊排列
 
