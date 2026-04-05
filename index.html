@@ -1411,11 +1411,14 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 async function copyFromMonth() {
   const months = [];
   const now = new Date();
-  for (let i = 1; i <= 12; i++) {
+  // 包含未來3個月 + 過去12個月，排除當前月份
+  for (let i = -3; i <= 12; i++) {
+    if (i === 0) continue; // 跳過當前月份
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const v = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-    months.push(v);
+    if (!months.includes(v)) months.push(v);
   }
+  months.sort((a,b) => b.localeCompare(a)); // 由新到舊排列
 
   // 建立選擇對話框
   const opts = months.map(m => {
@@ -1423,7 +1426,10 @@ async function copyFromMonth() {
     return yr + '年' + parseInt(mo) + '月';
   });
 
-  const sel = prompt('要從哪個月份複製庫存到【' + curMonth.replace('-','年').replace(/0(\d)/,'$1') + '月】的' + (invPd==='open'?'月初':'月末') + '庫存？\n\n' +
+  const [cyr, cmo] = curMonth.split('-');
+  const curLabel = cyr + '年' + parseInt(cmo) + '月';
+
+  const sel = prompt('要從哪個月份複製庫存到【' + curLabel + '】的' + (invPd==='open'?'月初':'月末') + '庫存？\n\n' +
     months.map((m,i) => (i+1) + '. ' + opts[i]).join('\n') + '\n\n請輸入數字（1-' + months.length + '）：');
 
   if (!sel) return;
@@ -1465,7 +1471,7 @@ async function copyFromMonth() {
   D.inventory[period] = srcInv.map(it => ({ ...it, id: uid() }));
   scheduleSave();
   renderInventory();
-  toast('✅ 已從 ' + opts[idx] + ' 複製 ' + srcInv.length + ' 筆庫存資料');
+  toast('✅ 已從 ' + opts[idx] + ' 複製 ' + srcInv.length + ' 筆庫存');
 }
 
 function renderAll() {
