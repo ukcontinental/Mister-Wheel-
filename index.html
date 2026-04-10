@@ -468,11 +468,18 @@ select.fi{cursor:pointer;}
 <!-- ═══ 採購確認 Modal ═══ -->
 <div id="pur-confirm-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center">
   <div style="background:var(--bg);border-radius:14px;padding:20px;width:min(92vw,480px);max-height:88vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)">
-    <div style="font-size:16px;font-weight:700;margin-bottom:6px">🛒 這筆支出是採購費用嗎？</div>
-    <div id="pur-confirm-desc" style="font-size:13px;color:var(--tx2);margin-bottom:14px"></div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="btn bp fw" onclick="openPurItemModal()">✅ 是，選擇採購品項</button>
-      <button class="btn bs fw" onclick="closePurConfirm()">✕ 不是</button>
+    <div style="font-size:16px;font-weight:700;margin-bottom:6px">這筆支出如何分類？</div>
+    <div id="pur-confirm-desc" style="font-size:13px;color:var(--tx2);margin-bottom:14px;padding:8px;background:var(--bg2);border-radius:8px"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+      <button class="btn bp fw" onclick="openPurItemModal()" style="justify-content:flex-start;gap:8px">
+        🛒 採購費用 — 建立庫存採購記錄
+      </button>
+      <button class="btn fw" onclick="markAsOpex()" style="background:#e8730a;color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;justify-content:flex-start;gap:8px">
+        🔧 營運費用 — 標記為一般支出
+      </button>
+      <button class="btn bs fw" onclick="closePurConfirm()" style="justify-content:flex-start;gap:8px">
+        ✕ 取消（稍後再分類）
+      </button>
     </div>
   </div>
 </div>
@@ -1454,18 +1461,31 @@ function renderBank() {
     <th style="text-align:right">支出</th><th style="text-align:right">餘額</th><th>備註</th><th></th>
   </tr></thead><tbody>`;
   D.bank.forEach((x,i) => {
-    const hasPur = x.note && x.note.includes('[已建採購記錄]');
-    const purBtn = (x.wd && N(x.wd) > 0)
-      ? `<button class="btn bs bsm" style="font-size:11px;padding:2px 6px;margin-right:3px" onclick="checkBankExpense(${i})" title="建立採購記錄">${hasPur?'🔁':'🛒'}</button>`
-      : '';
+    // 狀態按鈕設計
+    let catBtn = '';
+    if (x.wd && N(x.wd) > 0) {
+      if (x._cat === 'purchase') {
+        catBtn = `<button onclick="checkBankExpense(${i})" title="已分類為採購費用（點擊重新分類）"
+          style="background:#1a7a3a;color:#fff;border:none;border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer;margin-left:4px;font-weight:600">🛒</button>`;
+      } else if (x._cat === 'opex') {
+        catBtn = `<button onclick="checkBankExpense(${i})" title="已分類為營運費用（點擊重新分類）"
+          style="background:#e8730a;color:#fff;border:none;border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer;margin-left:4px;font-weight:600">🔧</button>`;
+      } else {
+        catBtn = `<button onclick="checkBankExpense(${i})" title="尚未分類，點擊確認"
+          style="background:transparent;color:var(--tx3);border:1.5px dashed var(--bd);border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer;margin-left:4px">？</button>`;
+      }
+    }
+    const wdCell = x.wd
+      ? `<span style="color:var(--rd);font-weight:700">${fmt(x.wd)}</span>${catBtn}`
+      : '<span style="color:var(--tx3)">-</span>';
     html += `<tr>
       <td style="color:var(--tx2);white-space:nowrap">${x.date||'-'}</td>
       <td style="font-size:12px">${esc(x.desc)}</td>
       <td style="text-align:right;color:var(--gn);font-weight:${x.dep?'700':'400'}">${x.dep?fmt(x.dep):'-'}</td>
-      <td style="text-align:right;color:var(--rd);font-weight:${x.wd?'700':'400'}">${x.wd?fmt(x.wd):'-'}</td>
+      <td style="text-align:right;white-space:nowrap">${wdCell}</td>
       <td style="text-align:right;color:var(--bl)">${x.bal?'$'+parseFloat(x.bal).toLocaleString('en',{minimumFractionDigits:2}):'-'}</td>
       <td style="font-size:12px;color:var(--tx3)">${esc(x.note||'')}</td>
-      <td style="white-space:nowrap">${purBtn}<button class="dbtn" onclick="removeBank(${i})">✕</button></td>
+      <td><button class="dbtn" onclick="removeBank(${i})">✕</button></td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -1561,9 +1581,20 @@ function checkBankExpense(bankIdx) {
 }
 
 function closePurConfirm() {
-  _pendingBankIdx = null;
+  // 只關閉 modal，不清 _pendingBankIdx（讓 markAsOpex 還能用）
   const ovl = document.getElementById('pur-confirm-ovl');
   if (ovl) ovl.style.display = 'none';
+  _pendingBankIdx = null;
+}
+
+function markAsOpex() {
+  if (_pendingBankIdx === null) return;
+  D.bank[_pendingBankIdx]._cat = 'opex';
+  document.getElementById('pur-confirm-ovl').style.display = 'none';
+  _pendingBankIdx = null;
+  scheduleSave();
+  renderBank();
+  toast('🔧 已標記為營運費用');
 }
 
 function openPurItemModal() {
@@ -1600,8 +1631,8 @@ function openPurItemModal() {
 }
 
 function closePurItemModal() {
-  _pendingBankIdx = null;
   document.getElementById('pur-item-ovl').style.display = 'none';
+  _pendingBankIdx = null;
 }
 
 function confirmPurchaseFromBank() {
@@ -1634,8 +1665,10 @@ function confirmPurchaseFromBank() {
 
   if (count === 0) { toast('請至少勾選一個品項'); return; }
 
-  // 在銀行記錄備註加上標記
-  D.bank[_pendingBankIdx].note = (D.bank[_pendingBankIdx].note ? D.bank[_pendingBankIdx].note + ' ' : '') + '[已建採購記錄]';
+  // 標記狀態與記錄關聯 id
+  D.bank[_pendingBankIdx]._cat = 'purchase';
+  D.bank[_pendingBankIdx]._purIds = (D.bank[_pendingBankIdx]._purIds || [])
+    .concat(D.purchases.slice(-count).map(p => p.id));
   scheduleSave();
   renderPurchases();
   renderBank();
