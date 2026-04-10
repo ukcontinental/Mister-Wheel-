@@ -1461,13 +1461,14 @@ function renderBank() {
     <th style="text-align:right">支出</th><th style="text-align:right">餘額</th><th>備註</th><th></th>
   </tr></thead><tbody>`;
   D.bank.forEach((x,i) => {
-    // 狀態按鈕設計
+    // 狀態按鈕設計（_cat 優先；向後相容：備註含 [已建採購記錄] 視為 purchase）
     let catBtn = '';
     if (x.wd && N(x.wd) > 0) {
-      if (x._cat === 'purchase') {
+      const cat = x._cat || ((x.note && x.note.includes('[已建採購記錄]')) ? 'purchase' : '');
+      if (cat === 'purchase') {
         catBtn = `<button onclick="checkBankExpense(${i})" title="已分類為採購費用（點擊重新分類）"
           style="background:#1a7a3a;color:#fff;border:none;border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer;margin-left:4px;font-weight:600">🛒</button>`;
-      } else if (x._cat === 'opex') {
+      } else if (cat === 'opex') {
         catBtn = `<button onclick="checkBankExpense(${i})" title="已分類為營運費用（點擊重新分類）"
           style="background:#e8730a;color:#fff;border:none;border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer;margin-left:4px;font-weight:600">🔧</button>`;
       } else {
