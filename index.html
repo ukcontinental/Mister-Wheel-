@@ -150,6 +150,7 @@ select.fi{cursor:pointer;}
   <div class="tab" onclick="gotoTab(3)">💸 費用管理</div>
   <div class="tab" onclick="gotoTab(4)">📋 月度報表</div>
   <div class="tab" onclick="gotoTab(5)">🏦 銀行帳目</div>
+  <div class="tab" onclick="gotoTab(6)">🏢 資產總覽</div>
 </div>
 
 <!-- ═══ PAGE 0: 每日營收 ═══ -->
@@ -305,121 +306,111 @@ select.fi{cursor:pointer;}
 <!-- ═══ PAGE 4: 月度報表 ═══ -->
 <div class="pg" id="p4">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div style="font-size:16px;font-weight:700" id="rpt-title">月度損益報表</div>
+    <div style="font-size:16px;font-weight:700" id="rpt2-title">🏦 月度損益報表（銀行基準）</div>
     <div style="display:flex;gap:6px">
       <button class="btn bs bsm" onclick="buildReport();buildBankReport()">🔄 重算</button>
       <button class="btn bp bsm" onclick="exportPDF()">📄 匯出PDF</button>
     </div>
   </div>
+  <div class="al ali sm" style="margin-bottom:10px">
+    💡 以銀行實際存入總額為基準，先拆出 HST（×13÷113），所有平台費用已在匯款前扣除，數字最準確。
+  </div>
+  <!-- ▌主報表：銀行基準 -->
   <div class="mrow">
-    <div class="mc"><div class="ml">未稅 Net Sales</div><div class="mv g" id="rpt-rev">$0</div></div>
-    <div class="mc"><div class="ml">原料耗用</div><div class="mv r" id="rpt-cogs">$0</div></div>
-    <div class="mc"><div class="ml">費用合計</div><div class="mv r" id="rpt-exp">$0</div></div>
-    <div class="mc"><div class="ml">本月淨利</div><div class="mv" id="rpt-profit">$0</div></div>
+    <div class="mc"><div class="ml">銀行存入合計</div><div class="mv b" id="r2-dep">$0</div></div>
+    <div class="mc"><div class="ml">拆出 HST（13/113）</div><div class="mv r" id="r2-hst">$0</div></div>
+    <div class="mc"><div class="ml">未稅 Net Sales</div><div class="mv g" id="r2-rev">$0</div></div>
+    <div class="mc"><div class="ml">本月淨利</div><div class="mv" id="r2-profit">$0</div></div>
   </div>
   <div class="rb">
     <div class="rsh">▌ 損益明細</div>
-    <div class="rr"><span>未稅 Net Sales</span><span class="rn rpos" id="d-rev">$0</span></div>
-    <div class="rr i"><span>（－）POS 手續費 0.5%</span><span class="rn rneg" id="d-pos-fee">$0</span></div>
-    <div class="rr i"><span>（－）Online 手續費 2%</span><span class="rn rneg" id="d-online-fee">$0</span></div>
-    <div class="rr st"><span>＝ 扣費後淨收入</span><span class="rn" id="d-net2">$0</span></div>
+    <div class="rr"><span>銀行存入總額（含 HST）</span><span class="rn rpos" id="b2-dep">$0</span></div>
+    <div class="rr i"><span>（－）HST 拆出（×13÷113）</span><span class="rn rneg" id="b2-hst">$0</span></div>
+    <div class="rr st"><span>＝ 未稅 Net Sales</span><span class="rn" id="b2-rev">$0</span></div>
     <div class="sep"></div>
     <div class="rr" style="color:var(--tx2)"><span>（－）原料耗用成本</span><span></span></div>
-    <div class="rr i"><span>月初庫存</span><span class="rn" id="d-open">$0</span></div>
-    <div class="rr i"><span>＋ 採購（未稅）</span><span class="rn" id="d-pur">$0</span></div>
-    <div class="rr i"><span>－ 月末庫存</span><span class="rn" id="d-close">$0</span></div>
-    <div class="rr st"><span>＝ 原料耗用</span><span class="rn rneg" id="d-cogs">$0</span></div>
+    <div class="rr i"><span>月初庫存</span><span class="rn" id="b2-open">$0</span></div>
+    <div class="rr i"><span>＋ 採購（未稅）</span><span class="rn" id="b2-pur">$0</span></div>
+    <div class="rr i"><span>－ 月末庫存</span><span class="rn" id="b2-close">$0</span></div>
+    <div class="rr st"><span>＝ 原料耗用</span><span class="rn rneg" id="b2-cogs">$0</span></div>
     <div class="sep"></div>
     <div class="rr" style="color:var(--tx2)"><span>（－）費用支出（未稅）</span><span></span></div>
-    <div class="rr i"><span>租金</span><span class="rn" id="d-rent">$0</span></div>
-    <div class="rr i"><span>人事費用</span><span class="rn" id="d-staff2">$0</span></div>
+    <div class="rr i"><span>租金</span><span class="rn" id="b2-rent">$0</span></div>
+    <div class="rr i"><span>人事費用</span><span class="rn" id="b2-staff">$0</span></div>
     <div class="rr i"><span>電冰箱承租</span><span class="rn">$50.00</span></div>
     <div class="rr i"><span>停車費（未稅）</span><span class="rn">$168.14</span></div>
     <div class="rr i"><span>網路費</span><span class="rn">$40.00</span></div>
     <div class="rr i"><span>門店保費（未稅）</span><span class="rn">$155.75</span></div>
     <div class="rr i"><span>銀行手續費</span><span class="rn">$10.00</span></div>
     <div class="rr i"><span>POS 系統費（未稅）</span><span class="rn">$178.76</span></div>
-    <div class="rr i"><span>雜支（未稅）</span><span class="rn" id="d-misc">$0</span></div>
-    <div class="rr st"><span>＝ 費用合計</span><span class="rn rneg" id="d-exp">$0</span></div>
+    <div class="rr i"><span>雜支（未稅）</span><span class="rn" id="b2-misc">$0</span></div>
+    <div class="rr st"><span>＝ 費用合計</span><span class="rn rneg" id="b2-exp">$0</span></div>
     <div class="sep"></div>
-    <div class="rr st"><span>營業利潤</span><span class="rn" id="d-op">$0</span></div>
-    <div class="rr i"><span>（－）5% 品牌權利金</span><span class="rn rneg" id="d-roy">$0</span></div>
-    <div class="rr gr"><span>本月淨利（虧損）</span><span class="rn" id="d-profit">$0</span></div>
+    <div class="rr st"><span>營業利潤</span><span class="rn" id="b2-op">$0</span></div>
+    <div class="rr i"><span>（－）5% 品牌權利金</span><span class="rn rneg" id="b2-roy">$0</span></div>
+    <div class="rr gr"><span>本月淨利（虧損）</span><span class="rn" id="b2-profit-row">$0</span></div>
   </div>
   <div class="rb">
     <div class="rsh">▌ HST 稅務對賬</div>
-    <div class="rr"><span>客戶 HST 代收</span><span class="rn rpos" id="d-hst-c">$0</span></div>
-    <div class="rr" style="color:var(--tx2)"><span>（－）ITC 可抵扣</span><span></span></div>
-    <div class="rr i"><span>採購 ITC</span><span class="rn" id="d-itc-pur">$0</span></div>
-    <div class="rr i"><span>固定費用 ITC</span><span class="rn" id="d-itc-fix">$0</span></div>
-    <div class="rr i"><span>雜支 ITC</span><span class="rn" id="d-itc-misc">$0</span></div>
-    <div class="rr st"><span>應交 CRA 淨 HST</span><span class="rn rneg" id="d-hst-net">$0</span></div>
+    <div class="rr"><span>客戶 HST 代收（銀行拆出）</span><span class="rn rpos" id="b2-hst-c">$0</span></div>
+    <div class="rr i"><span>採購 ITC</span><span class="rn" id="b2-itc-pur">$0</span></div>
+    <div class="rr i"><span>固定費用 ITC</span><span class="rn" id="b2-itc-fix">$0</span></div>
+    <div class="rr i"><span>雜支 ITC</span><span class="rn" id="b2-itc-misc">$0</span></div>
+    <div class="rr st"><span>應交 CRA 淨 HST</span><span class="rn rneg" id="b2-hst-net">$0</span></div>
   </div>
   <div class="rsv">
     <div class="rsv-t">⚠️ 本月應預留款項</div>
-    <div class="rsv-r"><span>HST 應交 CRA</span><span class="rn bold" id="rsv-hst">$0</span></div>
-    <div class="rsv-r"><span>5% 品牌權利金</span><span class="rn bold" id="rsv-roy">$0</span></div>
-    <div class="rsv-r" id="rsv-rent-row" style="display:none"><span>🏠 租金補繳（業績超 $20,000）</span><span class="rn bold r" id="rsv-rent-extra">$0</span></div>
-    <div class="rsv-tot"><span>合計需預留</span><span class="rn o" id="rsv-total">$0</span></div>
+    <div class="rsv-r"><span>HST 應交 CRA</span><span class="rn bold" id="b2-rsv-hst">$0</span></div>
+    <div class="rsv-r"><span>5% 品牌權利金</span><span class="rn bold" id="b2-rsv-roy">$0</span></div>
+    <div class="rsv-r" id="b2-rsv-rent-row" style="display:none"><span>🏠 租金補繳（業績超 $20,000）</span><span class="rn bold r" id="b2-rsv-rent-extra">$0</span></div>
+    <div class="rsv-tot"><span>合計需預留</span><span class="rn o" id="b2-rsv-total">$0</span></div>
   </div>
 
-  <!-- ── 月度報表２：銀行收入基準 ── -->
-  <div style="margin-top:18px;padding-top:14px;border-top:2px solid var(--bl)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-size:15px;font-weight:700;color:var(--bl)" id="rpt2-title">🏦 月度報表２（銀行收入基準）</div>
-      <button class="btn bs bsm" onclick="buildBankReport()">🔄 重算</button>
-    </div>
-    <div class="al ali sm" style="margin-bottom:10px">
-      💡 以銀行存入總額為基準（最準確），先拆 13% HST，再跑相同 P&amp;L。外送平台活動折扣不影響此數字。
+  <!-- ▌參考報表：POS 基準 -->
+  <div style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--bd)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--tx2)" id="rpt-title">📊 POS 帳本基準（參考）</div>
+      <span style="font-size:11px;background:#f0f0f0;color:#888;padding:2px 7px;border-radius:10px">平台費用未完整扣除，僅供對照</span>
     </div>
     <div class="mrow">
-      <div class="mc"><div class="ml">銀行存入合計</div><div class="mv b" id="r2-dep">$0</div></div>
-      <div class="mc"><div class="ml">拆出 HST（13/113）</div><div class="mv r" id="r2-hst">$0</div></div>
-      <div class="mc"><div class="ml">未稅 Net Sales</div><div class="mv g" id="r2-rev">$0</div></div>
-      <div class="mc"><div class="ml">本月淨利</div><div class="mv" id="r2-profit">$0</div></div>
+      <div class="mc"><div class="ml">未稅 Net Sales</div><div class="mv" id="rpt-rev" style="font-size:16px">$0</div></div>
+      <div class="mc"><div class="ml">原料耗用</div><div class="mv r" id="rpt-cogs" style="font-size:16px">$0</div></div>
+      <div class="mc"><div class="ml">費用合計</div><div class="mv r" id="rpt-exp" style="font-size:16px">$0</div></div>
+      <div class="mc"><div class="ml">POS 基準淨利</div><div class="mv" id="rpt-profit" style="font-size:16px">$0</div></div>
     </div>
-    <div class="rb">
-      <div class="rsh">▌ 損益明細（銀行基準）</div>
-      <div class="rr"><span>銀行存入總額</span><span class="rn rpos" id="b2-dep">$0</span></div>
-      <div class="rr i"><span>（－）HST 拆出（×13÷113）</span><span class="rn rneg" id="b2-hst">$0</span></div>
-      <div class="rr st"><span>＝ 未稅 Net Sales（銀行基準）</span><span class="rn" id="b2-rev">$0</span></div>
+    <div class="rb" style="opacity:0.8">
+      <div class="rsh">▌ POS 損益明細</div>
+      <div class="rr"><span>未稅 Net Sales（POS）</span><span class="rn rpos" id="d-rev">$0</span></div>
+      <div class="rr i"><span>（－）POS 手續費 0.5%</span><span class="rn rneg" id="d-pos-fee">$0</span></div>
+      <div class="rr i"><span>（－）Online 手續費 2%</span><span class="rn rneg" id="d-online-fee">$0</span></div>
+      <div class="rr st"><span>＝ 扣費後淨收入</span><span class="rn" id="d-net2">$0</span></div>
       <div class="sep"></div>
-      <div class="rr" style="color:var(--tx2)"><span>（－）原料耗用成本</span><span></span></div>
-      <div class="rr i"><span>月初庫存</span><span class="rn" id="b2-open">$0</span></div>
-      <div class="rr i"><span>＋ 採購（未稅）</span><span class="rn" id="b2-pur">$0</span></div>
-      <div class="rr i"><span>－ 月末庫存</span><span class="rn" id="b2-close">$0</span></div>
-      <div class="rr st"><span>＝ 原料耗用</span><span class="rn rneg" id="b2-cogs">$0</span></div>
+      <div class="rr i"><span>月初庫存</span><span class="rn" id="d-open">$0</span></div>
+      <div class="rr i"><span>＋ 採購（未稅）</span><span class="rn" id="d-pur">$0</span></div>
+      <div class="rr i"><span>－ 月末庫存</span><span class="rn" id="d-close">$0</span></div>
+      <div class="rr st"><span>＝ 原料耗用</span><span class="rn rneg" id="d-cogs">$0</span></div>
       <div class="sep"></div>
-      <div class="rr" style="color:var(--tx2)"><span>（－）費用支出（未稅）</span><span></span></div>
-      <div class="rr i"><span>租金</span><span class="rn" id="b2-rent">$0</span></div>
-      <div class="rr i"><span>人事費用</span><span class="rn" id="b2-staff">$0</span></div>
-      <div class="rr i"><span>電冰箱承租</span><span class="rn">$50.00</span></div>
-      <div class="rr i"><span>停車費（未稅）</span><span class="rn">$168.14</span></div>
-      <div class="rr i"><span>網路費</span><span class="rn">$40.00</span></div>
-      <div class="rr i"><span>門店保費（未稅）</span><span class="rn">$155.75</span></div>
-      <div class="rr i"><span>銀行手續費</span><span class="rn">$10.00</span></div>
-      <div class="rr i"><span>POS 系統費（未稅）</span><span class="rn">$178.76</span></div>
-      <div class="rr i"><span>雜支（未稅）</span><span class="rn" id="b2-misc">$0</span></div>
-      <div class="rr st"><span>＝ 費用合計</span><span class="rn rneg" id="b2-exp">$0</span></div>
+      <div class="rr i"><span>租金</span><span class="rn" id="d-rent">$0</span></div>
+      <div class="rr i"><span>人事費用</span><span class="rn" id="d-staff2">$0</span></div>
+      <div class="rr i"><span>雜支（未稅）</span><span class="rn" id="d-misc">$0</span></div>
+      <div class="rr st"><span>＝ 費用合計</span><span class="rn rneg" id="d-exp">$0</span></div>
       <div class="sep"></div>
-      <div class="rr st"><span>營業利潤</span><span class="rn" id="b2-op">$0</span></div>
-      <div class="rr i"><span>（－）5% 品牌權利金</span><span class="rn rneg" id="b2-roy">$0</span></div>
-      <div class="rr gr"><span>本月淨利（虧損）</span><span class="rn" id="b2-profit-row">$0</span></div>
+      <div class="rr st"><span>營業利潤</span><span class="rn" id="d-op">$0</span></div>
+      <div class="rr i"><span>（－）5% 品牌權利金</span><span class="rn rneg" id="d-roy">$0</span></div>
+      <div class="rr gr"><span>POS 基準淨利</span><span class="rn" id="d-profit">$0</span></div>
+      <div class="sep"></div>
+      <div class="rr i"><span>HST 代收</span><span class="rn" id="d-hst-c">$0</span></div>
+      <div class="rr i"><span>採購 ITC</span><span class="rn" id="d-itc-pur">$0</span></div>
+      <div class="rr i"><span>固定費用 ITC</span><span class="rn" id="d-itc-fix">$0</span></div>
+      <div class="rr i"><span>雜支 ITC</span><span class="rn" id="d-itc-misc">$0</span></div>
+      <div class="rr st"><span>應交 CRA 淨 HST（POS）</span><span class="rn rneg" id="d-hst-net">$0</span></div>
     </div>
-    <div class="rb">
-      <div class="rsh">▌ HST 稅務對賬（銀行基準）</div>
-      <div class="rr"><span>客戶 HST 代收（銀行拆出）</span><span class="rn rpos" id="b2-hst-c">$0</span></div>
-      <div class="rr i"><span>採購 ITC</span><span class="rn" id="b2-itc-pur">$0</span></div>
-      <div class="rr i"><span>固定費用 ITC</span><span class="rn" id="b2-itc-fix">$0</span></div>
-      <div class="rr i"><span>雜支 ITC</span><span class="rn" id="b2-itc-misc">$0</span></div>
-      <div class="rr st"><span>應交 CRA 淨 HST</span><span class="rn rneg" id="b2-hst-net">$0</span></div>
-    </div>
-    <div class="rsv">
-      <div class="rsv-t">⚠️ 銀行基準應預留款項</div>
-      <div class="rsv-r"><span>HST 應交 CRA</span><span class="rn bold" id="b2-rsv-hst">$0</span></div>
-      <div class="rsv-r"><span>5% 品牌權利金</span><span class="rn bold" id="b2-rsv-roy">$0</span></div>
-      <div class="rsv-r" id="b2-rsv-rent-row" style="display:none"><span>🏠 租金補繳（業績超 $20,000）</span><span class="rn bold r" id="b2-rsv-rent-extra">$0</span></div>
-      <div class="rsv-tot"><span>合計需預留</span><span class="rn o" id="b2-rsv-total">$0</span></div>
+    <div class="rsv" style="opacity:0.8">
+      <div class="rsv-t">POS 基準應預留</div>
+      <div class="rsv-r"><span>HST 應交 CRA</span><span class="rn bold" id="rsv-hst">$0</span></div>
+      <div class="rsv-r"><span>5% 品牌權利金</span><span class="rn bold" id="rsv-roy">$0</span></div>
+      <div class="rsv-r" id="rsv-rent-row" style="display:none"><span>🏠 租金補繳</span><span class="rn bold r" id="rsv-rent-extra">$0</span></div>
+      <div class="rsv-tot"><span>合計</span><span class="rn o" id="rsv-total">$0</span></div>
     </div>
   </div>
 </div>
@@ -462,6 +453,78 @@ select.fi{cursor:pointer;}
   <div class="card">
     <div class="ch"><div class="ct">銀行交易明細</div></div>
     <div id="bank-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 6: 資產總覽 ═══ -->
+<div class="pg" id="p6">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:16px;font-weight:700">🏢 資產總覽</div>
+    <button class="btn bs bsm" onclick="buildAssetReport()">🔄 更新</button>
+  </div>
+  <div class="al ali sm" style="margin-bottom:12px">
+    💡 庫存原物料取最新月末盤點值；銀行現金取最新餘額；設備以購入原價計。
+  </div>
+
+  <!-- 總資產摘要 -->
+  <div class="mrow">
+    <div class="mc"><div class="ml">庫存原物料</div><div class="mv g" id="ast-inv">$0</div><div class="ms" id="ast-inv-src">—</div></div>
+    <div class="mc"><div class="ml">銀行現金</div><div class="mv b" id="ast-cash">$0</div><div class="ms" id="ast-cash-src">—</div></div>
+    <div class="mc"><div class="ml">設備原值合計</div><div class="mv" id="ast-eq">$0</div></div>
+    <div class="mc"><div class="ml" style="font-weight:700">總資產</div><div class="mv o bold" id="ast-total">$0</div></div>
+  </div>
+
+  <!-- 設備清單 -->
+  <div class="card" style="margin-top:14px">
+    <div class="ch">
+      <div class="ct">設備清單</div>
+      <button class="btn bp bsm" onclick="showAddEquipment()">＋ 新增設備</button>
+    </div>
+    <div class="cb">
+      <div id="eq-list"><div class="empty">尚無設備記錄</div></div>
+    </div>
+  </div>
+
+  <!-- 新增設備表單（預設隱藏）-->
+  <div id="eq-form" style="display:none" class="card" >
+    <div class="ch"><div class="ct">新增設備</div></div>
+    <div class="cb">
+      <div class="frow"><div class="fl">設備名稱</div><input class="fi" type="text" id="eq-name" placeholder="例：商用烤箱 Rational iCombi"></div>
+      <div class="frow"><div class="fl">購入日期</div><input class="fi" type="date" id="eq-date"></div>
+      <div class="frow"><div class="fl">購入金額 ($)</div><input class="fi" type="number" id="eq-price" placeholder="0.00" step="0.01"></div>
+      <div class="frow"><div class="fl">備註</div><input class="fi" type="text" id="eq-note" placeholder="廠商、型號、保固期等"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn bp fw" onclick="addEquipment()">＋ 新增</button>
+        <button class="btn bs fw" onclick="hideAddEquipment()">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 採購明細 Modal（點已分類 🛒 時顯示）═══ -->
+<div id="pur-detail-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border-radius:14px;padding:20px;width:min(94vw,520px);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px">🛒 採購明細</div>
+    <div id="pur-detail-bank-info" style="font-size:13px;color:var(--tx2);margin-bottom:10px;padding:8px;background:var(--bg2);border-radius:8px"></div>
+    <div style="flex:1;overflow-y:auto;margin-bottom:12px" id="pur-detail-list"></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn bp fw" onclick="appendPurItems()" style="justify-content:flex-start">➕ 追加品項（保留舊記錄）</button>
+      <button class="btn fw" onclick="reSelectPurItems()" style="background:#555;color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;justify-content:flex-start">🔄 重新選擇（清除舊記錄）</button>
+      <button class="btn fw" onclick="switchToOpexFromDetail()" style="background:#e8730a;color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;justify-content:flex-start">🔧 改為營運費用（清除採購記錄）</button>
+      <button class="btn bs fw" onclick="closePurDetail()">✕ 關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 月末複製到下月月初 Modal ═══ -->
+<div id="inv-copy-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border-radius:14px;padding:20px;width:min(92vw,440px);box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px">📋 複製上月月末庫存</div>
+    <div id="inv-copy-msg" style="font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.6"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bp fw" onclick="doInvCopy()">✅ 是，複製為本月月初</button>
+      <button class="btn bs fw" onclick="closeInvCopy()">✕ 不，從空白開始</button>
+    </div>
   </div>
 </div>
 
@@ -731,7 +794,68 @@ function onMonthChange() {
   curMonth = document.getElementById('monthSel').value;
   loadLocal();
   renderAll();
-  if (CFG.url) syncDown().then(() => renderAll());
+  if (CFG.url) syncDown().then(() => renderAll()).catch(() => {});
+  // B方案：若本月月初庫存為空，且上月月末有資料，提示複製
+  checkInvCopyPrompt();
+}
+
+function prevMonthStr(m) {
+  const [yr, mo] = m.split('-').map(Number);
+  const d = new Date(yr, mo - 2, 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function checkInvCopyPrompt() {
+  // 本月月初是否全空
+  const openFilled = (D.inventory && D.inventory.open || []).some(it => N(it.qty) > 0);
+  if (openFilled) return;
+  // 讀上月資料（localStorage）
+  const prev = prevMonthStr(curMonth);
+  const raw  = localStorage.getItem(lsKey(prev));
+  if (!raw) return;
+  try {
+    const prevD = JSON.parse(raw);
+    const closeFilled = (prevD.inventory && prevD.inventory.close || []).some(it => N(it.qty) > 0);
+    if (!closeFilled) return;
+    // 顯示提示
+    const [cyr, cmo] = curMonth.split('-').map(Number);
+    const [pyr, pmo] = prev.split('-').map(Number);
+    const msg = document.getElementById('inv-copy-msg');
+    if (msg) msg.innerHTML =
+      pyr + '年' + pmo + '月的月末盤點有資料。<br>要複製為 ' +
+      cyr + '年' + cmo + '月的<b>月初庫存</b>嗎？<br>' +
+      '<span style="color:var(--tx3);font-size:12px">（複製後仍可手動修改）</span>';
+    // 暫存上月資料供 doInvCopy 用
+    window._prevInvClose = prevD.inventory.close;
+    document.getElementById('inv-copy-ovl').style.display = 'flex';
+  } catch(e) {}
+}
+
+function closeInvCopy() {
+  document.getElementById('inv-copy-ovl').style.display = 'none';
+  window._prevInvClose = null;
+}
+
+function doInvCopy() {
+  const src = window._prevInvClose;
+  if (!src || !src.length) { closeInvCopy(); return; }
+  // 將上月月末的 qty 對應到本月月初（依名稱配對）
+  if (!D.inventory) D.inventory = { open: [], close: [] };
+  src.forEach(srcIt => {
+    if (!N(srcIt.qty)) return;
+    const target = D.inventory.open.find(t => t.name === srcIt.name);
+    if (target) {
+      target.qty = srcIt.qty;
+    } else {
+      // 品項不在模板，仍加入
+      D.inventory.open.push({ id: uid(), name: srcIt.name, unit: srcIt.unit, price: srcIt.price, qty: srcIt.qty, notes: srcIt.notes || '', category: srcIt.category || '其他' });
+    }
+  });
+  scheduleSave();
+  renderInventory();
+  updateInvMetrics();
+  closeInvCopy();
+  toast('✅ 已複製上月月末為本月月初庫存');
 }
 
 // ═══════════════════════════════
@@ -991,7 +1115,35 @@ function addPurchase() {
   toast('採購已新增');
 }
 
-function removePurchase(i) { D.purchases.splice(i, 1); scheduleSave(); renderPurchases(); updateInvMetrics(); }
+function removePurchase(i) {
+  const p = D.purchases[i];
+  // 同步更新關聯的銀行記錄
+  if (p && p._bankId) {
+    const bIdx = (D.bank || []).findIndex(x => x.id === p._bankId);
+    if (bIdx >= 0) {
+      D.bank[bIdx]._purIds = (D.bank[bIdx]._purIds || []).filter(id => id !== p.id);
+      if (D.bank[bIdx]._purIds.length === 0) D.bank[bIdx]._cat = undefined;
+    }
+  }
+  D.purchases.splice(i, 1);
+  scheduleSave(); renderPurchases(); renderBank(); updateInvMetrics();
+}
+
+function editPurchase(i) {
+  const p = D.purchases[i];
+  if (!p) return;
+  const newAmt  = prompt('修改金額（目前：' + N(p.amt).toFixed(2) + '）', N(p.amt).toFixed(2));
+  if (newAmt === null) return;
+  const newDesc = prompt('修改品項說明（目前：' + (p.desc || p.name || '') + '）', p.desc || p.name || '');
+  if (newDesc === null) return;
+  const newQty  = prompt('修改數量（目前：' + (p.qty || '') + '）', p.qty || '');
+  if (newQty === null) return;
+  D.purchases[i].amt  = String(parseFloat(newAmt) || 0);
+  D.purchases[i].desc = newDesc;
+  D.purchases[i].qty  = newQty;
+  scheduleSave(); renderPurchases(); updateInvMetrics();
+  toast('採購記錄已更新');
+}
 
 function renderPurchases() {
   if (!D.purchases) D.purchases = [];
@@ -1013,14 +1165,19 @@ function renderPurchases() {
   </tr></thead><tbody>`;
   D.purchases.forEach((p, i) => {
     const itcAmt = p.hasHST ? hstOf(N(p.amt)) : 0;
+    const displayName = p.desc || (p.name ? p.name + (p.qty ? ' ×' + p.qty + (p.unit||'') : '') : '-');
+    const fromBank = p._bankId ? '🔗' : '';
     html += `<tr>
       <td style="color:var(--tx2);white-space:nowrap">${p.date||'-'}</td>
-      <td>${esc(p.desc)}</td>
+      <td>${fromBank}${esc(displayName)}</td>
       <td style="text-align:right;font-weight:700">${fmt(N(p.amt))}</td>
       <td style="text-align:center">${p.hasHST?'<span class="tag to">有HST</span>':'<span class="tag tgr">免稅</span>'}</td>
       <td style="text-align:right;color:var(--bl)">${p.hasHST?fmt(itcAmt):'-'}</td>
       <td style="font-size:12px;color:var(--tx3)">${esc(p.note||'')}</td>
-      <td><button class="dbtn" onclick="removePurchase(${i})">✕</button></td>
+      <td style="white-space:nowrap">
+        <button class="dbtn" style="background:#3a6ea8;color:#fff;border-radius:5px;padding:2px 7px;margin-right:3px" onclick="editPurchase(${i})" title="編輯">✏️</button>
+        <button class="dbtn" onclick="removePurchase(${i})">✕</button>
+      </td>
     </tr>`;
   });
   list.innerHTML = html + '</tbody></table></div>';
@@ -1575,10 +1732,92 @@ function checkBankExpense(bankIdx) {
   const tx = (D.bank || [])[bankIdx];
   if (!tx || !N(tx.wd)) return;
   _pendingBankIdx = bankIdx;
+  // 已分類為採購 → 顯示明細視窗
+  const cat = tx._cat || ((tx.note && tx.note.includes('[已建採購記錄]')) ? 'purchase' : '');
+  if (cat === 'purchase') { showPurchaseDetail(bankIdx); return; }
+  // 其他狀態 → 顯示分類確認視窗
   const el = document.getElementById('pur-confirm-desc');
   if (el) el.textContent = tx.date + '  ' + tx.desc + '  支出 ' + fmt(N(tx.wd));
   const ovl = document.getElementById('pur-confirm-ovl');
   if (ovl) ovl.style.display = 'flex';
+}
+
+// ── 採購明細視窗 ──
+function showPurchaseDetail(bankIdx) {
+  const tx = (D.bank || [])[bankIdx];
+  if (!tx) return;
+  _pendingBankIdx = bankIdx;
+  const info = document.getElementById('pur-detail-bank-info');
+  if (info) info.textContent = tx.date + '  ' + tx.desc + '  支出 ' + fmt(N(tx.wd));
+
+  // 找出關聯的採購記錄
+  const purIds = tx._purIds || [];
+  const linked = (D.purchases || []).filter(p => purIds.includes(p.id));
+  const list = document.getElementById('pur-detail-list');
+  if (linked.length === 0) {
+    list.innerHTML = '<div class="sm muted" style="padding:12px">無關聯採購記錄（可能已刪除）</div>';
+  } else {
+    let html = `<table class="tbl" style="width:100%"><thead><tr>
+      <th>品項</th><th style="text-align:right">數量</th><th style="text-align:right">金額</th><th style="text-align:center">HST</th>
+    </tr></thead><tbody>`;
+    let tot = 0;
+    linked.forEach(p => {
+      const a = N(p.amt); tot += a;
+      const name = p.desc || (p.name ? p.name + (p.qty ? ' ×' + p.qty + (p.unit||'') : '') : '-');
+      html += `<tr>
+        <td style="font-size:13px">${esc(name)}</td>
+        <td style="text-align:right;font-size:13px">${p.qty ? p.qty + (p.unit||'') : '-'}</td>
+        <td style="text-align:right;font-weight:700">${fmt(a)}</td>
+        <td style="text-align:center">${p.hasHST ? '<span class="tag to">有HST</span>' : '<span class="tag tgr">免稅</span>'}</td>
+      </tr>`;
+    });
+    html += `<tr style="border-top:2px solid var(--bd)">
+      <td colspan="2" style="font-weight:700;padding-top:6px">合計</td>
+      <td style="text-align:right;font-weight:700;padding-top:6px">${fmt(tot)}</td><td></td>
+    </tr></tbody></table>`;
+    list.innerHTML = html;
+  }
+  document.getElementById('pur-detail-ovl').style.display = 'flex';
+}
+
+function closePurDetail() {
+  document.getElementById('pur-detail-ovl').style.display = 'none';
+  _pendingBankIdx = null;
+}
+
+function appendPurItems() {
+  // 追加：不清舊記錄，直接開品項選單
+  document.getElementById('pur-detail-ovl').style.display = 'none';
+  openPurItemModal();
+}
+
+function reSelectPurItems() {
+  const tx = _pendingBankIdx !== null ? (D.bank || [])[_pendingBankIdx] : null;
+  if (!tx) return;
+  const purIds = tx._purIds || [];
+  const count = (D.purchases || []).filter(p => purIds.includes(p.id)).length;
+  if (count > 0 && !confirm('將刪除 ' + count + ' 筆舊採購記錄，確認重新選擇？')) return;
+  // 刪除舊記錄
+  D.purchases = (D.purchases || []).filter(p => !purIds.includes(p.id));
+  D.bank[_pendingBankIdx]._purIds = [];
+  D.bank[_pendingBankIdx]._cat = undefined;
+  document.getElementById('pur-detail-ovl').style.display = 'none';
+  openPurItemModal();
+}
+
+function switchToOpexFromDetail() {
+  const tx = _pendingBankIdx !== null ? (D.bank || [])[_pendingBankIdx] : null;
+  if (!tx) return;
+  const purIds = tx._purIds || [];
+  const count = (D.purchases || []).filter(p => purIds.includes(p.id)).length;
+  if (count > 0 && !confirm('將刪除 ' + count + ' 筆採購記錄，並改標記為營運費用，確認？')) return;
+  D.purchases = (D.purchases || []).filter(p => !purIds.includes(p.id));
+  D.bank[_pendingBankIdx]._cat = 'opex';
+  D.bank[_pendingBankIdx]._purIds = [];
+  scheduleSave(); renderPurchases(); renderBank();
+  document.getElementById('pur-detail-ovl').style.display = 'none';
+  _pendingBankIdx = null;
+  toast('🔧 已改為營運費用，採購記錄已刪除');
 }
 
 function closePurConfirm() {
@@ -1609,26 +1848,69 @@ function openPurItemModal() {
   if (info) info.textContent = tx.date + '  ' + tx.desc + '  支出 ' + fmt(N(tx.wd));
 
   // 建立品項清單（分類顯示）
+  // 包裝耗材 → 含HST；其他食材分類 → 免稅
+  const HST_CATS = ['包裝耗材'];
   const items = getTemplateItems()();
   const categories = [...new Set(items.map(it => it.category || '其他'))];
   let html = '';
+  let foodTot = 0, matTot = 0;
   categories.forEach(cat => {
     const catItems = items.filter(it => (it.category || '其他') === cat);
-    html += `<div style="font-size:12px;font-weight:700;color:var(--tx2);margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--bd)">${cat}</div>`;
-    catItems.forEach((it, gi) => {
+    const isHSTCat = HST_CATS.includes(cat);
+    html += `<div style="display:flex;align-items:center;gap:6px;margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--bd)">
+      <span style="font-size:12px;font-weight:700;color:var(--tx2)">${cat}</span>
+      <span style="font-size:10px;padding:1px 5px;border-radius:4px;${isHSTCat?'background:#fde8cc;color:#c05000':'background:#d4f0e0;color:#1a7a3a'}">${isHSTCat?'含HST':'食材免稅'}</span>
+    </div>`;
+    catItems.forEach((it) => {
       const globalIdx = items.indexOf(it);
-      html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid var(--bd)">
+      const hstDefault = isHSTCat;
+      html += `<div style="display:flex;align-items:center;gap:6px;padding:5px 2px;border-bottom:1px solid var(--bd)">
         <input type="checkbox" id="pit-chk-${globalIdx}" style="width:16px;height:16px;flex-shrink:0">
         <label for="pit-chk-${globalIdx}" style="flex:1;font-size:13px;cursor:pointer">${esc(it.name)}</label>
-        <span style="font-size:11px;color:var(--tx3);min-width:30px">${esc(it.unit)}</span>
-        <input type="number" id="pit-qty-${globalIdx}" placeholder="數量" min="0" step="1"
-          style="width:65px;padding:3px 6px;border:1px solid var(--bd);border-radius:6px;font-size:13px;text-align:right">
-        <span style="font-size:11px;color:var(--tx3);min-width:55px;text-align:right">${it.price ? '$' + it.price : ''}</span>
+        <span style="font-size:11px;color:var(--tx3);min-width:24px">${esc(it.unit)}</span>
+        <input type="number" id="pit-qty-${globalIdx}" placeholder="數量" min="0" step="0.1"
+          style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:6px;font-size:13px;text-align:right">
+        <span style="font-size:11px;color:var(--tx3);min-width:52px;text-align:right">${it.price ? '$' + it.price : ''}</span>
+        <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:${hstDefault?'#c05000':'#1a7a3a'};cursor:pointer">
+          <input type="checkbox" id="pit-hst-${globalIdx}" ${hstDefault ? 'checked' : ''} style="width:13px;height:13px">HST
+        </label>
       </div>`;
     });
   });
+  // 底部合計提示區（動態更新）
+  html += `<div id="pit-summary" style="margin-top:10px;padding:8px;background:var(--bg2);border-radius:8px;font-size:12px;color:var(--tx2)">
+    勾選品項後顯示合計
+  </div>`;
   document.getElementById('pur-item-list').innerHTML = html;
+
+  // 勾選時更新合計
+  items.forEach((it, idx) => {
+    const chk = document.getElementById('pit-chk-' + idx);
+    const qtyEl = document.getElementById('pit-qty-' + idx);
+    const hstChk = document.getElementById('pit-hst-' + idx);
+    const update = () => updatePitSummary(items);
+    if (chk) chk.addEventListener('change', update);
+    if (qtyEl) qtyEl.addEventListener('input', update);
+    if (hstChk) hstChk.addEventListener('change', update);
+  });
+
   document.getElementById('pur-item-ovl').style.display = 'flex';
+}
+
+function updatePitSummary(items) {
+  let foodTot = 0, matTot = 0;
+  items.forEach((it, idx) => {
+    const chk = document.getElementById('pit-chk-' + idx);
+    if (!chk || !chk.checked) return;
+    const qty = parseFloat((document.getElementById('pit-qty-' + idx) || {}).value) || 1;
+    const price = parseFloat(it.price) || 0;
+    const hstChk = document.getElementById('pit-hst-' + idx);
+    const hasHST = hstChk ? hstChk.checked : false;
+    const total = price * qty;
+    if (hasHST) matTot += total; else foodTot += total;
+  });
+  const el = document.getElementById('pit-summary');
+  if (el) el.innerHTML = `食材（免稅）合計：<b>${fmt(foodTot)}</b> &nbsp;｜&nbsp; 包材（含HST）合計：<b>${fmt(matTot)}</b> &nbsp;｜&nbsp; 總計：<b>${fmt(foodTot + matTot)}</b>`;
 }
 
 function closePurItemModal() {
@@ -1645,21 +1927,26 @@ function confirmPurchaseFromBank() {
   if (!D.purchases) D.purchases = [];
 
   items.forEach((it, idx) => {
-    const chk = document.getElementById('pit-chk-' + idx);
-    const qtyEl = document.getElementById('pit-qty-' + idx);
+    const chk    = document.getElementById('pit-chk-' + idx);
+    const qtyEl  = document.getElementById('pit-qty-' + idx);
+    const hstChk = document.getElementById('pit-hst-' + idx);
     if (!chk || !chk.checked) return;
-    const qty = parseFloat(qtyEl ? qtyEl.value : '') || 1;
+    const qty      = parseFloat(qtyEl ? qtyEl.value : '') || 1;
+    const hasHST   = hstChk ? hstChk.checked : false;
     const unitPrice = parseFloat(it.price) || 0;
-    const total = unitPrice * qty;
+    const total    = unitPrice * qty;
+    const descStr  = it.name + ' ×' + qty + (it.unit || '');
     D.purchases.push({
       id: uid(),
       date: tx.date,
+      desc: descStr,
       name: it.name,
       unit: it.unit,
       qty: String(qty),
       amt: String(total > 0 ? total.toFixed(2) : ''),
-      hasHST: true,
-      note: '來自銀行支出：' + tx.desc
+      hasHST,
+      note: '來自銀行支出：' + tx.desc,
+      _bankId: tx.id
     });
     count++;
   });
@@ -1673,8 +1960,13 @@ function confirmPurchaseFromBank() {
   scheduleSave();
   renderPurchases();
   renderBank();
+  updateInvMetrics();
   closePurItemModal();
-  toast('✅ 已建立 ' + count + ' 筆採購記錄');
+  // Toast 含跳頁按鈕
+  const t = document.getElementById('toast');
+  t.innerHTML = '✅ 已建立 ' + count + ' 筆採購記錄 &nbsp;<a onclick="gotoTab(2)" style="color:#fff;text-decoration:underline;cursor:pointer;font-weight:700">→ 前往採購記錄</a>';
+  t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => { t.classList.remove('show'); t.textContent = ''; }, 4000);
 }
 
 // ═══════════════════════════════
@@ -1789,6 +2081,122 @@ function clearAllQty() {
   renderInventory();
   toast('✅ ' + total + ' 個品項數量已清零');
 }
+// ═══════════════════════════════
+//  設備管理（跨月份，獨立儲存）
+// ═══════════════════════════════
+const EQ_KEY = 'mw2_equipment';
+let EQ = [];
+
+function loadEquipment() {
+  try { EQ = JSON.parse(localStorage.getItem(EQ_KEY) || '[]'); } catch(e) { EQ = []; }
+}
+function saveEquipment() { localStorage.setItem(EQ_KEY, JSON.stringify(EQ)); }
+
+function showAddEquipment() {
+  document.getElementById('eq-form').style.display = 'block';
+  const today = new Date();
+  document.getElementById('eq-date').value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+}
+function hideAddEquipment() { document.getElementById('eq-form').style.display = 'none'; }
+
+function addEquipment() {
+  const name  = document.getElementById('eq-name').value.trim();
+  const date  = document.getElementById('eq-date').value;
+  const price = N(document.getElementById('eq-price').value);
+  const note  = document.getElementById('eq-note').value.trim();
+  if (!name || !price) { toast('請填寫設備名稱和購入金額'); return; }
+  EQ.push({ id: uid(), name, date, price, note });
+  saveEquipment();
+  renderEquipment();
+  buildAssetReport();
+  hideAddEquipment();
+  ['eq-name','eq-price','eq-note'].forEach(id => document.getElementById(id).value = '');
+  toast('✅ 設備已新增');
+}
+
+function removeEquipment(i) {
+  if (!confirm('確認刪除「' + EQ[i].name + '」？')) return;
+  EQ.splice(i, 1);
+  saveEquipment();
+  renderEquipment();
+  buildAssetReport();
+}
+
+function renderEquipment() {
+  const list = document.getElementById('eq-list');
+  if (!list) return;
+  if (!EQ.length) { list.innerHTML = '<div class="empty">尚無設備記錄</div>'; return; }
+  let total = 0;
+  let html = `<div class="scroll-x"><table class="tbl" style="min-width:420px"><thead><tr>
+    <th>設備名稱</th><th style="min-width:90px">購入日期</th><th style="text-align:right">購入原價</th><th>備註</th><th></th>
+  </tr></thead><tbody>`;
+  EQ.forEach((e, i) => {
+    total += N(e.price);
+    html += `<tr>
+      <td style="font-weight:600">${esc(e.name)}</td>
+      <td style="color:var(--tx2)">${e.date || '-'}</td>
+      <td style="text-align:right;font-weight:700">${fmt(N(e.price))}</td>
+      <td style="font-size:12px;color:var(--tx3)">${esc(e.note || '')}</td>
+      <td><button class="dbtn" onclick="removeEquipment(${i})">✕</button></td>
+    </tr>`;
+  });
+  html += `<tr style="border-top:2px solid var(--bd)">
+    <td colspan="2" style="font-weight:700;padding-top:6px">設備原值合計</td>
+    <td style="text-align:right;font-weight:700;padding-top:6px;color:var(--ac)">${fmt(total)}</td>
+    <td colspan="2"></td>
+  </tr>`;
+  list.innerHTML = html + '</tbody></table></div>';
+}
+
+// ═══════════════════════════════
+//  資產總覽計算
+// ═══════════════════════════════
+function buildAssetReport() {
+  // 1. 庫存原物料：掃所有月份找最新有月末資料的
+  let latestInv = 0, latestInvSrc = '—';
+  const months = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('mw2_') && k !== EQ_KEY && k !== 'mw2_cfg') {
+      months.push(k.replace('mw2_', '').replace('_', '-'));
+    }
+  }
+  months.sort().reverse(); // 最新在前
+  for (const m of months) {
+    try {
+      const raw = localStorage.getItem('mw2_' + m.replace('-', '_'));
+      if (!raw) continue;
+      const md = JSON.parse(raw);
+      const closeVal = (md.inventory && md.inventory.close || [])
+        .reduce((s, it) => s + N(it.price) * N(it.qty), 0);
+      if (closeVal > 0) {
+        latestInv = closeVal;
+        const [yr, mo] = m.split('-');
+        latestInvSrc = yr + '年' + parseInt(mo) + '月月末盤點';
+        break;
+      }
+    } catch(e) {}
+  }
+
+  // 2. 銀行現金：最新餘額
+  const lastBankEntry = [...(D.bank || [])].reverse().find(x => x.bal);
+  const cash = lastBankEntry ? parseFloat(lastBankEntry.bal) || 0 : 0;
+  const cashSrc = lastBankEntry ? (lastBankEntry.date || '最新記錄') : '—';
+
+  // 3. 設備合計
+  const eqTotal = EQ.reduce((s, e) => s + N(e.price), 0);
+
+  // 4. 總資產
+  const total = latestInv + cash + eqTotal;
+
+  s2('ast-inv',      fmt(latestInv), 'mv g');
+  s2('ast-inv-src',  latestInvSrc,   'ms');
+  s2('ast-cash',     fmt(cash),      'mv b');
+  s2('ast-cash-src', cashSrc,        'ms');
+  s2('ast-eq',       fmt(eqTotal),   'mv');
+  s2('ast-total',    fmt(total),     'mv o bold');
+}
+
 function renderAll() {
   renderRevenue();
   setInvPeriod(invPd);
@@ -1799,6 +2207,8 @@ function renderAll() {
   renderBank();
   buildReport();
   buildBankReport();
+  renderEquipment();
+  buildAssetReport();
 }
 
 // ═══════════════════════════════
@@ -1806,6 +2216,7 @@ function renderAll() {
 // ═══════════════════════════════
 function init() {
   loadCFG();
+  loadEquipment();
   initMonthSel();
   loadLocal();
   renderAll();
