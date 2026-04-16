@@ -144,13 +144,14 @@ select.fi{cursor:pointer;}
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active" onclick="gotoTab(0)">📊 每日營收</div>
+  <div class="tab active" onclick="gotoTab(0)">📊 每日營收（POS數據）</div>
   <div class="tab" onclick="gotoTab(1)">📦 庫存盤點</div>
   <div class="tab" onclick="gotoTab(2)">🛒 採購記錄</div>
   <div class="tab" onclick="gotoTab(3)">💸 費用管理</div>
   <div class="tab" onclick="gotoTab(4)">📋 月度報表</div>
   <div class="tab" onclick="gotoTab(5)">🏦 銀行帳目</div>
   <div class="tab" onclick="gotoTab(6)">🏢 資產總覽</div>
+  <div class="tab" onclick="gotoTab(7)">💳 平台收款</div>
 </div>
 
 <!-- ═══ PAGE 0: 每日營收 ═══ -->
@@ -177,11 +178,27 @@ select.fi{cursor:pointer;}
       <div style="margin-top:10px"><button class="btn bp fw" onclick="addRevenue()">＋ 新增</button></div>
     </div>
   </div>
+  <div class="al alw" style="font-size:12.5px;margin-bottom:8px">⚠️ 此頁為 POS 機數據，僅供記錄與品牌權利金試算用。實際損益請參考「月度財報」的銀行基準。</div>
   <div class="mrow">
-    <div class="mc"><div class="ml">本月 NET SALES</div><div class="mv g" id="rm-net">$0</div></div>
+    <div class="mc"><div class="ml">本月 NET SALES（POS）</div><div class="mv g" id="rm-net">$0</div></div>
     <div class="mc"><div class="ml">HST 代收合計</div><div class="mv o" id="rm-tax">$0</div></div>
     <div class="mc"><div class="ml">渠道手續費</div><div class="mv r" id="rm-fees">$0</div></div>
     <div class="mc"><div class="ml">已記錄天數</div><div class="mv" id="rm-days">0 天</div></div>
+  </div>
+  <div class="card" style="border-color:#f0d060;margin-bottom:12px">
+    <div class="ch" style="background:#fffaee">
+      <div class="ct" style="color:var(--or)">💰 品牌權利金試算（POS Net Sales × 5%）</div>
+    </div>
+    <div class="cb">
+      <div class="rr">
+        <span style="color:var(--tx2)">POS Net Sales（本月合計）</span>
+        <span class="rn" id="rm-royalty-base" style="font-weight:700">$0</span>
+      </div>
+      <div class="rr st" style="font-size:16px">
+        <span>品牌權利金（× 5%）</span>
+        <span class="rn" id="rm-royalty" style="color:var(--or);font-weight:700">$0</span>
+      </div>
+    </div>
   </div>
   <div class="card">
     <div class="ch"><div class="ct">每日明細</div></div>
@@ -501,6 +518,85 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
+<!-- ═══ PAGE 7: 平台收款 ═══ -->
+<div class="pg" id="p7">
+  <div class="al ali" style="margin-bottom:12px">
+    📥 依各平台對帳單記錄實際匯入公司戶的金額（Snappy 刷卡結算、Fantuan 番茄、Uber Eats、月底現金存入）。所有平台合計應與銀行帳目的收款存款相符。
+  </div>
+
+  <!-- 新增表單 -->
+  <div class="card">
+    <div class="ch"><div class="ct">新增平台收款記錄</div></div>
+    <div class="cb">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="frow" style="margin:0">
+          <div class="fl">平台</div>
+          <select class="fi" id="pd-platform">
+            <option value="snappy">💳 Snappy（刷卡收款）</option>
+            <option value="fantuan">🍅 Fantuan 番茄</option>
+            <option value="uber">🚗 Uber Eats</option>
+            <option value="cash">💵 現金存入</option>
+            <option value="other">📋 其他</option>
+          </select>
+        </div>
+        <div class="frow" style="margin:0">
+          <div class="fl">匯款日期</div>
+          <input class="fi" type="date" id="pd-date">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="frow" style="margin:0">
+          <div class="fl">金額 ($)</div>
+          <input class="fi" type="number" id="pd-amount" placeholder="0.00" step="0.01">
+        </div>
+        <div class="frow" style="margin:0">
+          <div class="fl">參考編號（可選）</div>
+          <input class="fi" type="text" id="pd-ref" placeholder="e.g. #202503-001">
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fl">備註</div>
+        <input class="fi" type="text" id="pd-note" placeholder="週期、批次說明等">
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn bp fw" onclick="addPlatformDep()">＋ 新增</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 各平台小計 -->
+  <div id="pd-summary" style="margin-top:4px"></div>
+
+  <!-- 銀行對帳 -->
+  <div class="card" style="margin-top:4px;border-color:#c0d8c0">
+    <div class="ch" style="background:#f0fdf4">
+      <div class="ct" style="color:var(--gn)">🔍 與銀行帳目核對</div>
+      <button class="btn bs bsm" onclick="renderPlatformDeps()">🔄 更新</button>
+    </div>
+    <div class="cb">
+      <div class="rr">
+        <span style="color:var(--tx2)">各平台收款合計（本頁記錄）</span>
+        <span class="rn" id="pd-total" style="font-weight:700">$0</span>
+      </div>
+      <div class="rr">
+        <span style="color:var(--tx2)">銀行帳目存款合計（本月）</span>
+        <span class="rn" id="pd-bank-total" style="font-weight:700">$0</span>
+      </div>
+      <div class="rr st">
+        <span>差額（銀行 − 平台）</span>
+        <span class="rn" id="pd-diff" style="font-weight:700">$0</span>
+      </div>
+      <div id="pd-recon-msg" style="margin-top:8px;font-size:12.5px;line-height:1.6;padding:8px;border-radius:6px;display:none"></div>
+    </div>
+  </div>
+
+  <!-- 明細列表 -->
+  <div class="card" style="margin-top:4px">
+    <div class="ch"><div class="ct">收款明細</div></div>
+    <div id="pd-list"></div>
+  </div>
+</div>
+
 <!-- ═══ 採購明細 Modal（點已分類 🛒 時顯示）═══ -->
 <div id="pur-detail-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center">
   <div style="background:var(--bg);border-radius:14px;padding:20px;width:min(94vw,520px);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.3)">
@@ -607,6 +703,7 @@ function blankData() {
     staff: [],
     misc: [],
     bank: [],
+    platformDeps: [],
   };
 }
 
@@ -924,10 +1021,13 @@ function renderRevenue() {
   const totNet  = D.revenues.reduce((s, r) => s + N(r.net), 0);
   const totTax  = D.revenues.reduce((s, r) => s + N(r.tax), 0);
   const totFees = D.revenues.reduce((s, r) => s + N(r.pos) * C.POS_FEE + N(r.onl) * C.ONLINE_FEE, 0);
+  const royalty = totNet * C.ROYALTY;
   s2('rm-net', fmt(totNet), 'mv g');
   s2('rm-tax', fmt(totTax), 'mv o');
   s2('rm-fees', fmt(totFees), 'mv r');
   document.getElementById('rm-days').textContent = D.revenues.length + ' 天';
+  sv('rm-royalty-base', fmt(totNet), 'rn');
+  sv('rm-royalty', fmt(royalty), 'rn');
 
   const list = document.getElementById('rev-list');
   if (!D.revenues.length) { list.innerHTML = '<div class="empty">尚無記錄</div>'; return; }
@@ -1006,8 +1106,60 @@ function addInvItem() {
   scheduleSave(); renderInventory();
 }
 
-function removeInvItem(i) { D.inventory[invPd].splice(i, 1); scheduleSave(); renderInventory(); }
-function updInv(i, f, v) { D.inventory[invPd][i][f] = v; scheduleSave(); renderInventory(); }
+// 同步兩個時期的品項清單（確保 open / close 品項相同，只有數量不同）
+function syncInvItems() {
+  if (!D.inventory) return;
+  if (!D.inventory.open)  D.inventory.open  = [];
+  if (!D.inventory.close) D.inventory.close = [];
+  const key = it => (it.name || '') + '|||' + (it.category || '其他');
+  let changed = false;
+
+  // open 有、close 沒有 → 加到 close（qty 空白）
+  const closeKeys = new Set(D.inventory.close.map(key));
+  D.inventory.open.forEach(it => {
+    if (it.name && !closeKeys.has(key(it))) {
+      D.inventory.close.push({ id: uid(), name: it.name, unit: it.unit||'', price: it.price||'', qty: '', notes: it.notes||'', category: it.category||'其他' });
+      changed = true;
+    }
+  });
+
+  // close 有、open 沒有 → 加到 open（qty 空白）
+  const openKeys = new Set(D.inventory.open.map(key));
+  D.inventory.close.forEach(it => {
+    if (it.name && !openKeys.has(key(it))) {
+      D.inventory.open.push({ id: uid(), name: it.name, unit: it.unit||'', price: it.price||'', qty: '', notes: it.notes||'', category: it.category||'其他' });
+      changed = true;
+    }
+  });
+
+  if (changed) scheduleSave();
+}
+
+function removeInvItem(i) {
+  const it = D.inventory[invPd][i];
+  // 兩個時期都刪除（同名同分類）
+  const other = invPd === 'open' ? 'close' : 'open';
+  const otherIdx = (D.inventory[other]||[]).findIndex(o =>
+    (o.name||'') === (it.name||'') && (o.category||'其他') === (it.category||'其他')
+  );
+  if (otherIdx >= 0) D.inventory[other].splice(otherIdx, 1);
+  D.inventory[invPd].splice(i, 1);
+  scheduleSave(); renderInventory();
+}
+
+function updInv(i, f, v) {
+  const oldItem = { ...D.inventory[invPd][i] }; // 改動前的快照，用來在另一邊找對應項
+  D.inventory[invPd][i][f] = v;
+  // 數量以外的欄位（名稱、單位、單價、分類、備註）同步到另一邊
+  if (f !== 'qty') {
+    const other = invPd === 'open' ? 'close' : 'open';
+    const otherItem = (D.inventory[other]||[]).find(o =>
+      (o.name||'') === (oldItem.name||'') && (o.category||'其他') === (oldItem.category||'其他')
+    );
+    if (otherItem) otherItem[f] = v;
+  }
+  scheduleSave(); renderInventory();
+}
 
 function invTotal(p) {
   return (D.inventory[p]||[]).reduce((s, it) => { const a = N(it.price)*N(it.qty); return s + (isNaN(a)?0:a); }, 0);
@@ -1023,6 +1175,7 @@ function toggleAllCat() {
 
 function renderInventory() {
   if (!D.inventory) D.inventory = { open: getTemplateItems()(), close: getTemplateItems()() };
+  syncInvItems(); // 確保 open/close 品項清單同步
   const items = D.inventory[invPd] || [];
   const catOrder = ['冷藏冰箱','冷凍/倉庫','茶葉','莊記進口','包裝耗材','其他'];
   const groups = {};
@@ -2197,6 +2350,131 @@ function buildAssetReport() {
   s2('ast-total',    fmt(total),     'mv o bold');
 }
 
+// ═══════════════════════════════
+//  平台收款
+// ═══════════════════════════════
+const PD_PLATFORMS = {
+  snappy:  { label: '💳 Snappy（刷卡收款）', color: 'var(--bl)',  bg: 'var(--blb)' },
+  fantuan: { label: '🍅 Fantuan 番茄',        color: '#c03030',   bg: '#fcecea' },
+  uber:    { label: '🚗 Uber Eats',            color: '#333',      bg: '#f0f0f0' },
+  cash:    { label: '💵 現金存入',              color: 'var(--gn)', bg: 'var(--gnb)' },
+  other:   { label: '📋 其他',                 color: 'var(--tx3)',bg: 'var(--sf2)' },
+};
+
+function addPlatformDep() {
+  const platform = document.getElementById('pd-platform').value;
+  const date     = document.getElementById('pd-date').value;
+  const amount   = parseFloat(document.getElementById('pd-amount').value) || 0;
+  const ref      = document.getElementById('pd-ref').value.trim();
+  const note     = document.getElementById('pd-note').value.trim();
+  if (!date) { toast('請填寫匯款日期'); return; }
+  if (!amount) { toast('請填寫金額'); return; }
+  if (!D.platformDeps) D.platformDeps = [];
+  D.platformDeps.push({ id: uid(), date, platform, amount, ref, note });
+  D.platformDeps.sort((a, b) => a.date.localeCompare(b.date));
+  scheduleSave();
+  renderPlatformDeps();
+  document.getElementById('pd-amount').value = '';
+  document.getElementById('pd-ref').value = '';
+  document.getElementById('pd-note').value = '';
+  toast('✅ 已新增');
+}
+
+function removePlatformDep(id) {
+  if (!confirm('確定刪除這筆收款記錄？')) return;
+  D.platformDeps = (D.platformDeps || []).filter(x => x.id !== id);
+  scheduleSave();
+  renderPlatformDeps();
+}
+
+function renderPlatformDeps() {
+  if (!D.platformDeps) D.platformDeps = [];
+  const deps = D.platformDeps;
+
+  // ── 各平台小計 ──
+  const totals = {};
+  let grandTotal = 0;
+  deps.forEach(d => {
+    totals[d.platform] = (totals[d.platform] || 0) + N(d.amount);
+    grandTotal += N(d.amount);
+  });
+
+  let sumHtml = '<div class="mrow" style="margin-bottom:4px">';
+  Object.keys(PD_PLATFORMS).forEach(key => {
+    const p = PD_PLATFORMS[key];
+    const amt = totals[key] || 0;
+    sumHtml += `<div class="mc" style="border-color:${p.color};opacity:${amt>0?1:0.45}">
+      <div class="ml" style="color:${p.color}">${p.label}</div>
+      <div class="mv" style="color:${p.color};font-size:17px">${fmt(amt)}</div>
+    </div>`;
+  });
+  sumHtml += `<div class="mc" style="border-color:var(--ac)">
+    <div class="ml" style="font-weight:700">合計收款</div>
+    <div class="mv g" style="font-size:19px">${fmt(grandTotal)}</div>
+  </div>`;
+  sumHtml += '</div>';
+  document.getElementById('pd-summary').innerHTML = sumHtml;
+
+  // ── 銀行對帳 ──
+  const bankDeps = (D.bank || []).reduce((s, x) => s + N(x.dep), 0);
+  const diff = bankDeps - grandTotal;
+  const absDiff = Math.abs(diff);
+  sv('pd-total',      fmt(grandTotal), 'rn');
+  sv('pd-bank-total', fmt(bankDeps),   'rn');
+  sv('pd-diff',       fmt(diff),       'rn ' + (absDiff < 1 ? 'rpos' : absDiff < 50 ? 'o' : 'rneg'));
+
+  const msgEl = document.getElementById('pd-recon-msg');
+  if (absDiff < 1) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--gnb)';
+    msgEl.style.color = 'var(--gn)';
+    msgEl.textContent = '✅ 平台收款與銀行帳目吻合！';
+  } else if (absDiff < 200) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--orb)';
+    msgEl.style.color = 'var(--or)';
+    msgEl.textContent = '⚠️ 差額 ' + fmt(absDiff) + '，可能有小額費用或四捨五入差異，請核對明細。';
+  } else {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--rdb)';
+    msgEl.style.color = 'var(--rd)';
+    msgEl.textContent = '❌ 差額 ' + fmt(absDiff) + '，請檢查是否有遺漏的匯款記錄或銀行存款。';
+  }
+
+  // ── 明細列表（依平台分組）──
+  const listEl = document.getElementById('pd-list');
+  if (!listEl) return;
+  if (!deps.length) { listEl.innerHTML = '<div class="empty">尚無記錄，請新增平台收款。</div>'; return; }
+
+  // 依平台分組顯示
+  let html = '';
+  Object.keys(PD_PLATFORMS).forEach(key => {
+    const p = PD_PLATFORMS[key];
+    const rows = deps.filter(d => d.platform === key);
+    if (!rows.length) return;
+    const subtotal = rows.reduce((s, d) => s + N(d.amount), 0);
+    html += `<div style="border-top:2px solid ${p.color};margin-top:4px">
+      <div style="padding:8px 14px;background:${p.bg};display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:${p.color};font-size:13px">${p.label}</span>
+        <span style="font-weight:700;color:${p.color}">${fmt(subtotal)}</span>
+      </div>
+      <div class="scroll-x"><table class="tbl" style="min-width:440px"><thead><tr>
+        <th>日期</th><th style="text-align:right">金額</th><th>參考編號</th><th>備註</th><th></th>
+      </tr></thead><tbody>`;
+    rows.forEach(d => {
+      html += `<tr>
+        <td style="white-space:nowrap">${d.date}</td>
+        <td style="text-align:right;font-weight:700">${fmt(N(d.amount))}</td>
+        <td style="color:var(--tx3);font-size:12px">${esc(d.ref||'')}</td>
+        <td style="color:var(--tx2);font-size:13px">${esc(d.note||'')}</td>
+        <td><button class="dbtn" onclick="removePlatformDep('${d.id}')">✕</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  });
+  listEl.innerHTML = html;
+}
+
 function renderAll() {
   renderRevenue();
   setInvPeriod(invPd);
@@ -2209,6 +2487,7 @@ function renderAll() {
   buildBankReport();
   renderEquipment();
   buildAssetReport();
+  renderPlatformDeps();
 }
 
 // ═══════════════════════════════
@@ -2221,7 +2500,7 @@ function init() {
   loadLocal();
   renderAll();
   const today = new Date().toISOString().split('T')[0];
-  ['r-date','pu-date','bk-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
+  ['r-date','pu-date','bk-date','pd-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
   if (!CFG.url) {
     document.getElementById('setupOvl').style.display = 'flex';
   } else {
