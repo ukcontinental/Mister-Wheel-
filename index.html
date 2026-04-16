@@ -524,6 +524,83 @@ select.fi{cursor:pointer;}
     📥 依各平台對帳單記錄實際匯入公司戶的金額（Snappy 刷卡結算、Fantuan 番茄、Uber Eats、月底現金存入）。所有平台合計應與銀行帳目的收款存款相符。
   </div>
 
+  <!-- PDF 資料參考區塊（靜態，每月手動維護） -->
+  <div id="pdf-ref-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-size:13px;font-weight:700;color:var(--tx2)">📄 PDF 對帳單摘要（2026年3月）</div>
+      <button class="btn bs bsm" onclick="togglePdfRef()">收起 ▲</button>
+    </div>
+    <div id="pdf-ref-content">
+      <div style="overflow-x:auto">
+        <table class="tbl" style="min-width:580px;margin-bottom:10px">
+          <thead><tr>
+            <th>平台</th><th>說明</th><th style="text-align:right">總收款</th>
+            <th style="text-align:right">手續費</th><th style="text-align:right">實際到帳</th><th>備註</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700;color:var(--bl)">💳 Snappy（刷卡）</td>
+              <td style="font-size:12px;color:var(--tx2)">863筆 · Visa/MC/Amex/Interac</td>
+              <td style="text-align:right">$12,934.21</td>
+              <td style="text-align:right;color:var(--rd)">-$221.38</td>
+              <td style="text-align:right;font-weight:700;color:var(--bl)">$12,712.83</td>
+              <td style="font-size:12px">Store #2804，每日結算</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:var(--bl)">💳 Snappy（線上）</td>
+              <td style="font-size:12px;color:var(--tx2)">42筆 · 網上訂單</td>
+              <td style="text-align:right">$805.00</td>
+              <td style="text-align:right;color:var(--rd)">-$35.91</td>
+              <td style="text-align:right;font-weight:700;color:var(--bl)">$769.09</td>
+              <td style="font-size:12px">Store #2804，批次結算</td>
+            </tr>
+            <tr style="background:var(--blb)">
+              <td style="font-weight:700;color:var(--bl)" colspan="2">💳 Snappy 小計</td>
+              <td style="text-align:right;font-weight:700">$13,739.21</td>
+              <td style="text-align:right;font-weight:700;color:var(--rd)">-$257.29</td>
+              <td style="text-align:right;font-weight:700;color:var(--bl)">$13,481.92</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:#c03030">🍅 Fantuan 番茄</td>
+              <td style="font-size:12px;color:var(--tx2)">月結匯款</td>
+              <td style="text-align:right">—</td>
+              <td style="text-align:right;color:var(--rd)">—</td>
+              <td style="text-align:right;font-weight:700;color:#c03030">$1,713.44</td>
+              <td style="font-size:12px">待確認匯款日期</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">🚗 Uber Eats</td>
+              <td style="font-size:12px;color:var(--tx2)">81筆訂單 · 月結淨額</td>
+              <td style="text-align:right">$2,384.25</td>
+              <td style="text-align:right;color:var(--rd)">-$1,164.93</td>
+              <td style="text-align:right;font-weight:700">$1,219.32</td>
+              <td style="font-size:12px">實際銀行匯款 $1,089.66（餘額跨月）</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:var(--gn)">💵 現金存入</td>
+              <td style="font-size:12px;color:var(--tx2)">月底現金清點存入</td>
+              <td style="text-align:right">—</td>
+              <td style="text-align:right">—</td>
+              <td style="text-align:right;font-weight:700;color:var(--tx3)">請填入</td>
+              <td style="font-size:12px">從銀行帳目核對</td>
+            </tr>
+            <tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
+              <td style="font-weight:700" colspan="2">合計（不含現金）</td>
+              <td style="text-align:right;font-weight:700">$16,128.46</td>
+              <td style="text-align:right;font-weight:700;color:var(--rd)">-$1,422.22</td>
+              <td style="text-align:right;font-weight:700;color:var(--ac)">$16,414.68</td>
+              <td style="font-size:12px;color:var(--tx3)">+ 現金存入</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="al alw" style="font-size:12px;margin-bottom:10px">
+        ⚠️ Uber 實際 3 月入帳 <b>$1,089.66</b>（$128.02 + $369.85 + $591.79），其餘部分將於 4 月匯入。月底核對銀行帳目時請注意跨月差異。
+      </div>
+    </div>
+  </div>
+
   <!-- 新增表單 -->
   <div class="card">
     <div class="ch"><div class="ct">新增平台收款記錄</div></div>
@@ -1750,18 +1827,27 @@ function renderBank() {
   s2('bm-net', fmt(net), 'mv '+(net>=0?'g':'r'));
   document.getElementById('bm-bal').textContent = lastBal ? '$'+parseFloat(lastBal.bal).toLocaleString('en',{minimumFractionDigits:2}) : '-';
 
-  const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
-  const hstColl  = (D.revenues||[]).reduce((s,r) => s+N(r.tax), 0);
+  const platTotal = (D.platformDeps||[]).reduce((s,x) => s+N(x.amount), 0);
   const rec = document.getElementById('bank-reconcile');
   if (D.bank.length > 0) {
-    const diff = totDep - (netSales + hstColl);
+    const diff = totDep - platTotal;
+    const absDiff = Math.abs(diff);
+    const diffColor = absDiff < 1 ? 'g' : absDiff < 200 ? 'o' : 'r';
+    const hasPlatData = platTotal > 0;
     rec.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div class="mc"><div class="ml">帳本 Net Sales + HST</div><div class="mv sm">${fmt(netSales+hstColl)}</div></div>
-      <div class="mc"><div class="ml">銀行存入合計</div><div class="mv sm">${fmt(totDep)}</div></div>
-      <div class="mc"><div class="ml">差異（存入 — 帳本收入）</div><div class="mv ${Math.abs(diff)<1?'g':'r'} sm">${diff>=0?'+':''}${fmt(diff)}</div></div>
+      <div class="mc" style="${hasPlatData?'':'opacity:0.5'}">
+        <div class="ml">平台收款合計（各對帳單）</div>
+        <div class="mv sm">${hasPlatData ? fmt(platTotal) : '尚未填入'}</div>
+        ${!hasPlatData ? '<div class="ms" style="color:var(--or)">請至「💳 平台收款」頁填入</div>' : ''}
+      </div>
+      <div class="mc"><div class="ml">銀行存入合計（含 HST）</div><div class="mv sm">${fmt(totDep)}</div></div>
+      <div class="mc"><div class="ml">差額（銀行 − 平台）</div><div class="mv ${hasPlatData?diffColor:'r'} sm">${hasPlatData?(diff>=0?'+':'')+fmt(diff):'—'}</div></div>
       <div class="mc"><div class="ml">銀行支出合計</div><div class="mv r sm">${fmt(totWd)}</div></div>
     </div>
-    <div class="sm muted" style="margin-top:8px">💡 差異在 $1 以內屬正常（四捨五入）。差異較大請逐筆核對備註。</div>`;
+    <div class="sm muted" style="margin-top:8px">
+      💡 平台收款（Snappy+Fantuan+Uber+現金）應與銀行存入相符。差異在 $1 以內屬正常。
+      ${hasPlatData && absDiff >= 1 ? '<br>⚠️ 差額 '+fmt(absDiff)+'，請至「💳 平台收款」頁核對明細。' : ''}
+    </div>`;
   } else { rec.innerHTML = '<div class="sm muted">輸入交易後自動顯示核對結果</div>'; }
 
   const list = document.getElementById('bank-list');
@@ -2353,6 +2439,14 @@ function buildAssetReport() {
 // ═══════════════════════════════
 //  平台收款
 // ═══════════════════════════════
+function togglePdfRef() {
+  const c = document.getElementById('pdf-ref-content');
+  const b = c.previousElementSibling.querySelector('button');
+  const hidden = c.style.display === 'none';
+  c.style.display = hidden ? '' : 'none';
+  b.textContent = hidden ? '收起 ▲' : '展開 ▼';
+}
+
 const PD_PLATFORMS = {
   snappy:  { label: '💳 Snappy（刷卡收款）', color: 'var(--bl)',  bg: 'var(--blb)' },
   fantuan: { label: '🍅 Fantuan 番茄',        color: '#c03030',   bg: '#fcecea' },
