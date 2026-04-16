@@ -689,6 +689,38 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
+<!-- ═══ 採購記錄編輯 Modal ═══ -->
+<div id="pur-edit-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;align-items:center;justify-content:center">
+  <div style="background:var(--sf);border-radius:14px;padding:20px;width:min(94vw,480px);box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;margin-bottom:14px">✏️ 編輯採購記錄</div>
+    <div class="frow"><div class="fl">日期</div><input class="fi" type="date" id="pe-date"></div>
+    <div class="frow"><div class="fl">品項說明</div><input class="fi" type="text" id="pe-desc" placeholder="品項名稱 × 數量"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="frow" style="margin:0 0 10px">
+        <div class="fl">金額 ($)</div>
+        <input class="fi" type="number" id="pe-amt" placeholder="0.00" step="0.01">
+      </div>
+      <div class="frow" style="margin:0 0 10px">
+        <div class="fl">數量</div>
+        <input class="fi" type="text" id="pe-qty" placeholder="e.g. 3">
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fl">備註</div>
+      <input class="fi" type="text" id="pe-note" placeholder="">
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0 16px;padding:10px 12px;background:var(--sf2);border-radius:8px;border:1px solid var(--bd)">
+      <input type="checkbox" id="pe-hst" style="width:18px;height:18px;cursor:pointer">
+      <label for="pe-hst" style="cursor:pointer;font-size:14px;font-weight:700">含 HST（包裝耗材 / 非食材 請勾選）</label>
+    </div>
+    <div id="pe-hst-preview" style="font-size:12.5px;color:var(--tx2);margin-bottom:14px;padding:6px 10px;background:var(--blb);border-radius:6px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bp fw" onclick="savePurchaseEdit()">✅ 儲存</button>
+      <button class="btn bs fw" onclick="closePurchaseEdit()">取消</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ 月末複製到下月月初 Modal ═══ -->
 <div id="inv-copy-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center">
   <div style="background:var(--bg);border-radius:14px;padding:20px;width:min(92vw,440px);box-shadow:0 8px 32px rgba(0,0,0,.3)">
@@ -1359,20 +1391,59 @@ function removePurchase(i) {
   scheduleSave(); renderPurchases(); renderBank(); updateInvMetrics();
 }
 
+let _editPurIdx = null;
+
 function editPurchase(i) {
   const p = D.purchases[i];
   if (!p) return;
-  const newAmt  = prompt('修改金額（目前：' + N(p.amt).toFixed(2) + '）', N(p.amt).toFixed(2));
-  if (newAmt === null) return;
-  const newDesc = prompt('修改品項說明（目前：' + (p.desc || p.name || '') + '）', p.desc || p.name || '');
-  if (newDesc === null) return;
-  const newQty  = prompt('修改數量（目前：' + (p.qty || '') + '）', p.qty || '');
-  if (newQty === null) return;
-  D.purchases[i].amt  = String(parseFloat(newAmt) || 0);
-  D.purchases[i].desc = newDesc;
-  D.purchases[i].qty  = newQty;
+  _editPurIdx = i;
+  document.getElementById('pe-date').value = p.date || '';
+  document.getElementById('pe-desc').value = p.desc || p.name || '';
+  document.getElementById('pe-amt').value  = N(p.amt).toFixed(2);
+  document.getElementById('pe-qty').value  = p.qty || '';
+  document.getElementById('pe-note').value = p.note || '';
+  document.getElementById('pe-hst').checked = !!p.hasHST;
+  updatePeHstPreview();
+  document.getElementById('pe-hst').onchange = updatePeHstPreview;
+  document.getElementById('pe-amt').oninput  = updatePeHstPreview;
+  document.getElementById('pur-edit-ovl').style.display = 'flex';
+}
+
+function updatePeHstPreview() {
+  const amt = parseFloat(document.getElementById('pe-amt').value) || 0;
+  const hasHST = document.getElementById('pe-hst').checked;
+  const el = document.getElementById('pe-hst-preview');
+  if (hasHST && amt > 0) {
+    const itc = amt * 13 / 113;
+    el.textContent = '含稅金額 $' + amt.toFixed(2) + ' → 未稅 $' + (amt / 1.13).toFixed(2) + '，ITC 可退 $' + itc.toFixed(2);
+    el.style.background = 'var(--orb)'; el.style.color = 'var(--or)';
+  } else if (!hasHST && amt > 0) {
+    el.textContent = '食材免稅，全額計入原料成本';
+    el.style.background = 'var(--gnb)'; el.style.color = 'var(--gn)';
+  } else {
+    el.textContent = '';
+  }
+}
+
+function savePurchaseEdit() {
+  if (_editPurIdx === null) return;
+  const p = D.purchases[_editPurIdx];
+  if (!p) return;
+  p.date   = document.getElementById('pe-date').value || p.date;
+  p.desc   = document.getElementById('pe-desc').value.trim() || p.desc;
+  p.amt    = String(parseFloat(document.getElementById('pe-amt').value) || 0);
+  p.qty    = document.getElementById('pe-qty').value.trim();
+  p.note   = document.getElementById('pe-note').value.trim();
+  p.hasHST = document.getElementById('pe-hst').checked;
+  D.purchases.sort((a, b) => a.date.localeCompare(b.date));
   scheduleSave(); renderPurchases(); updateInvMetrics();
-  toast('採購記錄已更新');
+  closePurchaseEdit();
+  toast('✅ 採購記錄已更新');
+}
+
+function closePurchaseEdit() {
+  document.getElementById('pur-edit-ovl').style.display = 'none';
+  _editPurIdx = null;
 }
 
 function renderPurchases() {
@@ -2076,6 +2147,13 @@ function markAsOpex() {
   toast('🔧 已標記為營運費用');
 }
 
+// 取採購品項清單：優先用實際庫存，若空則退回模板
+function getPurItemList() {
+  const inv = (D.inventory && D.inventory.open) ? D.inventory.open : [];
+  const named = inv.filter(it => it.name && it.name.trim());
+  return named.length > 0 ? named : getTemplateItems()();
+}
+
 function openPurItemModal() {
   // 關閉確認框，開啟品項框
   document.getElementById('pur-confirm-ovl').style.display = 'none';
@@ -2086,10 +2164,10 @@ function openPurItemModal() {
   const info = document.getElementById('pur-item-bank-info');
   if (info) info.textContent = tx.date + '  ' + tx.desc + '  支出 ' + fmt(N(tx.wd));
 
-  // 建立品項清單（分類顯示）
+  // 建立品項清單（分類顯示）— 從實際庫存讀取
   // 包裝耗材 → 含HST；其他食材分類 → 免稅
   const HST_CATS = ['包裝耗材'];
-  const items = getTemplateItems()();
+  const items = getPurItemList();
   const categories = [...new Set(items.map(it => it.category || '其他'))];
   let html = '';
   let foodTot = 0, matTot = 0;
@@ -2161,7 +2239,7 @@ function confirmPurchaseFromBank() {
   const tx = _pendingBankIdx !== null ? (D.bank || [])[_pendingBankIdx] : null;
   if (!tx) { closePurItemModal(); return; }
 
-  const items = getTemplateItems()();
+  const items = getPurItemList();
   let count = 0;
   if (!D.purchases) D.purchases = [];
 
