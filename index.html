@@ -237,8 +237,11 @@ select.fi{cursor:pointer;}
 <!-- ═══ PAGE 2: 採購記錄 ═══ -->
 <div class="pg" id="p2">
   <div class="card">
-    <div class="ch"><div class="ct">新增採購記錄</div></div>
-    <div class="cb">
+    <div class="ch" style="cursor:pointer" onclick="toggleForm('pu-form','pu-toggle-btn')">
+      <div class="ct">採購記錄</div>
+      <button id="pu-toggle-btn" class="btn bs bsm" onclick="event.stopPropagation();toggleForm('pu-form','pu-toggle-btn')">＋ 新增</button>
+    </div>
+    <div id="pu-form" class="cb" style="display:none">
       <div class="frow"><div class="fl">日期</div><input class="fi" type="date" id="pu-date"></div>
       <div class="frow"><div class="fl">說明</div><input class="fi" type="text" id="pu-desc" placeholder="例：T&T 麵粉補貨"></div>
       <div class="frow"><div class="fl">金額</div><input class="fi" type="number" id="pu-amt" placeholder="0.00" step="0.01"></div>
@@ -249,7 +252,7 @@ select.fi{cursor:pointer;}
         </label>
       </div>
       <div class="frow"><div class="fl">備註（選填）</div><input class="fi" type="text" id="pu-note" placeholder=""></div>
-      <div style="margin-top:10px"><button class="btn bp fw" onclick="addPurchase()">＋ 新增</button></div>
+      <div style="margin-top:10px"><button class="btn bp fw" onclick="addPurchase()">✅ 確認新增</button></div>
     </div>
   </div>
   <div class="mrow">
@@ -437,8 +440,11 @@ select.fi{cursor:pointer;}
 <!-- ═══ PAGE 5: 銀行帳目 ═══ -->
 <div class="pg" id="p5">
   <div class="card">
-    <div class="ch"><div class="ct">新增銀行交易</div></div>
-    <div class="cb">
+    <div class="ch" style="cursor:pointer" onclick="toggleForm('bk-form','bk-toggle-btn')">
+      <div class="ct">銀行帳目</div>
+      <button id="bk-toggle-btn" class="btn bs bsm" onclick="event.stopPropagation();toggleForm('bk-form','bk-toggle-btn')">＋ 新增</button>
+    </div>
+    <div id="bk-form" class="cb" style="display:none">
       <div class="al ali sm" style="margin-bottom:10px">💡 <b>快速貼上（免費）：</b>從網銀複製一行文字直接貼上，自動解析日期與金額。</div>
       <div class="frow">
         <div class="fl">貼上網銀交易文字</div>
@@ -455,7 +461,7 @@ select.fi{cursor:pointer;}
         <div class="frow"><div class="fl">支出 ($)</div><input class="fi" type="number" id="bk-wd" placeholder="0.00" step="0.01"></div>
         <div class="frow"><div class="fl">餘額 ($)</div><input class="fi" type="number" id="bk-bal" placeholder="0.00" step="0.01"></div>
         <div class="frow"><div class="fl">備註（核對用）</div><input class="fi" type="text" id="bk-note" placeholder="例：POS 3/25 結算、Costco 採購麵粉"></div>
-        <div style="margin-top:10px"><button class="btn bp fw" onclick="addBank()">＋ 新增</button></div>
+        <div style="margin-top:10px"><button class="btn bp fw" onclick="addBank()">✅ 確認新增</button></div>
       </div>
     </div>
   </div>
@@ -534,87 +540,26 @@ select.fi{cursor:pointer;}
     </div>
   </div>
 
-  <!-- PDF 資料參考區塊（靜態，每月手動維護） -->
-  <div id="pdf-ref-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-size:13px;font-weight:700;color:var(--tx2)">📄 PDF 對帳單摘要（2026年3月）</div>
-      <button class="btn bs bsm" onclick="togglePdfRef()">展開 ▼</button>
+  <!-- PDF 對帳單摘要（動態，每月資料存入 D.pdfSummary） -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="ch" style="cursor:pointer" onclick="toggleForm('pdf-ref-content','pdf-ref-btn')">
+      <div class="ct">📄 PDF 對帳單摘要</div>
+      <button id="pdf-ref-btn" class="btn bs bsm" data-open-label="展開 ▼" onclick="event.stopPropagation();toggleForm('pdf-ref-content','pdf-ref-btn')">展開 ▼</button>
     </div>
-    <div id="pdf-ref-content" style="display:none">
-      <div style="overflow-x:auto">
-        <table class="tbl" style="min-width:580px;margin-bottom:10px">
-          <thead><tr>
-            <th>平台</th><th>說明</th><th style="text-align:right">總收款</th>
-            <th style="text-align:right">手續費</th><th style="text-align:right">實際到帳</th><th>備註</th>
-          </tr></thead>
-          <tbody>
-            <tr>
-              <td style="font-weight:700;color:var(--bl)">💳 Snappy（刷卡）</td>
-              <td style="font-size:12px;color:var(--tx2)">863筆 · Visa/MC/Amex/Interac</td>
-              <td style="text-align:right">$12,934.21</td>
-              <td style="text-align:right;color:var(--rd)">-$221.38</td>
-              <td style="text-align:right;font-weight:700;color:var(--bl)">$12,712.83</td>
-              <td style="font-size:12px">Store #2804，每日結算</td>
-            </tr>
-            <tr>
-              <td style="font-weight:700;color:var(--bl)">💳 Snappy（線上）</td>
-              <td style="font-size:12px;color:var(--tx2)">42筆 · 網上訂單</td>
-              <td style="text-align:right">$805.00</td>
-              <td style="text-align:right;color:var(--rd)">-$35.91</td>
-              <td style="text-align:right;font-weight:700;color:var(--bl)">$769.09</td>
-              <td style="font-size:12px">Store #2804，批次結算</td>
-            </tr>
-            <tr style="background:var(--blb)">
-              <td style="font-weight:700;color:var(--bl)" colspan="2">💳 Snappy 小計</td>
-              <td style="text-align:right;font-weight:700">$13,739.21</td>
-              <td style="text-align:right;font-weight:700;color:var(--rd)">-$257.29</td>
-              <td style="text-align:right;font-weight:700;color:var(--bl)">$13,481.92</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td style="font-weight:700;color:#c03030">🥡 飯糰 Fantuan</td>
-              <td style="font-size:12px;color:var(--tx2)">月結匯款</td>
-              <td style="text-align:right">—</td>
-              <td style="text-align:right;color:var(--rd)">—</td>
-              <td style="text-align:right;font-weight:700;color:#c03030">$1,713.44</td>
-              <td style="font-size:12px">待確認匯款日期</td>
-            </tr>
-            <tr>
-              <td style="font-weight:700">🚗 Uber Eats</td>
-              <td style="font-size:12px;color:var(--tx2)">81筆訂單 · 月結淨額</td>
-              <td style="text-align:right">$2,384.25</td>
-              <td style="text-align:right;color:var(--rd)">-$1,164.93</td>
-              <td style="text-align:right;font-weight:700">$1,219.32</td>
-              <td style="font-size:12px">實際銀行匯款 $1,089.66（餘額跨月）</td>
-            </tr>
-            <tr>
-              <td style="font-weight:700;color:var(--gn)">💵 現金存入</td>
-              <td style="font-size:12px;color:var(--tx2)">月底現金清點存入</td>
-              <td style="text-align:right">—</td>
-              <td style="text-align:right">—</td>
-              <td style="text-align:right;font-weight:700;color:var(--tx3)">請填入</td>
-              <td style="font-size:12px">從銀行帳目核對</td>
-            </tr>
-            <tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
-              <td style="font-weight:700" colspan="2">合計（不含現金）</td>
-              <td style="text-align:right;font-weight:700">$16,128.46</td>
-              <td style="text-align:right;font-weight:700;color:var(--rd)">-$1,422.22</td>
-              <td style="text-align:right;font-weight:700;color:var(--ac)">$16,414.68</td>
-              <td style="font-size:12px;color:var(--tx3)">+ 現金存入</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="al alw" style="font-size:12px;margin-bottom:10px">
-        ⚠️ Uber 實際 3 月入帳 <b>$1,089.66</b>（$128.02 + $369.85 + $591.79），其餘部分將於 4 月匯入。月底核對銀行帳目時請注意跨月差異。
-      </div>
+    <div id="pdf-ref-content" style="display:none;padding:10px 14px 14px">
+      <div id="pdf-summary-table"><div class="empty">尚無 PDF 資料，請點下方「＋ 新增行」</div></div>
+      <button class="btn bs bsm" style="margin-top:10px" onclick="openPdfRowEdit(null)">＋ 新增行</button>
     </div>
   </div>
 
-  <!-- 新增表單 -->
+  <!-- 新增表單（手動補充調整用，預設收起） -->
   <div class="card">
-    <div class="ch"><div class="ct">新增平台收款記錄</div></div>
-    <div class="cb">
+    <div class="ch" style="cursor:pointer" onclick="toggleForm('pd-form','pd-toggle-btn')">
+      <div class="ct" style="font-size:13px;color:var(--tx2)">＋ 手動補充收款記錄</div>
+      <button id="pd-toggle-btn" class="btn bs bsm" data-open-label="展開" onclick="event.stopPropagation();toggleForm('pd-form','pd-toggle-btn')">展開</button>
+    </div>
+    <div id="pd-form" class="cb" style="display:none">
+      <div class="al ali sm" style="margin-bottom:10px">手動補充用途：現金存入、或 PDF 數字有誤需補充時使用。</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div class="frow" style="margin:0">
           <div class="fl">平台</div>
@@ -646,7 +591,7 @@ select.fi{cursor:pointer;}
         <input class="fi" type="text" id="pd-note" placeholder="週期、批次說明等">
       </div>
       <div style="margin-top:10px">
-        <button class="btn bp fw" onclick="addPlatformDep()">＋ 新增</button>
+        <button class="btn bp fw" onclick="addPlatformDep()">✅ 確認新增</button>
       </div>
     </div>
   </div>
@@ -662,7 +607,7 @@ select.fi{cursor:pointer;}
     </div>
     <div class="cb">
       <div class="rr">
-        <span style="color:var(--tx2)">各平台收款合計（本頁記錄）</span>
+        <span style="color:var(--tx2)">各平台收款合計（PDF 對帳單）</span>
         <span class="rn" id="pd-total" style="font-weight:700">$0</span>
       </div>
       <div class="rr">
@@ -681,6 +626,34 @@ select.fi{cursor:pointer;}
   <div class="card" style="margin-top:4px">
     <div class="ch"><div class="ct">收款明細</div></div>
     <div id="pd-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PDF 對帳單行 編輯 Modal ═══ -->
+<div id="pdf-row-edit-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center">
+  <div style="background:var(--sf);border-radius:14px;padding:20px;width:min(94vw,420px);box-shadow:0 8px 32px rgba(0,0,0,.25)">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">📄 PDF 對帳單資料</div>
+    <div class="frow">
+      <div class="fl">平台</div>
+      <select class="fi" id="pdfr-platform">
+        <option value="snappy">💳 Snappy</option>
+        <option value="fantuan">🥡 飯糰 Fantuan</option>
+        <option value="uber">🚗 Uber Eats</option>
+        <option value="cash">💵 現金存入</option>
+        <option value="other">📋 其他</option>
+      </select>
+    </div>
+    <div class="frow"><div class="fl">說明</div><input class="fi" type="text" id="pdfr-desc" placeholder="e.g. 863筆 · 刷卡"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="frow" style="margin:0 0 10px"><div class="fl">總收款 ($)</div><input class="fi" type="number" id="pdfr-gross" placeholder="留空=—" step="0.01"></div>
+      <div class="frow" style="margin:0 0 10px"><div class="fl">手續費 ($)</div><input class="fi" type="number" id="pdfr-fees" placeholder="留空=—" step="0.01"></div>
+    </div>
+    <div class="frow"><div class="fl">實際到帳 ($)</div><input class="fi" type="number" id="pdfr-actual" placeholder="留空=未知" step="0.01"></div>
+    <div class="frow"><div class="fl">備註</div><input class="fi" type="text" id="pdfr-note" placeholder="跨月說明等"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn bp fw" onclick="savePdfRowEdit()">✅ 確認</button>
+      <button class="btn bs fw" onclick="document.getElementById('pdf-row-edit-ovl').style.display='none'">取消</button>
+    </div>
   </div>
 </div>
 
@@ -853,7 +826,8 @@ function blankData() {
     misc: [],
     bank: [],
     platformDeps: [],
-    fixedCfg: null,  // 每月費用設定（null = 繼承或使用預設值）
+    pdfSummary: [],   // PDF 對帳單各行（主要資料來源）
+    fixedCfg: null,   // 每月費用設定（null = 繼承或使用預設值）
   };
 }
 
@@ -1436,6 +1410,7 @@ function addPurchase() {
   ['pu-desc','pu-amt','pu-note'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pu-hst').checked = false;
   toast('採購已新增');
+  collapseForm('pu-form','pu-toggle-btn');
 }
 
 function removePurchase(i) {
@@ -1997,6 +1972,7 @@ function addBank() {
   scheduleSave(); renderBank();
   ['bk-desc','bk-dep','bk-wd','bk-bal','bk-note'].forEach(id => document.getElementById(id).value = '');
   toast('已新增');
+  collapseForm('bk-form','bk-toggle-btn');
   // 若為支出，且非薪資支票（每月5號），提示是否為採購
   if (wd > 0) {
     const day = date ? parseInt(date.split('-')[2]) : 0;
@@ -2654,6 +2630,22 @@ function togglePdfRef() {
   b.textContent = hidden ? '收起 ▲' : '展開 ▼';
 }
 
+// ── 通用表單展開／收起 helper ──
+function toggleForm(formId, btnId) {
+  const el = document.getElementById(formId);
+  const btn = btnId ? document.getElementById(btnId) : null;
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? '' : 'none';
+  if (btn) btn.textContent = hidden ? '✕ 收起' : (btn.dataset.openLabel || '＋ 新增');
+}
+function collapseForm(formId, btnId) {
+  const el = document.getElementById(formId);
+  const btn = btnId ? document.getElementById(btnId) : null;
+  if (el) el.style.display = 'none';
+  if (btn) btn.textContent = btn.dataset.openLabel || '＋ 新增';
+}
+
 const PD_PLATFORMS = {
   snappy:  { label: '💳 Snappy（刷卡收款）', color: 'var(--bl)',  bg: 'var(--blb)' },
   fantuan: { label: '🥡 飯糰 Fantuan',        color: '#c03030',   bg: '#fcecea' },
@@ -2679,6 +2671,7 @@ function addPlatformDep() {
   document.getElementById('pd-ref').value = '';
   document.getElementById('pd-note').value = '';
   toast('✅ 已新增');
+  collapseForm('pd-form','pd-toggle-btn');
 }
 
 function removePlatformDep(id) {
@@ -2698,59 +2691,98 @@ function togglePlatformDetail(key) {
 }
 
 function renderPlatformDeps() {
+  if (!D.pdfSummary) D.pdfSummary = [];
   if (!D.platformDeps) D.platformDeps = [];
-  const deps = D.platformDeps;
 
-  // ── 各平台合計 ──
-  const totals = {};
-  let grandTotal = 0;
-  deps.forEach(d => {
-    totals[d.platform] = (totals[d.platform] || 0) + N(d.amount);
-    grandTotal += N(d.amount);
+  // ── 從 PDF 對帳單聚合各平台實際到帳 ──
+  const pdfRows = D.pdfSummary;
+  const pdfTotals = {};  // platform key -> total actual
+  let pdfGrandTotal = 0;
+  pdfRows.forEach(r => {
+    const amt = r.actual != null ? r.actual : 0;
+    if (r.platform !== 'cash') pdfGrandTotal += amt;  // 合計不含現金（另外核對）
+    pdfTotals[r.platform] = (pdfTotals[r.platform] || 0) + amt;
+  });
+  // 加上手動補充的 platformDeps
+  const manualTotals = {};
+  D.platformDeps.forEach(d => {
+    manualTotals[d.platform] = (manualTotals[d.platform] || 0) + N(d.amount);
   });
 
-  // ── 股東視角：乾淨到帳表 ──
+  // ── 股東視角：各平台實際到帳 ──
   const shEl = document.getElementById('pd-shareholder-view');
   if (shEl) {
-    if (!deps.length) {
-      shEl.innerHTML = '<div class="empty">尚無記錄，請在下方新增平台收款。</div>';
+    const hasPdf = pdfRows.length > 0;
+    const hasManual = D.platformDeps.length > 0;
+    if (!hasPdf && !hasManual) {
+      shEl.innerHTML = '<div class="empty">尚無記錄，請展開上方「PDF 對帳單摘要」輸入資料。</div>';
     } else {
-      let shHtml = `<div style="border-radius:0 0 var(--r) var(--r);overflow:hidden">
-        <table style="width:100%;border-collapse:collapse;font-size:15px">
-          <tbody>`;
-      Object.keys(PD_PLATFORMS).forEach(key => {
-        const p = PD_PLATFORMS[key];
-        const amt = totals[key] || 0;
-        const rows = deps.filter(d => d.platform === key);
-        if (!amt && !rows.length) return;
-        // 明細子表（預設隱藏）
-        let detailHtml = `<div id="pd-detail-${key}" style="display:none;padding:0 14px 10px;background:${p.bg}">
-          <table class="tbl" style="min-width:360px"><thead><tr>
-            <th>日期</th><th style="text-align:right">金額</th><th>參考編號</th><th>備註</th><th></th>
-          </tr></thead><tbody>`;
-        rows.forEach(d => {
-          detailHtml += `<tr>
-            <td style="white-space:nowrap;font-size:13px">${d.date}</td>
-            <td style="text-align:right;font-weight:700;font-size:13px">${fmt(N(d.amount))}</td>
-            <td style="color:var(--tx3);font-size:12px">${esc(d.ref||'')}</td>
-            <td style="color:var(--tx2);font-size:12px">${esc(d.note||'')}</td>
-            <td><button class="dbtn" onclick="removePlatformDep('${d.id}')">✕</button></td>
-          </tr>`;
-        });
-        detailHtml += `</tbody></table></div>`;
+      // 合併所有平台 key
+      const allKeys = new Set([
+        ...pdfRows.map(r => r.platform),
+        ...D.platformDeps.map(d => d.platform),
+      ]);
+      let shHtml = `<div style="overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:15px"><tbody>`;
+      allKeys.forEach(key => {
+        const p = PD_PLATFORMS[key] || PD_PLATFORMS.other;
+        const pdfAmt = pdfTotals[key] || 0;
+        const manAmt = manualTotals[key] || 0;
+        const totalAmt = pdfAmt + manAmt;
+        if (!totalAmt && !pdfRows.some(r => r.platform === key)) return;
+        // 明細行（PDF 子行 + 手動記錄）
+        const myPdfRows = pdfRows.filter(r => r.platform === key);
+        const myDeps = D.platformDeps.filter(d => d.platform === key);
+        let detailHtml = `<div id="pd-detail-${key}" style="display:none;padding:6px 14px 10px;background:${p.bg||'var(--sf2)'}">`;
+        if (myPdfRows.length) {
+          detailHtml += `<div style="font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:4px">PDF 對帳單</div>
+            <table class="tbl" style="margin-bottom:8px"><thead><tr>
+              <th>說明</th><th style="text-align:right">總收款</th><th style="text-align:right">手續費</th><th style="text-align:right">實際到帳</th><th>備註</th><th></th>
+            </tr></thead><tbody>`;
+          myPdfRows.forEach(r => {
+            detailHtml += `<tr>
+              <td style="font-size:13px">${esc(r.desc||r.label||'')}</td>
+              <td style="text-align:right;font-size:13px">${r.gross!=null?fmt(r.gross):'—'}</td>
+              <td style="text-align:right;font-size:13px;color:var(--rd)">${r.fees!=null?fmt(r.fees):'—'}</td>
+              <td style="text-align:right;font-weight:700;font-size:13px;color:${p.color||'var(--ac)'}">${r.actual!=null?fmt(r.actual):'—'}</td>
+              <td style="font-size:12px;color:var(--tx2)">${esc(r.note||'')}</td>
+              <td><button class="dbtn" onclick="openPdfRowEdit('${r.id}')">✏️</button> <button class="dbtn" onclick="removePdfRow('${r.id}')">✕</button></td>
+            </tr>`;
+          });
+          detailHtml += `</tbody></table>`;
+        }
+        if (myDeps.length) {
+          detailHtml += `<div style="font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:4px">手動補充</div>
+            <table class="tbl"><thead><tr>
+              <th>日期</th><th style="text-align:right">金額</th><th>參考</th><th>備註</th><th></th>
+            </tr></thead><tbody>`;
+          myDeps.forEach(d => {
+            detailHtml += `<tr>
+              <td style="font-size:13px">${d.date}</td>
+              <td style="text-align:right;font-weight:700;font-size:13px">${fmt(N(d.amount))}</td>
+              <td style="font-size:12px;color:var(--tx3)">${esc(d.ref||'')}</td>
+              <td style="font-size:12px;color:var(--tx2)">${esc(d.note||'')}</td>
+              <td><button class="dbtn" onclick="removePlatformDep('${d.id}')">✕</button></td>
+            </tr>`;
+          });
+          detailHtml += `</tbody></table>`;
+        }
+        detailHtml += `</div>`;
         shHtml += `<tr style="border-bottom:1px solid var(--bd)">
-          <td style="padding:12px 14px;font-weight:700;color:${p.color};font-size:15px">${p.label}</td>
-          <td style="padding:12px 14px;text-align:right;font-size:20px;font-weight:700;color:${amt>0?p.color:'var(--tx3)'}">${amt>0?fmt(amt):'—'}</td>
+          <td style="padding:12px 14px;font-weight:700;color:${p.color||'inherit'};font-size:15px">${p.label}</td>
+          <td style="padding:12px 14px;text-align:right;font-size:20px;font-weight:700;color:${totalAmt>0?(p.color||'var(--ac)'):'var(--tx3)'}">${totalAmt>0?fmt(totalAmt):'—'}</td>
           <td style="padding:12px 10px;white-space:nowrap">
-            ${rows.length > 0 ? `<button id="pd-detail-btn-${key}" class="btn bs bsm" onclick="togglePlatformDetail('${key}')">詳情 ▼</button>` : ''}
+            <button id="pd-detail-btn-${key}" class="btn bs bsm" onclick="togglePlatformDetail('${key}')" style="font-size:12px">詳情 ▼</button>
           </td>
         </tr>
         <tr><td colspan="3" style="padding:0">${detailHtml}</td></tr>`;
       });
-      // 合計行
+      // 合計行（不含現金）
+      const manualNoCash = D.platformDeps.filter(d=>d.platform!=='cash').reduce((s,d)=>s+N(d.amount),0);
+      const displayTotal = pdfGrandTotal + manualNoCash;
       shHtml += `<tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
-        <td style="padding:14px;font-size:15px;font-weight:700">合計</td>
-        <td style="padding:14px;text-align:right;font-size:22px;font-weight:700;color:var(--ac)">${fmt(grandTotal)}</td>
+        <td style="padding:14px;font-size:14px;font-weight:700">合計（不含現金）</td>
+        <td style="padding:14px;text-align:right;font-size:22px;font-weight:700;color:var(--ac)">${fmt(displayTotal)}</td>
         <td></td>
       </tr>`;
       shHtml += `</tbody></table></div>`;
@@ -2758,21 +2790,25 @@ function renderPlatformDeps() {
     }
   }
 
-  // ── 保留舊 pd-summary（用於銀行對帳頁讀取，但不顯示） ──
-  const sumEl = document.getElementById('pd-summary');
-  if (sumEl) sumEl.innerHTML = '';
+  // ── 渲染 PDF 對帳單表格 ──
+  renderPdfSummary();
 
   // ── 銀行對帳 ──
+  const manualNoCash2 = D.platformDeps.filter(d=>d.platform!=='cash').reduce((s,d)=>s+N(d.amount),0);
+  const platformTotal = pdfGrandTotal + manualNoCash2;
   const bankDeps = (D.bank || []).reduce((s, x) => s + N(x.dep), 0);
-  const diff = bankDeps - grandTotal;
+  const diff = bankDeps - platformTotal;
   const absDiff = Math.abs(diff);
-  sv('pd-total',      fmt(grandTotal), 'rn');
-  sv('pd-bank-total', fmt(bankDeps),   'rn');
-  sv('pd-diff',       fmt(diff),       'rn ' + (absDiff < 1 ? 'rpos' : absDiff < 50 ? 'o' : 'rneg'));
+  sv('pd-total',      fmt(platformTotal), 'rn');
+  sv('pd-bank-total', fmt(bankDeps),      'rn');
+  sv('pd-diff',       fmt(diff),          'rn ' + (absDiff < 1 ? 'rpos' : absDiff < 50 ? 'o' : 'rneg'));
 
   const msgEl = document.getElementById('pd-recon-msg');
   if (msgEl) {
-    if (absDiff < 1) {
+    if (pdfRows.length === 0) {
+      msgEl.style.display = 'block'; msgEl.style.background = 'var(--sf2)'; msgEl.style.color = 'var(--tx2)';
+      msgEl.textContent = '請先在 PDF 對帳單摘要中輸入本月資料。';
+    } else if (absDiff < 1) {
       msgEl.style.display = 'block'; msgEl.style.background = 'var(--gnb)'; msgEl.style.color = 'var(--gn)';
       msgEl.textContent = '✅ 平台收款與銀行帳目吻合！';
     } else if (absDiff < 200) {
@@ -2784,11 +2820,11 @@ function renderPlatformDeps() {
     }
   }
 
-  // ── 明細列表（依平台分組，置於下方） ──
+  // ── 手動補充明細列表 ──
   const listEl = document.getElementById('pd-list');
   if (!listEl) return;
-  if (!deps.length) { listEl.innerHTML = '<div class="empty">尚無收款記錄</div>'; return; }
-  // 只顯示純列表（不再重複平台標題，因為股東視角已有）
+  const deps = D.platformDeps;
+  if (!deps.length) { listEl.innerHTML = '<div class="empty" style="font-size:13px;color:var(--tx3)">無手動補充記錄</div>'; return; }
   let html = `<div class="scroll-x"><table class="tbl" style="min-width:440px"><thead><tr>
     <th>日期</th><th>平台</th><th style="text-align:right">金額</th><th>參考編號</th><th>備註</th><th></th>
   </tr></thead><tbody>`;
@@ -2796,7 +2832,7 @@ function renderPlatformDeps() {
     const p = PD_PLATFORMS[d.platform] || PD_PLATFORMS.other;
     html += `<tr>
       <td style="white-space:nowrap;color:var(--tx2)">${d.date}</td>
-      <td style="font-size:12px;font-weight:700;color:${p.color}">${p.label}</td>
+      <td style="font-size:12px;font-weight:700;color:${p.color||'inherit'}">${p.label}</td>
       <td style="text-align:right;font-weight:700">${fmt(N(d.amount))}</td>
       <td style="color:var(--tx3);font-size:12px">${esc(d.ref||'')}</td>
       <td style="color:var(--tx2);font-size:12px">${esc(d.note||'')}</td>
@@ -2805,6 +2841,121 @@ function renderPlatformDeps() {
   });
   html += '</tbody></table></div>';
   listEl.innerHTML = html;
+}
+
+// ── PDF 對帳單摘要表格渲染 ──
+function renderPdfSummary() {
+  const el = document.getElementById('pdf-summary-table');
+  if (!el) return;
+  const rows = D.pdfSummary || [];
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty" style="font-size:13px">尚無 PDF 資料，請點下方「＋ 新增行」</div>';
+    return;
+  }
+  // 計算合計（不含現金）
+  let totalGross = 0, totalFees = 0, totalActual = 0;
+  rows.forEach(r => {
+    if (r.platform !== 'cash') {
+      if (r.gross != null) totalGross += r.gross;
+      if (r.fees != null) totalFees += r.fees;
+      if (r.actual != null) totalActual += r.actual;
+    }
+  });
+  let html = `<div style="overflow-x:auto">
+    <table class="tbl" style="min-width:600px;margin-bottom:6px">
+      <thead><tr>
+        <th>平台</th><th>說明</th>
+        <th style="text-align:right">總收款</th>
+        <th style="text-align:right">手續費</th>
+        <th style="text-align:right">實際到帳</th>
+        <th>備註</th><th></th>
+      </tr></thead><tbody>`;
+  // 按平台分組顯示，有多行的平台加小計
+  const platformGroups = {};
+  rows.forEach(r => {
+    if (!platformGroups[r.platform]) platformGroups[r.platform] = [];
+    platformGroups[r.platform].push(r);
+  });
+  Object.entries(platformGroups).forEach(([key, grpRows]) => {
+    const p = PD_PLATFORMS[key] || PD_PLATFORMS.other;
+    grpRows.forEach(r => {
+      html += `<tr>
+        <td style="font-weight:700;color:${p.color||'inherit'};white-space:nowrap">${p.label}</td>
+        <td style="font-size:12px;color:var(--tx2)">${esc(r.desc||'')}</td>
+        <td style="text-align:right">${r.gross!=null?fmt(r.gross):'—'}</td>
+        <td style="text-align:right;color:var(--rd)">${r.fees!=null?fmt(r.fees):'—'}</td>
+        <td style="text-align:right;font-weight:700;color:${p.color||'var(--ac)'}">${r.actual!=null?fmt(r.actual):'<span style="color:var(--tx3)">請填入</span>'}</td>
+        <td style="font-size:12px;color:var(--tx2)">${esc(r.note||'')}</td>
+        <td style="white-space:nowrap">
+          <button class="dbtn" onclick="openPdfRowEdit('${r.id}')">✏️</button>
+          <button class="dbtn" onclick="removePdfRow('${r.id}')">✕</button>
+        </td>
+      </tr>`;
+    });
+    // 小計（若有多行）
+    if (grpRows.length > 1 && key !== 'cash') {
+      const subGross = grpRows.reduce((s,r)=>s+(r.gross||0),0);
+      const subFees  = grpRows.reduce((s,r)=>s+(r.fees||0),0);
+      const subAct   = grpRows.reduce((s,r)=>s+(r.actual||0),0);
+      html += `<tr style="background:var(--blb);font-weight:700">
+        <td colspan="2" style="color:${p.color||'inherit'}">${p.label} 小計</td>
+        <td style="text-align:right">${fmt(subGross)}</td>
+        <td style="text-align:right;color:var(--rd)">${fmt(subFees)}</td>
+        <td style="text-align:right;color:${p.color||'var(--ac)'}">${fmt(subAct)}</td>
+        <td colspan="2"></td>
+      </tr>`;
+    }
+  });
+  // 總計行
+  html += `<tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
+    <td colspan="2" style="font-weight:700">合計（不含現金）</td>
+    <td style="text-align:right;font-weight:700">${totalGross>0?fmt(totalGross):'—'}</td>
+    <td style="text-align:right;font-weight:700;color:var(--rd)">${totalFees<0?fmt(totalFees):'—'}</td>
+    <td style="text-align:right;font-weight:700;color:var(--ac)">${fmt(totalActual)}</td>
+    <td colspan="2" style="font-size:12px;color:var(--tx3)">+ 現金存入</td>
+  </tr>`;
+  html += `</tbody></table></div>`;
+  el.innerHTML = html;
+}
+
+// ── PDF 行編輯 ──
+let _pdfEditId = null;
+function openPdfRowEdit(id) {
+  _pdfEditId = id;
+  const row = id ? (D.pdfSummary||[]).find(r=>r.id===id) : null;
+  document.getElementById('pdfr-platform').value = row ? row.platform : 'snappy';
+  document.getElementById('pdfr-desc').value    = row ? (row.desc||'') : '';
+  document.getElementById('pdfr-gross').value   = row && row.gross!=null ? row.gross : '';
+  document.getElementById('pdfr-fees').value    = row && row.fees!=null  ? row.fees  : '';
+  document.getElementById('pdfr-actual').value  = row && row.actual!=null? row.actual: '';
+  document.getElementById('pdfr-note').value    = row ? (row.note||'') : '';
+  const ovl = document.getElementById('pdf-row-edit-ovl');
+  ovl.style.display = 'flex';
+}
+function savePdfRowEdit() {
+  const platform = document.getElementById('pdfr-platform').value;
+  const desc     = document.getElementById('pdfr-desc').value.trim();
+  const gross    = document.getElementById('pdfr-gross').value !== '' ? parseFloat(document.getElementById('pdfr-gross').value) : null;
+  const fees     = document.getElementById('pdfr-fees').value  !== '' ? parseFloat(document.getElementById('pdfr-fees').value)  : null;
+  const actual   = document.getElementById('pdfr-actual').value!== '' ? parseFloat(document.getElementById('pdfr-actual').value): null;
+  const note     = document.getElementById('pdfr-note').value.trim();
+  if (!D.pdfSummary) D.pdfSummary = [];
+  if (_pdfEditId) {
+    const idx = D.pdfSummary.findIndex(r=>r.id===_pdfEditId);
+    if (idx >= 0) D.pdfSummary[idx] = { ...D.pdfSummary[idx], platform, desc, gross, fees, actual, note };
+  } else {
+    D.pdfSummary.push({ id: uid(), platform, desc, gross, fees, actual, note });
+  }
+  scheduleSave();
+  document.getElementById('pdf-row-edit-ovl').style.display = 'none';
+  renderPlatformDeps();
+  toast('✅ PDF 資料已更新');
+}
+function removePdfRow(id) {
+  if (!confirm('確定刪除這筆 PDF 記錄？')) return;
+  D.pdfSummary = (D.pdfSummary||[]).filter(r=>r.id!==id);
+  scheduleSave();
+  renderPlatformDeps();
 }
 
 // ═══════════════════════════════
