@@ -266,25 +266,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 3: 費用管理 ═══ -->
 <div class="pg" id="p3">
-  <div class="al alw">固定費用可手動調整（只影響本月）。新月份自動沿用上月設定，不常變動就不用動。</div>
-
-  <!-- 每月費用設定（可手動調整） -->
-  <div class="card" style="margin-bottom:12px">
-    <div class="ch">
-      <div class="ct">⚙️ 本月固定費用設定</div>
-      <span class="sm muted">修改後只影響本月，下個月會自動繼承本月設定</span>
-    </div>
-    <div class="scroll-x">
-      <table class="tbl" style="min-width:340px">
-        <thead><tr>
-          <th style="min-width:160px">項目</th>
-          <th style="text-align:right;min-width:120px">金額</th>
-          <th style="min-width:120px">說明</th>
-        </tr></thead>
-        <tbody id="fixed-cfg-body"></tbody>
-      </table>
-    </div>
-  </div>
+  <div class="al alw sm">固定費用預設自動沿用上月設定。如需調整，點各項目旁的 ✏️ 按鈕即可修改，只影響本月。</div>
 
   <div class="card">
     <div class="ch"><div class="ct">固定費用 ＆ 權利金（本月試算）</div></div>
@@ -296,6 +278,7 @@ select.fi{cursor:pointer;}
           <th style="text-align:right;min-width:80px;color:var(--bl)">HST/ITC</th>
           <th style="text-align:right;min-width:90px">含稅合計</th>
           <th style="min-width:100px">備註</th>
+          <th style="min-width:36px"></th>
         </tr></thead>
         <tbody id="fixed-body"></tbody>
       </table>
@@ -698,6 +681,22 @@ select.fi{cursor:pointer;}
   <div class="card" style="margin-top:4px">
     <div class="ch"><div class="ct">收款明細</div></div>
     <div id="pd-list"></div>
+  </div>
+</div>
+
+<!-- ═══ 固定費用 快速編輯 Modal ═══ -->
+<div id="fixed-edit-ovl" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center">
+  <div style="background:var(--sf);border-radius:14px;padding:20px;width:min(92vw,360px);box-shadow:0 8px 32px rgba(0,0,0,.25)">
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px" id="fixed-edit-label">編輯費用</div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">修改只影響本月，下月自動繼承</div>
+    <div class="frow">
+      <div class="fl" id="fixed-edit-note"></div>
+      <input class="fi" type="number" id="fixed-edit-val" step="0.01" style="text-align:right">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn bp fw" onclick="saveFixedEdit()">✅ 確認</button>
+      <button class="btn bs fw" onclick="closeFixedEdit()">取消</button>
+    </div>
   </div>
 </div>
 
@@ -1570,22 +1569,83 @@ function getFixedData() {
   return { rows, totalEx, totalITC, rentEx, royalty, rentExtraInc, FC };
 }
 
+// 固定費用 快速編輯 Modal
+let _editFixedKey = null;
+const FIXED_EDIT_META = {
+  rent_base:      { label:'租金（基本）',      note:'未稅，業績低於門檻時使用' },
+  rent_threshold: { label:'業績門檻',          note:'超過此金額改按比例收租' },
+  rent_pct:       { label:'超門檻租金比例',    note:'例：0.05 = 5%' },
+  fridge:         { label:'電冰箱承租',        note:'未稅' },
+  parking_inc:    { label:'停車費',            note:'含稅填入' },
+  internet:       { label:'網路費',            note:'未稅' },
+  insurance_inc:  { label:'門店保費',          note:'含稅填入' },
+  bank_fee:       { label:'銀行手續費',        note:'免HST' },
+  pos_sys_inc:    { label:'POS 系統費',        note:'含稅填入' },
+  royalty_pct:    { label:'品牌權利金比例',    note:'例：0.05 = 5%' },
+};
+
+function openFixedEdit(key) {
+  _editFixedKey = key;
+  const FC = monthFixedCfg();
+  const meta = FIXED_EDIT_META[key] || { label: key, note: '' };
+  document.getElementById('fixed-edit-label').textContent = '✏️ ' + meta.label;
+  document.getElementById('fixed-edit-note').textContent  = meta.note;
+  document.getElementById('fixed-edit-val').value         = FC[key];
+  document.getElementById('fixed-edit-ovl').style.display = 'flex';
+  setTimeout(() => { const el = document.getElementById('fixed-edit-val'); if(el){ el.focus(); el.select(); } }, 80);
+}
+
+function saveFixedEdit() {
+  if (!_editFixedKey) return;
+  const val = parseFloat(document.getElementById('fixed-edit-val').value);
+  if (isNaN(val)) { toast('請填寫有效數字'); return; }
+  if (!D.fixedCfg) D.fixedCfg = Object.assign({}, DEFAULT_FIXED_CFG);
+  D.fixedCfg[_editFixedKey] = val;
+  scheduleSave();
+  closeFixedEdit();
+  renderFixedExpenses();
+  buildReport();
+  buildBankReport();
+  toast('✅ 已更新（只影響本月）');
+}
+
+function closeFixedEdit() {
+  document.getElementById('fixed-edit-ovl').style.display = 'none';
+  _editFixedKey = null;
+}
+
 function renderFixedExpenses() {
   const { rows, totalEx, totalITC } = getFixedData();
+  // 每個 row 的 key 對應到可編輯的 fixedCfg key
+  const ROW_EDIT_KEY = {
+    rent:      'rent_base',   // 點租金那列 → 編輯基本租金（不常用，但特殊月份可改）
+    fridge:    'fridge',
+    parking:   'parking_inc',
+    internet:  'internet',
+    insurance: 'insurance_inc',
+    bank_fee:  'bank_fee',
+    pos_sys:   'pos_sys_inc',
+    royalty:   'royalty_pct',
+  };
   let html = '';
   rows.forEach(r => {
+    const editKey = ROW_EDIT_KEY[r.key];
+    const editBtn = editKey
+      ? `<button class="dbtn" onclick="openFixedEdit('${editKey}')" title="修改此項目" style="color:var(--bl);font-size:13px">✏️</button>`
+      : '';
     html += `<tr style="${r.isRoyalty?'background:#fff8ed;':''}">
       <td style="white-space:nowrap;${r.isRoyalty?'color:var(--or);font-weight:700;':''}">${r.label}</td>
       <td style="text-align:right;${r.isRoyalty?'color:var(--or);font-weight:700;':''}">${fmt(r.ex)}</td>
       <td style="text-align:right;color:var(--bl)">${r.hst>0?fmt(r.hst):'-'}</td>
       <td style="text-align:right;font-weight:700">${fmt(r.ex+r.hst)}</td>
       <td style="font-size:12px;color:var(--tx3);white-space:nowrap">${r.note}</td>
+      <td style="text-align:center">${editBtn}</td>
     </tr>`;
   });
   html += `<tr style="font-weight:700;background:var(--sf2)">
     <td>合計</td><td style="text-align:right">${fmt(totalEx)}</td>
     <td style="text-align:right;color:var(--bl)">${fmt(totalITC)}</td>
-    <td style="text-align:right">${fmt(totalEx+totalITC)}</td><td></td>
+    <td style="text-align:right">${fmt(totalEx+totalITC)}</td><td></td><td></td>
   </tr>`;
   document.getElementById('fixed-body').innerHTML = html;
 
@@ -2796,7 +2856,6 @@ function renderAll() {
   renderStaff();
   renderMisc();
   renderFixedExpenses();
-  renderFixedConfig();
   renderBank();
   buildReport();
   buildBankReport();
