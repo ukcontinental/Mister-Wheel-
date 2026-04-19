@@ -266,9 +266,28 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 3: 費用管理 ═══ -->
 <div class="pg" id="p3">
-  <div class="al alw">固定費用自動計算（租金依當月業績調整）。權利金按 Net Sales × 5% 自動帶入。</div>
+  <div class="al alw">固定費用可手動調整（只影響本月）。新月份自動沿用上月設定，不常變動就不用動。</div>
+
+  <!-- 每月費用設定（可手動調整） -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="ch">
+      <div class="ct">⚙️ 本月固定費用設定</div>
+      <span class="sm muted">修改後只影響本月，下個月會自動繼承本月設定</span>
+    </div>
+    <div class="scroll-x">
+      <table class="tbl" style="min-width:340px">
+        <thead><tr>
+          <th style="min-width:160px">項目</th>
+          <th style="text-align:right;min-width:120px">金額</th>
+          <th style="min-width:120px">說明</th>
+        </tr></thead>
+        <tbody id="fixed-cfg-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="card">
-    <div class="ch"><div class="ct">固定費用 ＆ 權利金（自動計算）</div></div>
+    <div class="ch"><div class="ct">固定費用 ＆ 權利金（本月試算）</div></div>
     <div class="scroll-x">
       <table class="tbl" style="min-width:420px">
         <thead><tr>
@@ -354,12 +373,12 @@ select.fi{cursor:pointer;}
     <div class="rr" style="color:var(--tx2)"><span>（－）費用支出（未稅）</span><span></span></div>
     <div class="rr i"><span>租金</span><span class="rn" id="b2-rent">$0</span></div>
     <div class="rr i"><span>人事費用</span><span class="rn" id="b2-staff">$0</span></div>
-    <div class="rr i"><span>電冰箱承租</span><span class="rn">$50.00</span></div>
-    <div class="rr i"><span>停車費（未稅）</span><span class="rn">$168.14</span></div>
-    <div class="rr i"><span>網路費</span><span class="rn">$40.00</span></div>
-    <div class="rr i"><span>門店保費（未稅）</span><span class="rn">$155.75</span></div>
-    <div class="rr i"><span>銀行手續費</span><span class="rn">$10.00</span></div>
-    <div class="rr i"><span>POS 系統費（未稅）</span><span class="rn">$178.76</span></div>
+    <div class="rr i"><span>電冰箱承租</span><span class="rn" id="b2-fridge">$0</span></div>
+    <div class="rr i"><span>停車費（未稅）</span><span class="rn" id="b2-parking">$0</span></div>
+    <div class="rr i"><span>網路費</span><span class="rn" id="b2-internet">$0</span></div>
+    <div class="rr i"><span>門店保費（未稅）</span><span class="rn" id="b2-insurance">$0</span></div>
+    <div class="rr i"><span>銀行手續費</span><span class="rn" id="b2-bankfee">$0</span></div>
+    <div class="rr i"><span>POS 系統費（未稅）</span><span class="rn" id="b2-possys">$0</span></div>
     <div class="rr i"><span>雜支（未稅）</span><span class="rn" id="b2-misc">$0</span></div>
     <div class="rr st"><span>＝ 費用合計</span><span class="rn rneg" id="b2-exp">$0</span></div>
     <div class="sep"></div>
@@ -520,17 +539,25 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 7: 平台收款 ═══ -->
 <div class="pg" id="p7">
-  <div class="al ali" style="margin-bottom:12px">
-    📥 依各平台對帳單記錄實際匯入公司戶的金額（Snappy 刷卡結算、Fantuan 番茄、Uber Eats、月底現金存入）。所有平台合計應與銀行帳目的收款存款相符。
+
+  <!-- ✅ 股東視角：各平台實際到帳 -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="ch">
+      <div class="ct">💰 各平台實際到帳</div>
+      <button class="btn bs bsm" onclick="renderPlatformDeps()">🔄 更新</button>
+    </div>
+    <div id="pd-shareholder-view">
+      <div class="empty">尚無記錄，請在下方新增平台收款。</div>
+    </div>
   </div>
 
   <!-- PDF 資料參考區塊（靜態，每月手動維護） -->
   <div id="pdf-ref-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <div style="font-size:13px;font-weight:700;color:var(--tx2)">📄 PDF 對帳單摘要（2026年3月）</div>
-      <button class="btn bs bsm" onclick="togglePdfRef()">收起 ▲</button>
+      <button class="btn bs bsm" onclick="togglePdfRef()">展開 ▼</button>
     </div>
-    <div id="pdf-ref-content">
+    <div id="pdf-ref-content" style="display:none">
       <div style="overflow-x:auto">
         <table class="tbl" style="min-width:580px;margin-bottom:10px">
           <thead><tr>
@@ -562,7 +589,7 @@ select.fi{cursor:pointer;}
               <td></td>
             </tr>
             <tr>
-              <td style="font-weight:700;color:#c03030">🍅 Fantuan 番茄</td>
+              <td style="font-weight:700;color:#c03030">🥡 飯糰 Fantuan</td>
               <td style="font-size:12px;color:var(--tx2)">月結匯款</td>
               <td style="text-align:right">—</td>
               <td style="text-align:right;color:var(--rd)">—</td>
@@ -610,7 +637,7 @@ select.fi{cursor:pointer;}
           <div class="fl">平台</div>
           <select class="fi" id="pd-platform">
             <option value="snappy">💳 Snappy（刷卡收款）</option>
-            <option value="fantuan">🍅 Fantuan 番茄</option>
+            <option value="fantuan">🥡 飯糰 Fantuan</option>
             <option value="uber">🚗 Uber Eats</option>
             <option value="cash">💵 現金存入</option>
             <option value="other">📋 其他</option>
@@ -795,6 +822,20 @@ const N = v => { const x = parseFloat(v); return isNaN(x) ? 0 : x; };
 const fmt = v => '$' + Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const uid = () => Math.random().toString(36).slice(2, 9);
 
+// ── 固定費用預設值（新月份無上月可繼承時使用）──
+const DEFAULT_FIXED_CFG = {
+  rent_base: 1000,        // 租金 未稅（業績 < threshold 時）
+  rent_threshold: 20000,  // 業績門檻
+  rent_pct: 0.05,         // 業績超門檻時按比例計算
+  fridge: 50,             // 電冰箱承租 未稅
+  parking_inc: 190,       // 停車費 含稅
+  internet: 40,           // 網路費 未稅
+  insurance_inc: 176,     // 門店保費 含稅
+  bank_fee: 10,           // 銀行手續費
+  pos_sys_inc: 202,       // POS 系統費 含稅
+  royalty_pct: 0.05,      // 品牌權利金比例
+};
+
 // ═══════════════════════════════
 //  狀態 & 儲存
 // ═══════════════════════════════
@@ -813,7 +854,13 @@ function blankData() {
     misc: [],
     bank: [],
     platformDeps: [],
+    fixedCfg: null,  // 每月費用設定（null = 繼承或使用預設值）
   };
+}
+
+// 取當月費用設定（優先讀 D.fixedCfg，沒有就用預設）
+function monthFixedCfg() {
+  return Object.assign({}, DEFAULT_FIXED_CFG, D.fixedCfg || {});
 }
 
 function getTemplateItems() {
@@ -999,6 +1046,21 @@ function initMonthSel() {
 function onMonthChange() {
   curMonth = document.getElementById('monthSel').value;
   loadLocal();
+  // 若當月沒有 fixedCfg，嘗試從上月繼承
+  if (!D.fixedCfg) {
+    const prev = prevMonthStr(curMonth);
+    const raw  = localStorage.getItem(lsKey(prev));
+    if (raw) {
+      try {
+        const prevD = JSON.parse(raw);
+        if (prevD.fixedCfg) {
+          D.fixedCfg = Object.assign({}, prevD.fixedCfg);
+          // 繼承後立即存入本月
+          saveLocal();
+        }
+      } catch(e) {}
+    }
+  }
   renderAll();
   if (CFG.url) syncDown().then(() => renderAll()).catch(() => {});
   // B方案：若本月月初庫存為空，且上月月末有資料，提示複製
@@ -1488,23 +1550,24 @@ function renderPurchases() {
 //  費用管理
 // ═══════════════════════════════
 function getFixedData() {
+  const FC = monthFixedCfg();
   const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
-  const rentEx   = netSales < C.RENT_THRESHOLD ? C.RENT_BASE_EX : netSales * C.RENT_PCT;
-  const royalty  = netSales * C.ROYALTY;
+  const rentEx   = netSales < FC.rent_threshold ? FC.rent_base : netSales * FC.rent_pct;
+  const royalty  = netSales * FC.royalty_pct;
   const rows = [
-    { label:'租金', ex:rentEx, hst:rentEx*C.HST, note: netSales>=C.RENT_THRESHOLD?'業績≥$20,000，按5%計算':'固定$1,000未稅' },
-    { label:'電冰箱承租', ex:C.FRIDGE_EX, hst:C.FRIDGE_EX*C.HST, note:'' },
-    { label:'停車費', ex:exHST(C.PARKING_INC), hst:hstOf(C.PARKING_INC), note:'含稅$190' },
-    { label:'網路費', ex:C.INTERNET_EX, hst:C.INTERNET_EX*C.HST, note:'' },
-    { label:'門店保費', ex:exHST(C.INSURANCE_INC), hst:hstOf(C.INSURANCE_INC), note:'含稅$176' },
-    { label:'銀行手續費', ex:C.BANK_FEE, hst:0, note:'金融服務免HST' },
-    { label:'POS 系統費', ex:exHST(C.POS_SYS_INC), hst:hstOf(C.POS_SYS_INC), note:'含稅$202' },
-    { label:'🏷 品牌權利金 5%', ex:royalty, hst:0, note:'Net Sales×5%，自動計算', isRoyalty:true },
+    { key:'rent',      label:'租金',        ex:rentEx,                    hst:rentEx*C.HST,                   note: netSales>=FC.rent_threshold?'業績≥$'+FC.rent_threshold.toLocaleString()+'，按'+(FC.rent_pct*100)+'%計算':'固定$'+FC.rent_base+'未稅' },
+    { key:'fridge',    label:'電冰箱承租',  ex:FC.fridge,                 hst:FC.fridge*C.HST,                note:'' },
+    { key:'parking',   label:'停車費',       ex:exHST(FC.parking_inc),     hst:hstOf(FC.parking_inc),          note:'含稅$'+FC.parking_inc },
+    { key:'internet',  label:'網路費',       ex:FC.internet,               hst:FC.internet*C.HST,              note:'' },
+    { key:'insurance', label:'門店保費',     ex:exHST(FC.insurance_inc),   hst:hstOf(FC.insurance_inc),        note:'含稅$'+FC.insurance_inc },
+    { key:'bank_fee',  label:'銀行手續費',   ex:FC.bank_fee,               hst:0,                              note:'金融服務免HST' },
+    { key:'pos_sys',   label:'POS 系統費',   ex:exHST(FC.pos_sys_inc),     hst:hstOf(FC.pos_sys_inc),          note:'含稅$'+FC.pos_sys_inc },
+    { key:'royalty',   label:'🏷 品牌權利金 '+(FC.royalty_pct*100)+'%', ex:royalty, hst:0, note:'Net Sales×'+(FC.royalty_pct*100)+'%，自動計算', isRoyalty:true },
   ];
   const totalEx  = rows.reduce((s,r) => s+r.ex, 0);
   const totalITC = rows.reduce((s,r) => s+r.hst, 0);
-  const rentExtraInc = netSales>=C.RENT_THRESHOLD ? (netSales*C.RENT_PCT - C.RENT_BASE_EX)*1.13 : 0;
-  return { rows, totalEx, totalITC, rentEx, royalty, rentExtraInc };
+  const rentExtraInc = netSales>=FC.rent_threshold ? (netSales*FC.rent_pct - FC.rent_base)*1.13 : 0;
+  return { rows, totalEx, totalITC, rentEx, royalty, rentExtraInc, FC };
 }
 
 function renderFixedExpenses() {
@@ -1610,7 +1673,7 @@ function exportPDF() {
   const closeInv = invTotal('close');
   const purEx    = (D.purchases||[]).reduce((s,p) => { const a=N(p.amt); return s+(p.hasHST?exHST(a):a); }, 0);
   const cogs     = openInv + purEx - closeInv;
-  const { totalEx:fixedEx, totalITC:fixedITC, rentEx, royalty, rentExtraInc } = getFixedData();
+  const { totalEx:fixedEx, totalITC:fixedITC, rentEx, royalty, rentExtraInc, FC:pdfFC } = getFixedData();
   const staffTot = (D.staff||[]).reduce((s,x) => s+N(x.amt), 0);
   const miscEx   = (D.misc||[]).reduce((s,x) => s+(x.hasHST?exHST(N(x.amt)):N(x.amt)), 0);
   const miscITC  = (D.misc||[]).reduce((s,x) => s+(x.hasHST?hstOf(N(x.amt)):0), 0);
@@ -1705,12 +1768,12 @@ function exportPDF() {
       ${pnl('（－）費用支出', '', 'sub')}
       ${pnl('租金', fmt(rentEx), 'sub', true)}
       ${pnl('人事費用', fmt(staffTot), 'sub', true)}
-      ${pnl('電冰箱承租', '$50.00', 'sub', true)}
-      ${pnl('停車費（未稅）', '$168.14', 'sub', true)}
-      ${pnl('網路費', '$40.00', 'sub', true)}
-      ${pnl('門店保費（未稅）', '$155.75', 'sub', true)}
-      ${pnl('銀行手續費', '$10.00', 'sub', true)}
-      ${pnl('POS 系統費（未稅）', '$178.76', 'sub', true)}
+      ${pnl('電冰箱承租', fmt(pdfFC.fridge), 'sub', true)}
+      ${pnl('停車費（未稅）', fmt(exHST(pdfFC.parking_inc)), 'sub', true)}
+      ${pnl('網路費', fmt(pdfFC.internet), 'sub', true)}
+      ${pnl('門店保費（未稅）', fmt(exHST(pdfFC.insurance_inc)), 'sub', true)}
+      ${pnl('銀行手續費', fmt(pdfFC.bank_fee), 'sub', true)}
+      ${pnl('POS 系統費（未稅）', fmt(exHST(pdfFC.pos_sys_inc)), 'sub', true)}
       ${pnl('雜支（未稅）', fmt(miscEx), 'sub', true)}
       ${divider}
       ${pnl('＝ 費用合計', fmt(totExpEx), 'neg')}
@@ -1981,8 +2044,8 @@ function buildBankReport() {
   }, 0);
   const cogs = openInv + purEx - closeInv;
 
-  // 費用：同報表１
-  const { totalEx: fixedEx, totalITC: fixedITC, rentEx, royalty, rentExtraInc } = getFixedData();
+  // 費用：同報表１（讀 D.fixedCfg 動態設定）
+  const { totalEx: fixedEx, totalITC: fixedITC, rentEx, royalty, rentExtraInc, FC } = getFixedData();
   const staffTot = (D.staff  || []).reduce((s, x) => s + N(x.amt), 0);
   const miscEx   = (D.misc   || []).reduce((s, x) => s + (x.hasHST ? exHST(N(x.amt)) : N(x.amt)), 0);
   const miscITC  = (D.misc   || []).reduce((s, x) => s + (x.hasHST ? hstOf(N(x.amt)) : 0), 0);
@@ -2007,9 +2070,15 @@ function buildBankReport() {
   sv('b2-pur',    fmt(purEx),       'rn');
   sv('b2-close',  fmt(closeInv),    'rn');
   sv('b2-cogs',   fmt(cogs),        'rn rneg');
-  sv('b2-rent',   fmt(rentEx),      'rn');
-  sv('b2-staff',  fmt(staffTot),    'rn');
-  sv('b2-misc',   fmt(miscEx),      'rn');
+  sv('b2-rent',      fmt(rentEx),              'rn');
+  sv('b2-staff',     fmt(staffTot),            'rn');
+  sv('b2-fridge',    fmt(FC.fridge),           'rn');
+  sv('b2-parking',   fmt(exHST(FC.parking_inc)),'rn');
+  sv('b2-internet',  fmt(FC.internet),         'rn');
+  sv('b2-insurance', fmt(exHST(FC.insurance_inc)),'rn');
+  sv('b2-bankfee',   fmt(FC.bank_fee),         'rn');
+  sv('b2-possys',    fmt(exHST(FC.pos_sys_inc)),'rn');
+  sv('b2-misc',      fmt(miscEx),              'rn');
   sv('b2-exp',    fmt(totExpEx),    'rn rneg');
   sv('b2-op',     fmt(opProfit),    'rn ' + (opProfit >= 0 ? 'rpos' : 'rneg'));
   sv('b2-roy',    fmt(royalty),     'rn rneg');
@@ -2527,7 +2596,7 @@ function togglePdfRef() {
 
 const PD_PLATFORMS = {
   snappy:  { label: '💳 Snappy（刷卡收款）', color: 'var(--bl)',  bg: 'var(--blb)' },
-  fantuan: { label: '🍅 Fantuan 番茄',        color: '#c03030',   bg: '#fcecea' },
+  fantuan: { label: '🥡 飯糰 Fantuan',        color: '#c03030',   bg: '#fcecea' },
   uber:    { label: '🚗 Uber Eats',            color: '#333',      bg: '#f0f0f0' },
   cash:    { label: '💵 現金存入',              color: 'var(--gn)', bg: 'var(--gnb)' },
   other:   { label: '📋 其他',                 color: 'var(--tx3)',bg: 'var(--sf2)' },
@@ -2559,11 +2628,20 @@ function removePlatformDep(id) {
   renderPlatformDeps();
 }
 
+function togglePlatformDetail(key) {
+  const el = document.getElementById('pd-detail-' + key);
+  const btn = document.getElementById('pd-detail-btn-' + key);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? 'block' : 'none';
+  if (btn) btn.textContent = hidden ? '收起 ▲' : '詳情 ▼';
+}
+
 function renderPlatformDeps() {
   if (!D.platformDeps) D.platformDeps = [];
   const deps = D.platformDeps;
 
-  // ── 各平台小計 ──
+  // ── 各平台合計 ──
   const totals = {};
   let grandTotal = 0;
   deps.forEach(d => {
@@ -2571,21 +2649,58 @@ function renderPlatformDeps() {
     grandTotal += N(d.amount);
   });
 
-  let sumHtml = '<div class="mrow" style="margin-bottom:4px">';
-  Object.keys(PD_PLATFORMS).forEach(key => {
-    const p = PD_PLATFORMS[key];
-    const amt = totals[key] || 0;
-    sumHtml += `<div class="mc" style="border-color:${p.color};opacity:${amt>0?1:0.45}">
-      <div class="ml" style="color:${p.color}">${p.label}</div>
-      <div class="mv" style="color:${p.color};font-size:17px">${fmt(amt)}</div>
-    </div>`;
-  });
-  sumHtml += `<div class="mc" style="border-color:var(--ac)">
-    <div class="ml" style="font-weight:700">合計收款</div>
-    <div class="mv g" style="font-size:19px">${fmt(grandTotal)}</div>
-  </div>`;
-  sumHtml += '</div>';
-  document.getElementById('pd-summary').innerHTML = sumHtml;
+  // ── 股東視角：乾淨到帳表 ──
+  const shEl = document.getElementById('pd-shareholder-view');
+  if (shEl) {
+    if (!deps.length) {
+      shEl.innerHTML = '<div class="empty">尚無記錄，請在下方新增平台收款。</div>';
+    } else {
+      let shHtml = `<div style="border-radius:0 0 var(--r) var(--r);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:15px">
+          <tbody>`;
+      Object.keys(PD_PLATFORMS).forEach(key => {
+        const p = PD_PLATFORMS[key];
+        const amt = totals[key] || 0;
+        const rows = deps.filter(d => d.platform === key);
+        if (!amt && !rows.length) return;
+        // 明細子表（預設隱藏）
+        let detailHtml = `<div id="pd-detail-${key}" style="display:none;padding:0 14px 10px;background:${p.bg}">
+          <table class="tbl" style="min-width:360px"><thead><tr>
+            <th>日期</th><th style="text-align:right">金額</th><th>參考編號</th><th>備註</th><th></th>
+          </tr></thead><tbody>`;
+        rows.forEach(d => {
+          detailHtml += `<tr>
+            <td style="white-space:nowrap;font-size:13px">${d.date}</td>
+            <td style="text-align:right;font-weight:700;font-size:13px">${fmt(N(d.amount))}</td>
+            <td style="color:var(--tx3);font-size:12px">${esc(d.ref||'')}</td>
+            <td style="color:var(--tx2);font-size:12px">${esc(d.note||'')}</td>
+            <td><button class="dbtn" onclick="removePlatformDep('${d.id}')">✕</button></td>
+          </tr>`;
+        });
+        detailHtml += `</tbody></table></div>`;
+        shHtml += `<tr style="border-bottom:1px solid var(--bd)">
+          <td style="padding:12px 14px;font-weight:700;color:${p.color};font-size:15px">${p.label}</td>
+          <td style="padding:12px 14px;text-align:right;font-size:20px;font-weight:700;color:${amt>0?p.color:'var(--tx3)'}">${amt>0?fmt(amt):'—'}</td>
+          <td style="padding:12px 10px;white-space:nowrap">
+            ${rows.length > 0 ? `<button id="pd-detail-btn-${key}" class="btn bs bsm" onclick="togglePlatformDetail('${key}')">詳情 ▼</button>` : ''}
+          </td>
+        </tr>
+        <tr><td colspan="3" style="padding:0">${detailHtml}</td></tr>`;
+      });
+      // 合計行
+      shHtml += `<tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
+        <td style="padding:14px;font-size:15px;font-weight:700">合計</td>
+        <td style="padding:14px;text-align:right;font-size:22px;font-weight:700;color:var(--ac)">${fmt(grandTotal)}</td>
+        <td></td>
+      </tr>`;
+      shHtml += `</tbody></table></div>`;
+      shEl.innerHTML = shHtml;
+    }
+  }
+
+  // ── 保留舊 pd-summary（用於銀行對帳頁讀取，但不顯示） ──
+  const sumEl = document.getElementById('pd-summary');
+  if (sumEl) sumEl.innerHTML = '';
 
   // ── 銀行對帳 ──
   const bankDeps = (D.bank || []).reduce((s, x) => s + N(x.dep), 0);
@@ -2596,55 +2711,82 @@ function renderPlatformDeps() {
   sv('pd-diff',       fmt(diff),       'rn ' + (absDiff < 1 ? 'rpos' : absDiff < 50 ? 'o' : 'rneg'));
 
   const msgEl = document.getElementById('pd-recon-msg');
-  if (absDiff < 1) {
-    msgEl.style.display = 'block';
-    msgEl.style.background = 'var(--gnb)';
-    msgEl.style.color = 'var(--gn)';
-    msgEl.textContent = '✅ 平台收款與銀行帳目吻合！';
-  } else if (absDiff < 200) {
-    msgEl.style.display = 'block';
-    msgEl.style.background = 'var(--orb)';
-    msgEl.style.color = 'var(--or)';
-    msgEl.textContent = '⚠️ 差額 ' + fmt(absDiff) + '，可能有小額費用或四捨五入差異，請核對明細。';
-  } else {
-    msgEl.style.display = 'block';
-    msgEl.style.background = 'var(--rdb)';
-    msgEl.style.color = 'var(--rd)';
-    msgEl.textContent = '❌ 差額 ' + fmt(absDiff) + '，請檢查是否有遺漏的匯款記錄或銀行存款。';
+  if (msgEl) {
+    if (absDiff < 1) {
+      msgEl.style.display = 'block'; msgEl.style.background = 'var(--gnb)'; msgEl.style.color = 'var(--gn)';
+      msgEl.textContent = '✅ 平台收款與銀行帳目吻合！';
+    } else if (absDiff < 200) {
+      msgEl.style.display = 'block'; msgEl.style.background = 'var(--orb)'; msgEl.style.color = 'var(--or)';
+      msgEl.textContent = '⚠️ 差額 ' + fmt(absDiff) + '，可能有小額費用或四捨五入差異，請核對明細。';
+    } else {
+      msgEl.style.display = 'block'; msgEl.style.background = 'var(--rdb)'; msgEl.style.color = 'var(--rd)';
+      msgEl.textContent = '❌ 差額 ' + fmt(absDiff) + '，請檢查是否有遺漏的匯款記錄或銀行存款。';
+    }
   }
 
-  // ── 明細列表（依平台分組）──
+  // ── 明細列表（依平台分組，置於下方） ──
   const listEl = document.getElementById('pd-list');
   if (!listEl) return;
-  if (!deps.length) { listEl.innerHTML = '<div class="empty">尚無記錄，請新增平台收款。</div>'; return; }
-
-  // 依平台分組顯示
-  let html = '';
-  Object.keys(PD_PLATFORMS).forEach(key => {
-    const p = PD_PLATFORMS[key];
-    const rows = deps.filter(d => d.platform === key);
-    if (!rows.length) return;
-    const subtotal = rows.reduce((s, d) => s + N(d.amount), 0);
-    html += `<div style="border-top:2px solid ${p.color};margin-top:4px">
-      <div style="padding:8px 14px;background:${p.bg};display:flex;justify-content:space-between;align-items:center">
-        <span style="font-weight:700;color:${p.color};font-size:13px">${p.label}</span>
-        <span style="font-weight:700;color:${p.color}">${fmt(subtotal)}</span>
-      </div>
-      <div class="scroll-x"><table class="tbl" style="min-width:440px"><thead><tr>
-        <th>日期</th><th style="text-align:right">金額</th><th>參考編號</th><th>備註</th><th></th>
-      </tr></thead><tbody>`;
-    rows.forEach(d => {
-      html += `<tr>
-        <td style="white-space:nowrap">${d.date}</td>
-        <td style="text-align:right;font-weight:700">${fmt(N(d.amount))}</td>
-        <td style="color:var(--tx3);font-size:12px">${esc(d.ref||'')}</td>
-        <td style="color:var(--tx2);font-size:13px">${esc(d.note||'')}</td>
-        <td><button class="dbtn" onclick="removePlatformDep('${d.id}')">✕</button></td>
-      </tr>`;
-    });
-    html += `</tbody></table></div></div>`;
+  if (!deps.length) { listEl.innerHTML = '<div class="empty">尚無收款記錄</div>'; return; }
+  // 只顯示純列表（不再重複平台標題，因為股東視角已有）
+  let html = `<div class="scroll-x"><table class="tbl" style="min-width:440px"><thead><tr>
+    <th>日期</th><th>平台</th><th style="text-align:right">金額</th><th>參考編號</th><th>備註</th><th></th>
+  </tr></thead><tbody>`;
+  [...deps].reverse().forEach(d => {
+    const p = PD_PLATFORMS[d.platform] || PD_PLATFORMS.other;
+    html += `<tr>
+      <td style="white-space:nowrap;color:var(--tx2)">${d.date}</td>
+      <td style="font-size:12px;font-weight:700;color:${p.color}">${p.label}</td>
+      <td style="text-align:right;font-weight:700">${fmt(N(d.amount))}</td>
+      <td style="color:var(--tx3);font-size:12px">${esc(d.ref||'')}</td>
+      <td style="color:var(--tx2);font-size:12px">${esc(d.note||'')}</td>
+      <td><button class="dbtn" onclick="removePlatformDep('${d.id}')">✕</button></td>
+    </tr>`;
   });
+  html += '</tbody></table></div>';
   listEl.innerHTML = html;
+}
+
+// ═══════════════════════════════
+//  固定費用設定 UI（每月可編輯）
+// ═══════════════════════════════
+function renderFixedConfig() {
+  const el = document.getElementById('fixed-cfg-body');
+  if (!el) return;
+  const FC = monthFixedCfg();
+  const fields = [
+    { key:'rent_base',      label:'租金（基本）未稅',     note:'業績低於門檻時使用',  type:'number' },
+    { key:'rent_threshold', label:'業績門檻',             note:'超過此金額改按比例收', type:'number' },
+    { key:'rent_pct',       label:'業績超門檻租金比例',   note:'例：0.05 = 5%',       type:'number', step:'0.001' },
+    { key:'fridge',         label:'電冰箱承租 未稅',      note:'',                    type:'number' },
+    { key:'parking_inc',    label:'停車費 含稅',           note:'',                    type:'number' },
+    { key:'internet',       label:'網路費 未稅',           note:'',                    type:'number' },
+    { key:'insurance_inc',  label:'門店保費 含稅',         note:'',                    type:'number' },
+    { key:'bank_fee',       label:'銀行手續費',            note:'免HST',              type:'number' },
+    { key:'pos_sys_inc',    label:'POS 系統費 含稅',       note:'',                    type:'number' },
+    { key:'royalty_pct',    label:'品牌權利金比例',        note:'例：0.05 = 5%',       type:'number', step:'0.001' },
+  ];
+  let html = '';
+  fields.forEach(f => {
+    html += `<tr>
+      <td style="white-space:nowrap;font-size:13px">${f.label}</td>
+      <td><input type="${f.type}" step="${f.step||'0.01'}" value="${FC[f.key]}"
+        style="width:110px;border:1px solid var(--bd2);border-radius:var(--rs);padding:5px 8px;font-size:14px;text-align:right;font-family:inherit"
+        onchange="updateFixedCfg('${f.key}', this.value)"></td>
+      <td style="font-size:11px;color:var(--tx3)">${f.note}</td>
+    </tr>`;
+  });
+  el.innerHTML = html;
+}
+
+function updateFixedCfg(key, val) {
+  if (!D.fixedCfg) D.fixedCfg = Object.assign({}, DEFAULT_FIXED_CFG);
+  D.fixedCfg[key] = parseFloat(val) || 0;
+  scheduleSave();
+  renderFixedExpenses();
+  buildReport();
+  buildBankReport();
+  toast('✅ 費用設定已更新（只影響本月）');
 }
 
 function renderAll() {
@@ -2654,6 +2796,7 @@ function renderAll() {
   renderStaff();
   renderMisc();
   renderFixedExpenses();
+  renderFixedConfig();
   renderBank();
   buildReport();
   buildBankReport();
