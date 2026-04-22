@@ -3018,10 +3018,30 @@ function renderAll() {
 // ═══════════════════════════════
 //  初始化
 // ═══════════════════════════════
+// ── 一次性資料遷移：補回 2026-03 的 PDF 對帳單資料 ──
+function migratePdfSummary() {
+  const key = 'mw_' + '2026-03';
+  const raw = localStorage.getItem(key);
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    if (d.pdfSummary && d.pdfSummary.length > 0) return; // 已有資料，不覆蓋
+    d.pdfSummary = [
+      { id: 'pdf-snappy-card',   platform: 'snappy',   desc: '863筆 · Visa/MC/Amex/Interac', gross: 12934.21, fees: -221.38,   actual: 12712.83, note: 'Store #2804，每日結算' },
+      { id: 'pdf-snappy-online', platform: 'snappy',   desc: '42筆 · 網上訂單',               gross: 805.00,   fees: -35.91,    actual: 769.09,   note: 'Store #2804，批次結算' },
+      { id: 'pdf-fantuan',       platform: 'fantuan',  desc: '月結匯款',                      gross: null,     fees: null,      actual: 1713.44,  note: '待確認匯款日期' },
+      { id: 'pdf-uber',          platform: 'uber',     desc: '81筆訂單 · 月結淨額',            gross: 2384.25,  fees: -1164.93,  actual: 1219.32,  note: '實際銀行匯款 $1,089.66（餘額跨月）' },
+      { id: 'pdf-cash',          platform: 'cash',     desc: '月底現金清點存入',               gross: null,     fees: null,      actual: null,     note: '從銀行帳目核對' },
+    ];
+    localStorage.setItem(key, JSON.stringify(d));
+  } catch(e) {}
+}
+
 function init() {
   loadCFG();
   loadEquipment();
   initMonthSel();
+  migratePdfSummary();
   loadLocal();
   renderAll();
   const today = new Date().toISOString().split('T')[0];
