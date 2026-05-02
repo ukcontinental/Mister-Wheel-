@@ -3465,6 +3465,10 @@ function init() {
   const today = new Date().toISOString().split('T')[0];
   ['r-date','pu-date','bk-date','pd-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
 
+  // 設定 overlay 永遠不自動跳出，改由老闆登入後手動開啟
+  const ovl = document.getElementById('setupOvl');
+  if (ovl) ovl.style.display = 'none';
+
   // 檢查 session 是否已登入
   const savedRole = sessionStorage.getItem('mw_role');
   if (savedRole === 'owner') {
@@ -3474,8 +3478,7 @@ function init() {
     document.getElementById('login-ovl').style.display = 'none';
     showShareholderApp();
   }
-  // 若無 session，保持 login overlay 顯示（不做 setup overlay 跳出）
-  // 原 sync setup 在登入後的 showOwnerApp 流程中觸發
+  // 若無 session，login overlay 維持顯示（z-index:600）
 }
 
 init();
