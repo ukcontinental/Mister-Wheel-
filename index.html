@@ -102,9 +102,118 @@ select.fi{cursor:pointer;}
 .right{text-align:right;}.bold{font-weight:700;}.sm{font-size:12px;}.muted{color:var(--tx2);}.fw{width:100%;}.mt8{margin-top:8px;}
 .tfoot-row{padding:8px 14px;background:var(--sf2);border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;}
 @media(min-width:560px){.mrow{grid-template-columns:repeat(4,1fr);}.pg{padding:18px;padding-bottom:60px;}}
+
+/* ═══ LOGIN ═══ */
+#login-ovl{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:linear-gradient(145deg,#1a3d2b 0%,#2e7d52 50%,#1a5c3a 100%);}
+.login-card{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.35);}
+.login-logo{text-align:center;margin-bottom:24px;}
+.login-logo-icon{font-size:56px;display:block;margin-bottom:8px;}
+.login-logo-title{font-size:22px;font-weight:700;color:#1a2e20;letter-spacing:-.3px;}
+.login-logo-sub{font-size:12px;color:#7aA088;margin-top:4px;}
+.login-field{margin-bottom:14px;}
+.login-field label{display:block;font-size:11px;font-weight:700;color:#4a7258;margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase;}
+.login-field input{width:100%;border:1.5px solid #c8dece;border-radius:10px;padding:12px 14px;font-size:15px;color:#1a2e20;outline:none;font-family:inherit;transition:border .15s;background:#f4f8f5;}
+.login-field input:focus{border-color:#2e7d52;background:#fff;}
+.login-btn{width:100%;padding:14px;background:#2e7d52;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:background .15s;letter-spacing:.3px;}
+.login-btn:hover{background:#1a5c3a;}
+.login-err{color:#c03030;font-size:13px;text-align:center;margin-top:10px;min-height:20px;}
+.login-deco{position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;}
+
+/* ═══ HOME CARDS ═══ */
+#home-pg{display:none;padding:16px;max-width:820px;margin:0 auto;padding-bottom:80px;}
+#home-pg.active{display:block;}
+.home-greeting{padding:16px 4px 20px;display:flex;align-items:center;justify-content:space-between;}
+.home-greet-text h2{font-size:20px;font-weight:700;color:var(--tx);}
+.home-greet-text p{font-size:13px;color:var(--tx2);margin-top:2px;}
+.home-month-badge{background:var(--ac);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;}
+.nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:16px;}
+@media(min-width:560px){.nav-grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:800px){.nav-grid{grid-template-columns:repeat(4,1fr);}}
+.nav-card{border-radius:20px;padding:28px 16px 22px;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;user-select:none;-webkit-tap-highlight-color:transparent;}
+.nav-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.18);}
+.nav-card:active{transform:translateY(-2px);}
+.nav-card::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:inherit;opacity:0;transition:opacity .15s;}
+.nav-card:hover::before{opacity:1;}
+.nav-icon{font-size:42px;display:block;margin-bottom:10px;line-height:1;}
+.nav-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px;}
+.nav-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:3px;}
+.nav-badge{display:inline-block;background:rgba(255,255,255,.25);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:8px;}
+/* card colors */
+.nc-revenue{background:linear-gradient(135deg,#2e7d52,#1a5c3a);}
+.nc-inventory{background:linear-gradient(135deg,#c47820,#9a5c10);}
+.nc-purchase{background:linear-gradient(135deg,#1a5fa8,#0e3d7a);}
+.nc-expense{background:linear-gradient(135deg,#6d28d9,#4c1d95);}
+.nc-report{background:linear-gradient(135deg,#0e7490,#155e75);}
+.nc-bank{background:linear-gradient(135deg,#15803d,#14532d);}
+.nc-asset{background:linear-gradient(135deg,#b45309,#7c2d12);}
+.nc-platform{background:linear-gradient(135deg,#be123c,#881337);}
+
+/* ═══ SHAREHOLDER DASHBOARD ═══ */
+#sh-app{display:none;}
+#sh-pg{padding:16px;max-width:780px;margin:0 auto;padding-bottom:80px;}
+.sh-header{text-align:center;padding:24px 16px 20px;border-bottom:1px solid var(--bd);margin-bottom:20px;}
+.sh-header h1{font-size:20px;font-weight:700;color:var(--ac);}
+.sh-header p{font-size:13px;color:var(--tx2);margin-top:4px;}
+.sh-month{display:inline-block;background:var(--acl);color:var(--ac);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-top:8px;}
+.kpi-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px;}
+@media(min-width:480px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+.kpi-card{background:#fff;border-radius:16px;padding:22px 18px;text-align:center;border:1.5px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.kpi-icon{font-size:28px;margin-bottom:8px;}
+.kpi-value{font-size:26px;font-weight:700;line-height:1.1;}
+.kpi-label{font-size:11px;color:var(--tx2);margin-top:6px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+.kpi-sub{font-size:11px;color:var(--tx3);margin-top:3px;}
+.sh-section{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:14px;}
+.sh-section-title{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sh-logout{display:block;text-align:center;margin-top:20px;color:var(--tx3);font-size:13px;cursor:pointer;text-decoration:underline;}
+.sh-kv-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px;color:var(--tx2);}
+.sh-kv-row:last-child{border-bottom:none;}
+.sh-kv-total{font-weight:700;color:var(--tx);font-size:14px;margin-top:4px;padding-top:10px;border-top:2px solid var(--bd);border-bottom:none;}
+.sh-val{font-weight:600;font-size:13px;}
+.role-badge{background:var(--acl);color:var(--ac);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.3px;}
+
+/* ═══ EDIT MODE ═══ */
+#edit-mode-bar{display:none;background:#fff8e8;border-bottom:2px solid #f0c030;padding:8px 14px;text-align:center;font-size:13px;font-weight:700;color:#92400e;}
+body.edit-mode #edit-mode-bar{display:block;}
+/* In non-edit mode, keep collapsed forms hidden */
+body:not(.edit-mode) .auto-collapse{display:none!important;}
+
+/* ═══ PAGE BACK BUTTON ═══ */
+.page-back{display:flex;align-items:center;gap:6px;padding:10px 4px 14px;color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;width:fit-content;}
+.page-back:hover{opacity:.8;}
+
+/* ═══ HEADER UPDATES ═══ */
+.role-badge.sh{background:#fcecea;color:#c03030;}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:400px){.nav-card{padding:20px 10px 16px;}.nav-icon{font-size:34px;}.nav-title{font-size:13px;}}
 </style>
 </head>
 <body>
+
+<!-- ═══ LOGIN OVERLAY ═══ -->
+<div id="login-ovl">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="login-logo-icon">🥐</span>
+      <div class="login-logo-title">不貳光</div>
+      <div class="login-logo-sub">營運月報系統 · Mister Wheel</div>
+    </div>
+    <div class="login-field">
+      <label>帳號</label>
+      <input type="text" id="login-user" placeholder="輸入帳號" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    </div>
+    <div class="login-field">
+      <label>密碼</label>
+      <input type="password" id="login-pass" placeholder="輸入密碼" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()">
+    </div>
+    <button class="login-btn" onclick="attemptLogin()">登入</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ═══ EDIT MODE BAR ═══ -->
+<div id="edit-mode-bar">🔧 修正模式已開啟 — 所有輸入欄位已顯示</div>
 
 <!-- SETUP OVERLAY -->
 <div class="ovl" id="setupOvl">
@@ -133,29 +242,132 @@ select.fi{cursor:pointer;}
 </div>
 
 <!-- HEADER -->
-<div class="hdr">
-  <div class="logo">🥐 Mister Wheel</div>
+<div class="hdr" id="main-hdr" style="display:none">
+  <div class="logo" onclick="goHome()" style="cursor:pointer">🥐 <span id="hdr-brand">不貳光</span></div>
   <div class="hdr-r">
+    <span class="role-badge" id="role-badge">老闆</span>
     <select class="fi" id="monthSel" style="padding:4px 8px;font-size:13px" onchange="onMonthChange()"></select>
     <button class="btn bs bsm" id="saveBtn" onclick="manualSave()" style="font-size:12px">☁ 儲存</button>
-    <button class="btn bs bsm" onclick="showSetup()">⚙</button>
+    <button class="btn bs bsm" id="edit-mode-btn" onclick="toggleEditMode()" style="font-size:12px;display:none" title="修正模式">🔧</button>
+    <button class="btn bs bsm" onclick="showSetup()" style="display:none" id="setup-btn">⚙</button>
+    <button class="btn bs bsm" onclick="doLogout()" style="font-size:12px" title="登出">⎋</button>
   </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" onclick="gotoTab(0)">📊 每日營收（POS數據）</div>
-  <div class="tab" onclick="gotoTab(1)">📦 庫存盤點</div>
-  <div class="tab" onclick="gotoTab(2)">🛒 採購記錄</div>
-  <div class="tab" onclick="gotoTab(3)">💸 費用管理</div>
-  <div class="tab" onclick="gotoTab(4)">📋 月度報表</div>
-  <div class="tab" onclick="gotoTab(5)">🏦 銀行帳目</div>
-  <div class="tab" onclick="gotoTab(6)">🏢 資產總覽</div>
-  <div class="tab" onclick="gotoTab(7)">💳 平台收款</div>
+<!-- TABS (老闆用，股東不顯示) -->
+<div class="tabs" id="main-tabs" style="display:none">
+  <div class="tab" onclick="gotoTab(0)">📊 每日營收</div>
+  <div class="tab" onclick="gotoTab(1)">📦 庫存</div>
+  <div class="tab" onclick="gotoTab(2)">🛒 採購</div>
+  <div class="tab" onclick="gotoTab(3)">💸 費用</div>
+  <div class="tab" onclick="gotoTab(4)">📋 報表</div>
+  <div class="tab" onclick="gotoTab(5)">🏦 銀行</div>
+  <div class="tab" onclick="gotoTab(6)">🏢 資產</div>
+  <div class="tab" onclick="gotoTab(7)">💳 平台</div>
+</div>
+
+<!-- ═══ HOME 首頁（老闆登入後看到） ═══ -->
+<div id="home-pg">
+  <div class="home-greeting">
+    <div class="home-greet-text">
+      <h2>👋 歡迎回來，Willie</h2>
+      <p>選擇要查看的項目</p>
+    </div>
+    <div class="home-month-badge" id="home-month-badge">2026年3月</div>
+  </div>
+  <div class="nav-grid">
+    <div class="nav-card nc-revenue" onclick="enterSection(0)">
+      <span class="nav-icon">📊</span>
+      <div class="nav-title">每日營收</div>
+      <div class="nav-sub">POS 數據</div>
+    </div>
+    <div class="nav-card nc-inventory" onclick="enterSection(1)">
+      <span class="nav-icon">📦</span>
+      <div class="nav-title">庫存盤點</div>
+      <div class="nav-sub">期初 · 期末</div>
+    </div>
+    <div class="nav-card nc-purchase" onclick="enterSection(2)">
+      <span class="nav-icon">🛒</span>
+      <div class="nav-title">採購記錄</div>
+      <div class="nav-sub">進貨 · ITC</div>
+    </div>
+    <div class="nav-card nc-expense" onclick="enterSection(3)">
+      <span class="nav-icon">💸</span>
+      <div class="nav-title">費用管理</div>
+      <div class="nav-sub">固定費用 · 人事</div>
+    </div>
+    <div class="nav-card nc-report" onclick="enterSection(4)">
+      <span class="nav-icon">📋</span>
+      <div class="nav-title">月度報表</div>
+      <div class="nav-sub">損益 · PDF</div>
+    </div>
+    <div class="nav-card nc-bank" onclick="enterSection(5)">
+      <span class="nav-icon">🏦</span>
+      <div class="nav-title">銀行帳目</div>
+      <div class="nav-sub">存款 · 核對</div>
+    </div>
+    <div class="nav-card nc-asset" onclick="enterSection(6)">
+      <span class="nav-icon">🏢</span>
+      <div class="nav-title">資產總覽</div>
+      <div class="nav-sub">設備 · 折舊</div>
+    </div>
+    <div class="nav-card nc-platform" onclick="enterSection(7)">
+      <span class="nav-icon">💳</span>
+      <div class="nav-title">平台收款</div>
+      <div class="nav-sub">Snappy · Uber · 飯糰</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 股東儀表板 ═══ -->
+<div id="sh-app">
+  <div id="sh-pg">
+    <div class="sh-header">
+      <h1>🥐 不貳光 · 股東報告</h1>
+      <p>財務摘要 · 月度更新</p>
+      <div class="sh-month" id="sh-month-label">2026年3月</div>
+    </div>
+    <!-- KPI 三大數字 -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-value g" id="sh-profit">—</div>
+        <div class="kpi-label">本月淨利潤</div>
+        <div class="kpi-sub" id="sh-profit-sub"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🏦</div>
+        <div class="kpi-value b" id="sh-bank">—</div>
+        <div class="kpi-label">銀行餘額</div>
+        <div class="kpi-sub" id="sh-bank-sub"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🏢</div>
+        <div class="kpi-value" id="sh-assets">—</div>
+        <div class="kpi-label">公司總資產</div>
+        <div class="kpi-sub" id="sh-assets-sub"></div>
+      </div>
+    </div>
+    <!-- 收入摘要 -->
+    <div class="sh-section">
+      <div class="sh-section-title">📊 本月收入摘要</div>
+      <div id="sh-revenue-detail"></div>
+    </div>
+    <!-- 平台收款 -->
+    <div class="sh-section">
+      <div class="sh-section-title">💳 平台實際到帳</div>
+      <div id="sh-platform-detail"></div>
+    </div>
+    <div style="text-align:center;padding:20px 0 8px;color:var(--tx3);font-size:12px">
+      資料更新：每月底由管理層更新
+    </div>
+    <span class="sh-logout" onclick="doLogout()">⎋ 登出</span>
+  </div>
 </div>
 
 <!-- ═══ PAGE 0: 每日營收 ═══ -->
-<div class="pg active" id="p0">
+<div class="pg" id="p0">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div class="card">
     <div class="ch"><div class="ct">新增每日營收</div></div>
     <div class="cb">
@@ -208,6 +420,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 1: 庫存盤點 ═══ -->
 <div class="pg" id="p1">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div class="al ali">月初填「月初庫存」，月末盤點後填「月末庫存」。耗用成本 ＝ 月初 ＋ 採購（未稅）－ 月末。</div>
   <div style="display:flex;gap:8px;margin-bottom:12px;touch-action:manipulation">
     <button class="btn fw" id="ibt-o" onclick="setInvPeriod('open')">月初庫存</button>
@@ -236,6 +449,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 2: 採購記錄 ═══ -->
 <div class="pg" id="p2">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div class="card">
     <div class="ch" style="cursor:pointer" onclick="toggleForm('pu-form','pu-toggle-btn')">
       <div class="ct">採購記錄</div>
@@ -269,6 +483,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 3: 費用管理 ═══ -->
 <div class="pg" id="p3">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div class="al alw sm">固定費用預設自動沿用上月設定。如需調整，點各項目旁的 ✏️ 按鈕即可修改，只影響本月。</div>
 
   <div class="card">
@@ -327,6 +542,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 4: 月度報表 ═══ -->
 <div class="pg" id="p4">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
     <div style="font-size:16px;font-weight:700" id="rpt2-title">🏦 月度損益報表（銀行基準）</div>
     <div style="display:flex;gap:6px">
@@ -439,6 +655,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 5: 銀行帳目 ═══ -->
 <div class="pg" id="p5">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div class="card">
     <div class="ch" style="cursor:pointer" onclick="toggleForm('bk-form','bk-toggle-btn')">
       <div class="ct">銀行帳目</div>
@@ -483,6 +700,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 6: 資產總覽 ═══ -->
 <div class="pg" id="p6">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
     <div style="font-size:16px;font-weight:700">🏢 資產總覽</div>
     <button class="btn bs bsm" onclick="buildAssetReport()">🔄 更新</button>
@@ -528,6 +746,7 @@ select.fi{cursor:pointer;}
 
 <!-- ═══ PAGE 7: 平台收款 ═══ -->
 <div class="pg" id="p7">
+  <div class="page-back" onclick="goHome()">← 返回首頁</div>
 
   <!-- ✅ 股東視角：各平台實際到帳 -->
   <div class="card" style="margin-bottom:12px">
@@ -3037,6 +3256,205 @@ function migratePdfSummary() {
   } catch(e) {}
 }
 
+// ════════════════════════════════════════════════════
+//  AUTH SYSTEM
+// ════════════════════════════════════════════════════
+const USERS = {
+  willie: { pass: '620428',   role: 'owner'       },
+  lihou:  { pass: '20070403', role: 'shareholder' }
+};
+
+function attemptLogin() {
+  const userRaw = (document.getElementById('login-user').value || '').trim();
+  const pass    = (document.getElementById('login-pass').value || '').trim();
+  const user    = userRaw.toLowerCase();
+  const errEl   = document.getElementById('login-err');
+
+  if (!USERS[user] || USERS[user].pass !== pass) {
+    errEl.textContent = '帳號或密碼不正確，請再試一次。';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+    return;
+  }
+  errEl.textContent = '';
+  const role = USERS[user].role;
+  sessionStorage.setItem('mw_role', role);
+  sessionStorage.setItem('mw_user', userRaw);
+  document.getElementById('login-ovl').style.display = 'none';
+
+  if (role === 'owner') {
+    showOwnerApp();
+  } else {
+    showShareholderApp();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('mw_role');
+  sessionStorage.removeItem('mw_user');
+  // 隱藏一切，顯示 login
+  document.getElementById('login-ovl').style.display   = 'flex';
+  document.getElementById('main-hdr').style.display    = 'none';
+  document.getElementById('main-tabs').style.display   = 'none';
+  document.getElementById('home-pg').classList.remove('active');
+  document.getElementById('sh-app').style.display      = 'none';
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
+  document.body.classList.remove('edit-mode');
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+function showOwnerApp() {
+  // 顯示 header
+  const hdr = document.getElementById('main-hdr');
+  hdr.style.display = 'flex';
+  // 設定 role badge
+  document.getElementById('role-badge').textContent = '老闆';
+  // 顯示 edit mode btn (only for owner)
+  document.getElementById('edit-mode-btn').style.display = '';
+  // 隱藏股東版
+  document.getElementById('sh-app').style.display = 'none';
+  // 隱藏 tabs（home 模式不顯示 tabs）
+  document.getElementById('main-tabs').style.display = 'none';
+  // 隱藏所有 pages
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
+  // 顯示首頁
+  goHome();
+  // 更新 home 月份顯示
+  updateHomeBadge();
+}
+
+function showShareholderApp() {
+  // 隱藏 header tabs home
+  document.getElementById('main-hdr').style.display  = 'none';
+  document.getElementById('main-tabs').style.display = 'none';
+  document.getElementById('home-pg').classList.remove('active');
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
+  // 顯示股東儀表板
+  document.getElementById('sh-app').style.display = 'block';
+  renderShareholderDashboard();
+}
+
+function goHome() {
+  // 隱藏所有 pages
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
+  document.getElementById('main-tabs').style.display = 'none';
+  // 顯示首頁卡片
+  document.getElementById('home-pg').classList.add('active');
+  updateHomeBadge();
+}
+
+function updateHomeBadge() {
+  const d   = new Date(curMonth + '-01');
+  const lbl = d.getFullYear() + '年' + (d.getMonth()+1) + '月';
+  const el  = document.getElementById('home-month-badge');
+  if (el) el.textContent = lbl;
+}
+
+function enterSection(tabIdx) {
+  // 隱藏首頁
+  document.getElementById('home-pg').classList.remove('active');
+  // 顯示 tabs
+  document.getElementById('main-tabs').style.display = '';
+  // 切換到對應 tab/page
+  gotoTab(tabIdx);
+  // 更新 tab 高亮
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===tabIdx));
+}
+
+function toggleEditMode() {
+  document.body.classList.toggle('edit-mode');
+  const btn = document.getElementById('edit-mode-btn');
+  const isOn = document.body.classList.contains('edit-mode');
+  btn.style.color = isOn ? 'var(--ac)' : '';
+  btn.title = isOn ? '關閉修正模式' : '修正模式';
+}
+
+// ════════════════════════════════════════════════════
+//  SHAREHOLDER DASHBOARD
+// ════════════════════════════════════════════════════
+function renderShareholderDashboard() {
+  // 月份標籤
+  const d   = new Date(curMonth + '-01');
+  const lbl = d.getFullYear() + '年' + (d.getMonth()+1) + '月';
+  const monthEl = document.getElementById('sh-month-label');
+  if (monthEl) monthEl.textContent = lbl;
+
+  // --- KPI 1: 本月淨利（使用與月度報表相同的銀行基準計算）---
+  const bkDeps   = (D.bank||[]).reduce((s,r)=>s+N(r.dep), 0);
+  const hstOut   = bkDeps * 13 / 113;
+  const netSales = bkDeps / 1.13;
+
+  const { totalEx: fixedTotal, royalty } = getFixedData();
+  const staffTotal = (D.staff||[]).reduce((s,r)=>s+N(r.amt), 0);
+  const miscTotal  = (D.misc||[]).reduce((s,r)=>s+(r.hasHST ? exHST(N(r.amt)) : N(r.amt)), 0);
+  // COGS: 月初+採購-月末
+  const invOpen  = invTotal('open');
+  const invClose = invTotal('close');
+  const purEx    = (D.purchases||[]).reduce((s,p)=>s+(p.hasHST?exHST(N(p.amt)):N(p.amt)), 0);
+  const cogs     = invOpen + purEx - invClose;
+  const totExpEx = fixedTotal - royalty + staffTotal + miscTotal;
+  const opProfit = netSales - cogs - totExpEx;
+  const profit   = opProfit - royalty;
+
+  const profitEl = document.getElementById('sh-profit');
+  const profitSub= document.getElementById('sh-profit-sub');
+  if (profitEl) {
+    profitEl.textContent = fmt(profit);
+    profitEl.className   = 'kpi-value ' + (profit >= 0 ? 'g' : 'r');
+  }
+  if (profitSub) profitSub.textContent = 'Net Sales ' + fmt(netSales);
+
+  // --- KPI 2: 銀行餘額 ---
+  const bkRows  = (D.bank||[]).filter(r=>r.bal!=null&&r.bal!='');
+  const lastBal = bkRows.length ? bkRows[bkRows.length-1].bal : null;
+  const bankEl  = document.getElementById('sh-bank');
+  const bankSub = document.getElementById('sh-bank-sub');
+  if (bankEl)  bankEl.textContent  = lastBal != null ? fmt(lastBal) : '—';
+  if (bankSub) bankSub.textContent = bkRows.length ? '最後記錄：' + bkRows[bkRows.length-1].date : '尚無記錄';
+
+  // --- KPI 3: 總資產 ---
+  const invVal    = invClose || 0;
+  const cashVal   = lastBal || 0;
+  const eqTotal   = (EQ||[]).reduce((s,e)=>s+(e.price||0),0);
+  const totalAst  = invVal + cashVal + eqTotal;
+  const astEl     = document.getElementById('sh-assets');
+  const astSub    = document.getElementById('sh-assets-sub');
+  if (astEl)  astEl.textContent  = fmt(totalAst);
+  if (astSub) astSub.textContent = '庫存 ' + fmt(invVal) + ' + 現金 ' + fmt(cashVal);
+
+  // --- Revenue detail ---
+  const revEl = document.getElementById('sh-revenue-detail');
+  if (revEl) {
+    const netPOS = (D.revenues||[]).reduce((s,r)=>s+(r.net||0),0);
+    revEl.innerHTML = `
+      <div class="sh-kv-row"><span>銀行存入合計</span><span class="sh-val">${fmt(bkDeps)}</span></div>
+      <div class="sh-kv-row"><span>拆出 HST（13/113）</span><span class="sh-val r">-${fmt(hstOut)}</span></div>
+      <div class="sh-kv-row"><span>未稅 Net Sales</span><span class="sh-val g">${fmt(netSales)}</span></div>
+      <div class="sh-kv-row"><span>原料耗用成本</span><span class="sh-val r">-${fmt(cogs)}</span></div>
+      <div class="sh-kv-row"><span>固定費用＋人事＋雜支</span><span class="sh-val r">-${fmt(totExpEx + royalty)}</span></div>
+      <div class="sh-kv-row sh-kv-total"><span>本月淨利</span><span class="sh-val ${profit>=0?'g':'r'}">${fmt(profit)}</span></div>
+    `;
+  }
+
+  // --- Platform detail ---
+  const platEl = document.getElementById('sh-platform-detail');
+  if (platEl) {
+    const rows = (D.pdfSummary||[]);
+    if (!rows.length) {
+      platEl.innerHTML = '<div class="empty">尚無平台對帳資料</div>';
+    } else {
+      const totalPlatform = rows.reduce((s,r)=>s+(r.actual||0),0);
+      platEl.innerHTML = rows.map(r=>`
+        <div class="sh-kv-row">
+          <span>${r.platform ? r.platform.charAt(0).toUpperCase()+r.platform.slice(1) : ''} ${r.desc||''}</span>
+          <span class="sh-val">${r.actual!=null ? fmt(r.actual) : '—'}</span>
+        </div>
+      `).join('') + `<div class="sh-kv-row sh-kv-total"><span>合計</span><span class="sh-val g">${fmt(totalPlatform)}</span></div>`;
+    }
+  }
+}
+
 function init() {
   loadCFG();
   loadEquipment();
@@ -3046,12 +3464,18 @@ function init() {
   renderAll();
   const today = new Date().toISOString().split('T')[0];
   ['r-date','pu-date','bk-date','pd-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=today; });
-  if (!CFG.url) {
-    document.getElementById('setupOvl').style.display = 'flex';
-  } else {
-    document.getElementById('setupOvl').style.display = 'none';
-    syncDown().then(() => renderAll()).catch(() => {});
+
+  // 檢查 session 是否已登入
+  const savedRole = sessionStorage.getItem('mw_role');
+  if (savedRole === 'owner') {
+    document.getElementById('login-ovl').style.display = 'none';
+    showOwnerApp();
+  } else if (savedRole === 'shareholder') {
+    document.getElementById('login-ovl').style.display = 'none';
+    showShareholderApp();
   }
+  // 若無 session，保持 login overlay 顯示（不做 setup overlay 跳出）
+  // 原 sync setup 在登入後的 showOwnerApp 流程中觸發
 }
 
 init();
