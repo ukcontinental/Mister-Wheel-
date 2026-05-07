@@ -1135,11 +1135,132 @@ function defaultItems() {
 }
 
 // ═══════════════════════════════
+//  種子資料（直接燒進 HTML，不依賴 localStorage）
+// ═══════════════════════════════
+const SEED_DATA = {
+  '2026-04': {
+    revenues: [], purchases: [], misc: [], platformDeps: [],
+    staff: [
+      {id:'s1',desc:'Ada 薪資（3月）',amt:1614.61},
+      {id:'s2',desc:'Jason 薪資（3月含CPP）',amt:2610.51},
+      {id:'s3',desc:'Willie 薪資（3月）',amt:721.60},
+      {id:'s4',desc:'Winnie 薪資（3月）',amt:1881.65},
+      {id:'s5',desc:'CPP/EI 3月（政府扣繳）',amt:1579.56}
+    ],
+    fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.75,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05},
+    pdfSummary: [
+      {id:'p1',platform:'Snappy POS',desc:'4月現場刷卡',gross:null,fees:null,actual:13094.21,note:'銀行實收基準'},
+      {id:'p2',platform:'Snappy Online',desc:'4月線上訂單',gross:1427.82,fees:null,actual:1354.48,note:'對帳單$1427.82，銀行實收$1354.48，差$73.34含跨月'},
+      {id:'p3',platform:'Fantuan',desc:'4月飯糰打款',gross:1891.15,fees:null,actual:1887.10,note:'對帳單$1891.15，差$4.05為最後一筆跨月'},
+      {id:'p4',platform:'Uber Eats',desc:'4月Uber打款',gross:null,fees:null,actual:2355.05,note:'4/7 $450.44+4/14 $536.43+4/21 $482.66+4/28 $885.52'},
+      {id:'p5',platform:'現金',desc:'4月現金營業額',gross:null,fees:null,actual:583.45,note:'5/4存入$583.45，小費$217.00'}
+    ],
+    bank: [
+      {id:'b001',date:'2026-04-01',desc:'FANTUAN MSP',dep:16.69,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b002',date:'2026-04-01',desc:'FANTUAN MSP',dep:135.29,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b003',date:'2026-04-01',desc:'SNAPPYON2804 EXP',dep:27.25,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b004',date:'2026-04-01',desc:'SNAPPYON2804 EXP',dep:96.76,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b005',date:'2026-04-01',desc:'SNAPPY2804 EXP',dep:245.07,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b006',date:'2026-04-01',desc:'SNAPPY2804 EXP',dep:659.57,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b007',date:'2026-04-01',desc:'SNAPPY2804 EXP',dep:668.77,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b008',date:'2026-04-01',desc:'TRAVELERS INS INS',dep:0,wd:175.75,bal:'30543.57',note:'店面保險（4月）'},
+      {id:'b009',date:'2026-04-02',desc:'GC 1078-DEPOSIT',dep:590.15,wd:0,bal:'',note:'現金存入（3月）'},
+      {id:'b010',date:'2026-04-02',desc:'GC 1078-CASH WITHDRA',dep:0,wd:154.00,bal:'',note:'現金提領（3月小費）'},
+      {id:'b011',date:'2026-04-02',desc:'SNAPPY2804 EXP',dep:188.07,wd:0,bal:'31167.79',note:'Snappy POS'},
+      {id:'b012',date:'2026-04-06',desc:'SNAPPYON2804 EXP',dep:19.41,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b013',date:'2026-04-06',desc:'SNAPPY2804 EXP',dep:182.27,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b014',date:'2026-04-06',desc:'CHQ#00119',dep:0,wd:1614.61,bal:'',note:'Ada 薪資（3月）'},
+      {id:'b015',date:'2026-04-06',desc:'CHQ#00120',dep:0,wd:2610.51,bal:'',note:'Jason 薪資（3月含CPP）'},
+      {id:'b016',date:'2026-04-06',desc:'CHQ#00121',dep:0,wd:721.60,bal:'26422.75',note:'Willie 薪資（3月）'},
+      {id:'b017',date:'2026-04-07',desc:'Uber Holdings C MSP',dep:450.44,wd:0,bal:'',note:'Uber打款'},
+      {id:'b018',date:'2026-04-07',desc:'SNAPPYON2804 EXP',dep:90.21,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b019',date:'2026-04-07',desc:'SNAPPY2804 EXP',dep:124.20,wd:0,bal:'27087.60',note:'Snappy POS'},
+      {id:'b020',date:'2026-04-08',desc:'FANTUAN MSP',dep:19.12,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b021',date:'2026-04-08',desc:'FANTUAN MSP',dep:434.14,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b022',date:'2026-04-08',desc:'CHEFCO KITCHEN',dep:0,wd:3.96,bal:'',note:'採購 Chefco - 待補明細'},
+      {id:'b023',date:'2026-04-08',desc:'WC RICHMOND HIL',dep:0,wd:75.00,bal:'',note:'採購 WC Richmond - 待補明細'},
+      {id:'b024',date:'2026-04-08',desc:'SNAPPYON2804 EXP',dep:33.64,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b025',date:'2026-04-08',desc:'SNAPPYON2804 EXP',dep:48.37,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b026',date:'2026-04-08',desc:'SNAPPYON2804 EXP',dep:60.85,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b027',date:'2026-04-08',desc:'SNAPPY2804 EXP',dep:187.36,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b028',date:'2026-04-08',desc:'SNAPPY2804 EXP',dep:570.14,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b029',date:'2026-04-08',desc:'SNAPPY2804 EXP',dep:751.49,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b030',date:'2026-04-08',desc:'SNAPPY2804 EXP',dep:775.95,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b031',date:'2026-04-08',desc:'SNAPPYDEBIT EXP',dep:0,wd:201.25,bal:'29688.45',note:'Snappy POS月費（含稅）'},
+      {id:'b032',date:'2026-04-09',desc:'SNAPPYON2804 EXP',dep:19.41,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b033',date:'2026-04-09',desc:'SNAPPY2804 EXP',dep:397.45,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b034',date:'2026-04-09',desc:'CHQ#00122',dep:0,wd:1047.48,bal:'29057.83',note:'採購 - 待補明細（Costco/H-MART/MVR）'},
+      {id:'b035',date:'2026-04-10',desc:'SNAPPYON2804 EXP',dep:34.91,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b036',date:'2026-04-10',desc:'SNAPPY2804 EXP',dep:267.18,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b037',date:'2026-04-10',desc:'CHQ#00011',dep:0,wd:1130.00,bal:'28229.92',note:'租金 Upper East（4月）'},
+      {id:'b038',date:'2026-04-13',desc:'SNAPPY2804 EXP',dep:211.29,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b039',date:'2026-04-13',desc:'CHQ#00123',dep:0,wd:1881.65,bal:'26559.56',note:'Winnie 薪資（3月）'},
+      {id:'b040',date:'2026-04-14',desc:'Uber Holdings C MSP',dep:536.43,wd:0,bal:'',note:'Uber打款'},
+      {id:'b041',date:'2026-04-14',desc:'SNAPPYON2804 EXP',dep:92.05,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b042',date:'2026-04-14',desc:'SNAPPY2804 EXP',dep:339.79,wd:0,bal:'27527.83',note:'Snappy POS'},
+      {id:'b043',date:'2026-04-15',desc:'FANTUAN MSP',dep:178.87,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b044',date:'2026-04-15',desc:'SNAPPYON2804 EXP',dep:69.10,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b045',date:'2026-04-15',desc:'SNAPPYON2804 EXP',dep:72.71,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b046',date:'2026-04-15',desc:'SNAPPY2804 EXP',dep:155.60,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b047',date:'2026-04-15',desc:'SNAPPY2804 EXP',dep:462.03,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b048',date:'2026-04-15',desc:'SNAPPY2804 EXP',dep:716.94,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b049',date:'2026-04-15',desc:'CHQ#00040',dep:0,wd:16000.00,bal:'13183.08',note:'CRA 2025 HST繳交（不計入P&L）'},
+      {id:'b050',date:'2026-04-16',desc:'BAKEMARK INGRED',dep:0,wd:433.56,bal:'',note:'採購 Bakemark - 待補明細'},
+      {id:'b051',date:'2026-04-16',desc:'SNAPPYON2804 EXP',dep:80.60,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b052',date:'2026-04-16',desc:'SNAPPY2804 EXP',dep:150.64,wd:0,bal:'12980.76',note:'Snappy POS'},
+      {id:'b053',date:'2026-04-17',desc:'SNAPPY2804 EXP',dep:178.75,wd:0,bal:'13159.51',note:'Snappy POS'},
+      {id:'b054',date:'2026-04-20',desc:'SNAPPY2804 EXP',dep:183.93,wd:0,bal:'13343.44',note:'Snappy POS'},
+      {id:'b055',date:'2026-04-21',desc:'Uber Holdings C MSP',dep:482.66,wd:0,bal:'',note:'Uber打款'},
+      {id:'b056',date:'2026-04-21',desc:'SNAPPYON2804 EXP',dep:68.74,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b057',date:'2026-04-21',desc:'SNAPPY2804 EXP',dep:547.99,wd:0,bal:'14442.83',note:'Snappy POS'},
+      {id:'b058',date:'2026-04-22',desc:'FANTUAN MSP',dep:8.13,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b059',date:'2026-04-22',desc:'FANTUAN MSP',dep:313.78,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b060',date:'2026-04-22',desc:'CHUANGS COMPANY',dep:0,wd:112.40,bal:'',note:'採購 莊記 - 待補明細'},
+      {id:'b061',date:'2026-04-22',desc:'SNAPPYON2804 EXP',dep:4.62,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b062',date:'2026-04-22',desc:'SNAPPYON2804 EXP',dep:80.93,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b063',date:'2026-04-22',desc:'SNAPPYON2804 EXP',dep:95.42,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b064',date:'2026-04-22',desc:'SNAPPY2804 EXP',dep:449.62,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b065',date:'2026-04-22',desc:'SNAPPY2804 EXP',dep:479.01,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b066',date:'2026-04-22',desc:'SNAPPY2804 EXP',dep:594.77,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b067',date:'2026-04-22',desc:'CHQ#00041',dep:0,wd:1579.56,bal:'14777.15',note:'CPP/EI 3月（政府扣繳）'},
+      {id:'b068',date:'2026-04-23',desc:'SNAPPYON2804 EXP',dep:24.03,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b069',date:'2026-04-23',desc:'SNAPPY2804 EXP',dep:259.51,wd:0,bal:'15060.69',note:'Snappy POS'},
+      {id:'b070',date:'2026-04-24',desc:'SNAPPYON2804 EXP',dep:44.98,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b071',date:'2026-04-24',desc:'SNAPPY2804 EXP',dep:246.51,wd:0,bal:'15352.18',note:'Snappy POS'},
+      {id:'b072',date:'2026-04-27',desc:'SNAPPYON2804 EXP',dep:66.63,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b073',date:'2026-04-27',desc:'SNAPPY2804 EXP',dep:317.21,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b074',date:'2026-04-27',desc:'CHQ#00134',dep:0,wd:328.55,bal:'15407.47',note:'採購 - 待補明細'},
+      {id:'b075',date:'2026-04-28',desc:'Uber Holdings C MSP',dep:885.52,wd:0,bal:'',note:'Uber打款'},
+      {id:'b076',date:'2026-04-28',desc:'SNAPPYON2804 EXP',dep:30.07,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b077',date:'2026-04-28',desc:'SNAPPY2804 EXP',dep:594.52,wd:0,bal:'16917.58',note:'Snappy POS'},
+      {id:'b078',date:'2026-04-29',desc:'FANTUAN MSP',dep:39.99,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b079',date:'2026-04-29',desc:'FANTUAN MSP',dep:741.09,wd:0,bal:'',note:'飯糰打款'},
+      {id:'b080',date:'2026-04-29',desc:'SNAPPYON2804 EXP',dep:63.40,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b081',date:'2026-04-29',desc:'SNAPPYON2804 EXP',dep:76.53,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b082',date:'2026-04-29',desc:'SNAPPYON2804 EXP',dep:176.36,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b083',date:'2026-04-29',desc:'SNAPPY2804 EXP',dep:284.50,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b084',date:'2026-04-29',desc:'SNAPPY2804 EXP',dep:592.42,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b085',date:'2026-04-29',desc:'SNAPPY2804 EXP',dep:720.50,wd:0,bal:'19612.37',note:'Snappy POS'},
+      {id:'b086',date:'2026-04-30',desc:'SNAPPYON2804 EXP',dep:55.19,wd:0,bal:'',note:'Snappy Online'},
+      {id:'b087',date:'2026-04-30',desc:'SNAPPY2804 EXP',dep:413.47,wd:0,bal:'',note:'Snappy POS'},
+      {id:'b088',date:'2026-04-30',desc:'MONTHLY PLAN FEE',dep:0,wd:19.00,bal:'20062.03',note:'TD銀行月費'}
+    ],
+    inventory: {"open":[{"id":"mwawdq0","name":"蛋白","unit":"瓶","price":"9.94","qty":"17","notes":"BAKER，每箱12瓶","category":"冷藏冰箱"},{"id":"5zxp0dq","name":"蛋黃","unit":"瓶","price":"10.37","qty":"41","notes":"BAKER，每箱12瓶","category":"冷藏冰箱"},{"id":"5gloud7","name":"麻糬","unit":"包","price":"2.40","qty":"36","notes":"莊記，每箱36包，5片/包","category":"冷藏冰箱"},{"id":"t8ctka9","name":"雞蛋","unit":"盤","price":"9.69","qty":"2","notes":"Costco，30顆/盤","category":"冷藏冰箱"},{"id":"7f935d7","name":"鮮奶油","unit":"瓶","price":"6.49","qty":"4","notes":"WC Richmond，1000g/瓶","category":"冷藏冰箱"},{"id":"x8644pe","name":"無鹽奶油","unit":"塊","price":"6.99","qty":"1","notes":"Metro，454g/塊","category":"冷藏冰箱"},{"id":"7ve2yyb","name":"Cream Cheese","unit":"盒","price":"2.5","qty":"4","notes":"Costco","category":"冷藏冰箱"},{"id":"tx050cf","name":"榴槤","unit":"包","price":"42.00","qty":"1","notes":"莊記，1000g/包","category":"冷藏冰箱"},{"id":"c4777fw","name":"麵粉(PM)","unit":"袋","price":"18.55","qty":"7","notes":"Makers","category":"冷凍/倉庫"},{"id":"5y1nmrf","name":"全脂奶粉","unit":"袋","price":"276.16","qty":"1","notes":"Makers","category":"冷凍/倉庫"},{"id":"u57aa6j","name":"糖","unit":"袋","price":"30.18","qty":"1","notes":"Makers","category":"冷凍/倉庫"},{"id":"gamayqr","name":"蔬菜油","unit":"桶","price":"31.69","qty":"","notes":"Costco","category":"冷凍/倉庫"},{"id":"nwjnsv7","name":"牛奶","unit":"包","price":"6.89","qty":"2","notes":"Costco","category":"冷凍/倉庫"},{"id":"n8ux7xx","name":"玉米粉","unit":"包","price":"7.99","qty":"1","notes":"costco","category":"冷凍/倉庫"},{"id":"kwcd6ut","name":"玉米醬罐頭","unit":"罐","price":"3.99","qty":"5","notes":"No Frills","category":"冷凍/倉庫"},{"id":"7vyyp81","name":"玉米粒罐頭","unit":"罐","price":"1.50","qty":"13","notes":"No Frills","category":"冷凍/倉庫"},{"id":"z3x6bfj","name":"鷹牌煉乳","unit":"罐","price":"3.99","qty":"","notes":"Winco","category":"冷凍/倉庫"},{"id":"p0495zf","name":"開心果醬","unit":"罐","price":"164.23","qty":"1","notes":"MVF","category":"冷凍/倉庫"},{"id":"qmdpsur","name":"開心果粒","unit":"包","price":"21.99","qty":"","notes":"Costco","category":"冷凍/倉庫"},{"id":"utyyr99","name":"巧克力豆","unit":"包","price":"74.89","qty":"","notes":"MVF","category":"冷凍/倉庫"},{"id":"nfhax2v","name":"可可粉","unit":"包","price":"42.89","qty":"","notes":"MVF","category":"冷凍/倉庫"},{"id":"6vfg1me","name":"抹茶（達利）","unit":"包","price":"8.99","qty":"1","notes":"Winco","category":"冷凍/倉庫"},{"id":"fsz2bib","name":"抹茶（ELAN）","unit":"罐","price":"27.54","qty":"7","notes":"Costco Elan","category":"冷凍/倉庫"},{"id":"52ps878","name":"杏仁片","unit":"包","price":"11.99","qty":"1","notes":"WC Richmond","category":"冷凍/倉庫"},{"id":"zyc61s6","name":"杏仁條","unit":"包","price":"3.50","qty":"2","notes":"PC","category":"冷凍/倉庫"},{"id":"4gd74zs","name":"黑芝麻","unit":"包","price":"4.79","qty":"","notes":"Fresh Way","category":"冷凍/倉庫"},{"id":"gxzw3q3","name":"白芝麻","unit":"包","price":"4.79","qty":"","notes":"Fresh Way","category":"冷凍/倉庫"},{"id":"qeuz9gb","name":"葵瓜子","unit":"包","price":"5.49","qty":"1","notes":"WC Richmond","category":"冷凍/倉庫"},{"id":"imv5dx7","name":"南瓜子","unit":"包","price":"11.99","qty":"","notes":"Costco","category":"冷凍/倉庫"},{"id":"ypj7gdl","name":"楓糖（小）","unit":"罐","price":"17.50","qty":"1","notes":"Costco","category":"冷凍/倉庫"},{"id":"mw01w36","name":"楓糖漿（大）","unit":"罐","price":"89.99","qty":"","notes":"WC Richmond","category":"冷凍/倉庫"},{"id":"aljqqzr","name":"冬瓜磚","unit":"塊","price":"4.99","qty":"2","notes":"國華","category":"冷凍/倉庫"},{"id":"s6himd8","name":"香草醬","unit":"罐","price":"56.00","qty":"","notes":"","category":"冷凍/倉庫"},{"id":"9gkfq30","name":"金萱茶","unit":"包","price":"25.00","qty":"6","notes":"不貳光","category":"茶葉"},{"id":"vzjnymg","name":"18號紅玉","unit":"包","price":"25.00","qty":"8","notes":"不貳光","category":"茶葉"},{"id":"c4bfmhx","name":"凍頂烏龍","unit":"包","price":"25.00","qty":"6","notes":"不貳光","category":"茶葉"},{"id":"r809uqr","name":"桂花烏龍","unit":"包","price":"25.00","qty":"6","notes":"不貳光","category":"茶葉"},{"id":"ry717r3","name":"泰式奶茶（茶葉）","unit":"包","price":"6.00","qty":"4","notes":"金樂客","category":"茶葉"},{"id":"rcn5aby","name":"伯爵茶","unit":"盒","price":"12.49","qty":"2","notes":"Costco 144包/盒","category":"茶葉"},{"id":"tl3m6nq","name":"芋頭內餡（莊記）","unit":"箱","price":"164.45","qty":"26","notes":"USD$115/箱","category":"莊記進口"},{"id":"5dwd459","name":"內餡粉（莊記）","unit":"箱","price":"429.00","qty":"23","notes":"USD$300/箱","category":"莊記進口"},{"id":"u985tnw","name":"麵漿粉（莊記）","unit":"箱","price":"271.70","qty":"80","notes":"USD$190/箱，81kg/箱","category":"莊記進口"},{"id":"4s7x9lq","name":"紅豆餡（莊記）","unit":"箱","price":"54.34","qty":"22","notes":"USD$38/箱","category":"莊記進口"},{"id":"o6ayj97","name":"芝麻餡（莊記）","unit":"箱","price":"72.93","qty":"9","notes":"USD$51/箱","category":"莊記進口"},{"id":"fgaofz4","name":"草莓醬（莊記）","unit":"罐","price":"16","qty":"1","notes":"莊記","category":"莊記進口"},{"id":"s96n2bj","name":"單顆紙袋","unit":"箱","price":"123.27","qty":"20","notes":"USD$86.20/箱","category":"包裝耗材"},{"id":"5v6kwds","name":"小點袋","unit":"箱","price":"98.67","qty":"30","notes":"USD$69.00/箱","category":"包裝耗材"},{"id":"cu05cdg","name":"大點袋","unit":"箱","price":"111.00","qty":"39","notes":"USD$77.63/箱","category":"包裝耗材"},{"id":"85das9r","name":"十人盒","unit":"箱","price":"203.42","qty":"4","notes":"USD$142.25/箱","category":"包裝耗材"},{"id":"7i04xpk","name":"單人盒","unit":"箱","price":"414.70","qty":"2","notes":"USD$290.00/箱","category":"包裝耗材"},{"id":"1wp8y85","name":"雙人盒紙襯","unit":"箱","price":"436.15","qty":"1","notes":"USD$305.00/箱","category":"包裝耗材"},{"id":"5b5u2ua","name":"手套","unit":"箱","price":"1.13","qty":"190","notes":"240雙/箱","category":"包裝耗材"},{"id":"y7ll0kq","name":"口罩","unit":"包","price":"30.60","qty":"14","notes":"2000PCS/包","category":"包裝耗材"},{"id":"kgdd43n","name":"16oz Cup","unit":"條","price":"4.99","qty":"16","notes":"WC Richmond","category":"包裝耗材"},{"id":"ui1esms","name":"16oz Lid","unit":"條","price":"1.99","qty":"15","notes":"WC Richmond","category":"包裝耗材"},{"id":"75ql9sv","name":"16oz 瓶子","unit":"個","price":"2.00","qty":"400","notes":"單一計算","category":"包裝耗材"},{"id":"nb295t0","name":"透明一杯袋","unit":"包","price":"5.50","qty":"3","notes":"松盛，100個/包","category":"包裝耗材"},{"id":"1tcsbjr","name":"粗吸管","unit":"包","price":"3.96","qty":"14","notes":"金樂客，2000支/包","category":"包裝耗材"},{"id":"d4efhrm","name":"細吸管","unit":"盒","price":"13.55","qty":"1","notes":"WC Richmond/松盛","category":"包裝耗材"},{"id":"ct528x6","name":"餐巾紙","unit":"包","price":"6.00","qty":"1","notes":"","category":"包裝耗材"},{"id":"3bjydvp","name":"紙捲","unit":"捲","price":"13.00","qty":"1","notes":"","category":"包裝耗材"}],"close":[{"id":"xlipsz9","name":"蛋白","unit":"瓶","price":"9.94","qty":"12","notes":"BAKER，每箱12瓶","category":"冷藏冰箱"},{"id":"2rm6q6c","name":"蛋黃","unit":"瓶","price":"10.37","qty":"26","notes":"BAKER，每箱12瓶","category":"冷藏冰箱"},{"id":"13r5alb","name":"麻糬","unit":"包","price":"2.40","qty":"42","notes":"莊記，每箱36包，5片/包","category":"冷藏冰箱"},{"id":"b36xbqj","name":"雞蛋","unit":"盤","price":"9.69","qty":"12","notes":"Costco，30顆/盤","category":"冷藏冰箱"},{"id":"8fz3w2h","name":"鮮奶油","unit":"瓶","price":"6.49","qty":"9","notes":"WC Richmond，1000g/瓶","category":"冷藏冰箱"},{"id":"vdzaddj","name":"無鹽奶油","unit":"塊","price":"6.99","qty":"1","notes":"Metro，454g/塊","category":"冷藏冰箱"},{"id":"tm2n9px","name":"Cream Cheese","unit":"盒","price":"2.5","qty":"4","notes":"Costco","category":"冷藏冰箱"},{"id":"oza2nib","name":"榴槤","unit":"包","price":"42.00","qty":"0","notes":"莊記，1000g/包","category":"冷藏冰箱"},{"id":"fy6dsic","name":"麵粉(PM)","unit":"袋","price":"18.55","qty":"5","notes":"Makers","category":"冷凍/倉庫"},{"id":"0642lv2","name":"全脂奶粉","unit":"袋","price":"276.16","qty":"1","notes":"Makers","category":"冷凍/倉庫"},{"id":"28fyyxm","name":"糖","unit":"袋","price":"30.18","qty":"0","notes":"Makers","category":"冷凍/倉庫"},{"id":"p6csdne","name":"蔬菜油","unit":"桶","price":"31.69","qty":"1","notes":"Costco","category":"冷凍/倉庫"},{"id":"k49p8yy","name":"牛奶","unit":"包","price":"6.89","qty":"1","notes":"Costco","category":"冷凍/倉庫"},{"id":"aygq3y1","name":"玉米粉","unit":"包","price":"7.99","qty":"1","notes":"costco","category":"冷凍/倉庫"},{"id":"k0epk9r","name":"玉米醬罐頭","unit":"罐","price":"3.99","qty":"4","notes":"No Frills","category":"冷凍/倉庫"},{"id":"tfc1oes","name":"玉米粒罐頭","unit":"罐","price":"1.50","qty":"11","notes":"No Frills","category":"冷凍/倉庫"},{"id":"mhmaw5z","name":"鷹牌煉乳","unit":"罐","price":"3.99","qty":"4","notes":"Winco","category":"冷凍/倉庫"},{"id":"yh8l52k","name":"開心果醬","unit":"罐","price":"164.23","qty":"2","notes":"MVF","category":"冷凍/倉庫"},{"id":"2tv9lyo","name":"開心果粒","unit":"包","price":"21.99","qty":"0","notes":"Costco","category":"冷凍/倉庫"},{"id":"y0hd32o","name":"巧克力豆","unit":"包","price":"74.89","qty":"1","notes":"MVF","category":"冷凍/倉庫"},{"id":"bqsr233","name":"可可粉","unit":"包","price":"42.89","qty":"0","notes":"MVF","category":"冷凍/倉庫"},{"id":"i1m0uf0","name":"抹茶（達利）","unit":"包","price":"8.99","qty":"6","notes":"Winco","category":"冷凍/倉庫"},{"id":"01wvyf8","name":"抹茶（ELAN）","unit":"罐","price":"27.54","qty":"5","notes":"Costco Elan","category":"冷凍/倉庫"},{"id":"1w3qvrb","name":"杏仁片","unit":"包","price":"11.99","qty":"1","notes":"WC Richmond","category":"冷凍/倉庫"},{"id":"vmrrfba","name":"杏仁條","unit":"包","price":"3.50","qty":"0","notes":"PC","category":"冷凍/倉庫"},{"id":"wdv4p2j","name":"黑芝麻","unit":"包","price":"4.79","qty":"0","notes":"Fresh Way","category":"冷凍/倉庫"},{"id":"q7jti26","name":"白芝麻","unit":"包","price":"4.79","qty":"0","notes":"Fresh Way","category":"冷凍/倉庫"},{"id":"6i98sk1","name":"葵瓜子","unit":"包","price":"5.49","qty":"","notes":"WC Richmond","category":"冷凍/倉庫"},{"id":"vzjset3","name":"南瓜子","unit":"包","price":"11.99","qty":"0","notes":"Costco","category":"冷凍/倉庫"},{"id":"u4p4wog","name":"楓糖（小）","unit":"罐","price":"17.50","qty":"1","notes":"Costco","category":"冷凍/倉庫"},{"id":"lch6vtm","name":"楓糖漿（大）","unit":"罐","price":"89.99","qty":"1","notes":"WC Richmond","category":"冷凍/倉庫"},{"id":"4rt5awk","name":"冬瓜磚","unit":"塊","price":"4.99","qty":"0","notes":"國華","category":"冷凍/倉庫"},{"id":"wdgufve","name":"香草醬","unit":"罐","price":"56.00","qty":"1","notes":"","category":"冷凍/倉庫"},{"id":"g64klaq","name":"金萱茶","unit":"包","price":"25.00","qty":"6","notes":"不貳光","category":"茶葉"},{"id":"c46po5t","name":"18號紅玉","unit":"包","price":"25.00","qty":"9","notes":"不貳光","category":"茶葉"},{"id":"ax8ecvs","name":"凍頂烏龍","unit":"包","price":"25.00","qty":"5","notes":"不貳光","category":"茶葉"},{"id":"fv8lwpf","name":"桂花烏龍","unit":"包","price":"25.00","qty":"0","notes":"不貳光","category":"茶葉"},{"id":"8iszyv4","name":"泰式奶茶（茶葉）","unit":"包","price":"6.00","qty":"2","notes":"金樂客","category":"茶葉"},{"id":"47p74qm","name":"伯爵茶","unit":"盒","price":"12.49","qty":"1","notes":"Costco 144包/盒","category":"茶葉"},{"id":"eanfc3u","name":"芋頭內餡（莊記）","unit":"箱","price":"164.45","qty":"23","notes":"USD$115/箱","category":"莊記進口"},{"id":"3i1r0pa","name":"內餡粉（莊記）","unit":"箱","price":"429.00","qty":"23","notes":"USD$300/箱","category":"莊記進口"},{"id":"zl7w6rj","name":"麵漿粉（莊記）","unit":"箱","price":"271.70","qty":"78","notes":"USD$190/箱，81kg/箱","category":"莊記進口"},{"id":"2bbr2pv","name":"紅豆餡（莊記）","unit":"箱","price":"54.34","qty":"19","notes":"USD$38/箱","category":"莊記進口"},{"id":"zf2h2oi","name":"芝麻餡（莊記）","unit":"箱","price":"72.93","qty":"9","notes":"USD$51/箱","category":"莊記進口"},{"id":"jwnpta2","name":"草莓醬（莊記）","unit":"罐","price":"16","qty":"1","notes":"莊記","category":"莊記進口"},{"id":"4y1hjyb","name":"單顆紙袋","unit":"箱","price":"123.27","qty":"19","notes":"USD$86.20/箱","category":"包裝耗材"},{"id":"5hi0445","name":"小點袋","unit":"箱","price":"98.67","qty":"28","notes":"USD$69.00/箱","category":"包裝耗材"},{"id":"h771dwb","name":"大點袋","unit":"箱","price":"111.00","qty":"39","notes":"USD$77.63/箱","category":"包裝耗材"},{"id":"7u0610u","name":"十人盒","unit":"箱","price":"203.42","qty":"3","notes":"USD$142.25/箱","category":"包裝耗材"},{"id":"8gmp309","name":"單人盒","unit":"箱","price":"414.70","qty":"2","notes":"USD$290.00/箱","category":"包裝耗材"},{"id":"cqlqw95","name":"雙人盒紙襯","unit":"箱","price":"436.15","qty":"1","notes":"USD$305.00/箱","category":"包裝耗材"},{"id":"4lvyaz7","name":"手套","unit":"箱","price":"1.13","qty":"180","notes":"240雙/箱","category":"包裝耗材"},{"id":"2omhi28","name":"口罩","unit":"包","price":"30.60","qty":"13","notes":"2000PCS/包","category":"包裝耗材"},{"id":"tenrh8e","name":"16oz Cup","unit":"條","price":"4.99","qty":"15","notes":"WC Richmond","category":"包裝耗材"},{"id":"1nx9zj4","name":"16oz Lid","unit":"條","price":"1.99","qty":"14","notes":"WC Richmond","category":"包裝耗材"},{"id":"75os7dv","name":"16oz 瓶子","unit":"個","price":"2.00","qty":"300","notes":"各別買","category":"包裝耗材"},{"id":"95q9tkr","name":"透明一杯袋","unit":"包","price":"5.50","qty":"3","notes":"松盛，100個/包","category":"包裝耗材"},{"id":"do2g6t9","name":"粗吸管","unit":"包","price":"3.96","qty":"14","notes":"金樂客，2000支/包","category":"包裝耗材"},{"id":"54z81xa","name":"細吸管","unit":"盒","price":"13.55","qty":"0","notes":"WC Richmond/松盛","category":"包裝耗材"},{"id":"cw94nn0","name":"餐巾紙","unit":"包","price":"6.00","qty":"2","notes":"","category":"包裝耗材"},{"id":"d444ty5","name":"紙捲","unit":"捲","price":"13.00","qty":"2","notes":"","category":"包裝耗材"}]}
+  }
+};
+
+// ═══════════════════════════════
 //  本機儲存
 // ═══════════════════════════════
 const lsKey = m => 'mw2_' + m.replace('-', '_');
-function saveLocal() { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); }
-function loadLocal() { const r = localStorage.getItem(lsKey(curMonth)); D = r ? JSON.parse(r) : blankData(); }
+function saveLocal() { try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {} }
+function loadLocal() {
+  let r = null;
+  try { r = localStorage.getItem(lsKey(curMonth)); } catch(e) {}
+  if (r) { D = JSON.parse(r); }
+  else if (SEED_DATA[curMonth]) { D = JSON.parse(JSON.stringify(SEED_DATA[curMonth])); try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {} }
+  else { D = blankData(); }
+}
 function saveCFG() { localStorage.setItem('mw2_cfg', JSON.stringify(CFG)); }
 function loadCFG() {
   const r = localStorage.getItem('mw2_cfg'); if (r) CFG = JSON.parse(r);
