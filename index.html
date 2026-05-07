@@ -252,6 +252,8 @@ body:not(.edit-mode) .auto-collapse{display:none!important;}
     <select class="fi" id="monthSel" style="padding:4px 8px;font-size:13px" onchange="onMonthChange()"></select>
     <button class="btn bs bsm" id="saveBtn" onclick="manualSave()" style="font-size:12px">☁ 儲存</button>
     <button class="btn bs bsm" id="edit-mode-btn" onclick="toggleEditMode()" style="font-size:12px;display:none" title="修正模式">🔧</button>
+    <button class="btn bs bsm" onclick="exportAllData()" style="font-size:12px" title="匯出所有資料">📤</button>
+    <label class="btn bs bsm" style="font-size:12px;cursor:pointer;margin:0" title="匯入資料">📥<input type="file" accept=".json" style="display:none" onchange="importAllData(this)"></label>
     <button class="btn bs bsm" onclick="showSetup()" style="display:none" id="setup-btn">⚙</button>
     <button class="btn bs bsm" onclick="doLogout()" style="font-size:12px" title="登出">⎋</button>
   </div>
@@ -1585,7 +1587,7 @@ function renderInventory() {
           <td style="white-space:nowrap"><input type="text" value="${esc(it.name)}" placeholder="品項名稱" style="min-width:110px" onchange="updInv(${i},'name',this.value)"></td>
           <td><input type="text" value="${esc(it.unit)}" placeholder="" style="width:48px" onchange="updInv(${i},'unit',this.value)"></td>
           <td><input type="number" value="${it.price}" placeholder="0.00" step="0.01" style="width:80px" onchange="updInv(${i},'price',this.value)"></td>
-          <td><input type="number" value="${it.qty}" placeholder="0" min="0" step="1" style="width:65px" oninput="this.value=Math.max(0,Math.floor(+this.value||0))" onchange="updInv(${i},'qty',this.value)"></td>
+          <td><input type="number" value="${it.qty}" placeholder="0" min="0" step="0.1" style="width:65px" oninput="this.value=Math.max(0,+(+this.value||0).toFixed(1))" onchange="updInv(${i},'qty',this.value)"></td>
           <td style="text-align:right;color:var(--tx2);white-space:nowrap">${show}</td>
           <td><input type="text" value="${esc(it.notes||'')}" placeholder="備註" style="min-width:110px" onchange="updInv(${i},'notes',this.value)"></td>
           <td><button class="dbtn" onclick="removeInvItem(${i})" title="刪除此品項">✕</button></td>
@@ -3288,6 +3290,47 @@ function attemptLogin() {
     showShareholderApp();
   }
 }
+
+// ── 匯出 / 匯入 ──────────────────────────────────────────────
+function exportAllData() {
+  const out = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('mw2_') || k.startsWith('mw_')) {
+      try { out[k] = JSON.parse(localStorage.getItem(k)); }
+      catch(e) { out[k] = localStorage.getItem(k); }
+    }
+  }
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'misterwheel_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('✅ 資料已匯出');
+}
+
+function importAllData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let count = 0;
+      Object.entries(data).forEach(([k, v]) => {
+        localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+        count++;
+      });
+      toast('✅ 匯入成功（' + count + ' 筆），重新載入中…');
+      setTimeout(() => location.reload(), 1200);
+    } catch(err) {
+      toast('❌ 匯入失敗：檔案格式不正確');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+// ─────────────────────────────────────────────────────────────
 
 function doLogout() {
   sessionStorage.removeItem('mw_role');
