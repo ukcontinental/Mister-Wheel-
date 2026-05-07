@@ -1367,30 +1367,31 @@ function loadLocal() {
   try { r = localStorage.getItem(lsKey(curMonth)); } catch(e) {}
   if (r) {
     D = JSON.parse(r);
-    // 合併補齊：對有 SEED_DATA 的月份，任何空陣列/欄位都從 SEED_DATA 補回
     if (SEED_DATA[curMonth]) {
       const seed = SEED_DATA[curMonth];
+      // ── staff／fixedCfg 永遠以 SEED_DATA 為準（由 Claude 管理，非用戶手動輸入）──
+      if (seed.staff && seed.staff.length > 0)
+        D.staff = JSON.parse(JSON.stringify(seed.staff));
+      if (seed.fixedCfg && seed.fixedCfg.rent_base) {
+        const savedRoyaltyBase = D.fixedCfg && D.fixedCfg.royalty_base;
+        D.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg));
+        // 若用戶在 UI 改過 royalty_base 且 SEED 沒有設值，保留用戶值
+        if (savedRoyaltyBase && !seed.fixedCfg.royalty_base)
+          D.fixedCfg.royalty_base = savedRoyaltyBase;
+      }
+      // ── pdfSummary：版本升級才覆蓋（用戶會手動填金額）──
       const storedV = D._seedV || 0;
       const seedV   = seed._seedV || 0;
-      // ① 版本升級：強制更新所有主要欄位
       if (storedV < seedV) {
         if (seed.pdfSummary && seed.pdfSummary.length > 0)
           D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary));
-        if (seed.staff && seed.staff.length > 0)
-          D.staff = JSON.parse(JSON.stringify(seed.staff));
-        if (seed.fixedCfg && seed.fixedCfg.rent_base)
-          D.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg));
         D._seedV = seedV;
       }
-      // ② 補齊空陣列
+      // ── 補齊空陣列 ──
       if (!D.bank || D.bank.length === 0)
         D.bank = JSON.parse(JSON.stringify(seed.bank || []));
-      if (!D.staff || D.staff.length === 0)
-        D.staff = JSON.parse(JSON.stringify(seed.staff || []));
       if (!D.pdfSummary || D.pdfSummary.length === 0)
         D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary || []));
-      if (!D.fixedCfg || !D.fixedCfg.rent_base)
-        D.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg || {}));
       if (!D.inventory || !D.inventory.open || D.inventory.open.length === 0)
         D.inventory = JSON.parse(JSON.stringify(seed.inventory || { open: [], close: [] }));
       try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {}
