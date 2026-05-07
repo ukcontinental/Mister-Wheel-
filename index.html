@@ -1027,6 +1027,7 @@ const DEFAULT_FIXED_CFG = {
   bank_fee: 10,           // 銀行手續費
   pos_sys_inc: 202,       // POS 系統費 含稅
   royalty_pct: 0.05,      // 品牌權利金比例
+  royalty_base: 0,        // 月報淨銷售額（Snappy 月結手動填入；>0 時覆蓋每日累計）
 };
 
 // ═══════════════════════════════
@@ -1137,13 +1138,13 @@ function defaultItems() {
 // ═══════════════════════════════
 //  種子資料（直接燒進 HTML，不依賴 localStorage）
 // ═══════════════════════════════
-const SEED_VERSION = 4; // 每次更新 SEED_DATA 內容就遞增這個數字
+const SEED_VERSION = 5; // 每次更新 SEED_DATA 內容就遞增這個數字
 const SEED_DATA = {
   '2026-03': {
-    _seedV: 4,
+    _seedV: 5,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [],
-    fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.76,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05},
+    fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.76,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05,royalty_base:16022.43},
     pdfSummary: [
       {id:'mp1',platform:'snappy',desc:'3月現場刷卡（POS）',gross:12934.21,fees:-221.38,actual:12712.83,note:'Snappy對帳單，部分3月交易於4月入帳'},
       {id:'mp2',platform:'snappy',desc:'3月線上訂單（Online）',gross:805.00,fees:-35.91,actual:769.09,note:'Snappy對帳單淨額$769.09，部分於4月入帳'},
@@ -1239,7 +1240,7 @@ const SEED_DATA = {
     inventory: {open:[],close:[]}
   },
   '2026-04': {
-    _seedV: 4,
+    _seedV: 5,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [
       {id:'s1',desc:'Ada 薪資（3月）',amt:1614.61},
@@ -1248,7 +1249,7 @@ const SEED_DATA = {
       {id:'s4',desc:'Winnie 薪資（3月）',amt:1881.65},
       {id:'s5',desc:'CPP/EI 3月（政府扣繳）',amt:1579.56}
     ],
-    fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.75,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05},
+    fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.75,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05,royalty_base:17864.81},
     pdfSummary: [
       {id:'p1',platform:'snappy',desc:'4月現場刷卡（POS）',gross:null,fees:null,actual:13094.21,note:'銀行實收基準'},
       {id:'p2',platform:'snappy',desc:'4月線上訂單（Online）',gross:1427.82,fees:null,actual:1354.48,note:'對帳單$1427.82，銀行實收$1354.48，差$73.34含跨月'},
@@ -2003,7 +2004,9 @@ function renderPurchases() {
 // ═══════════════════════════════
 function getFixedData() {
   const FC = monthFixedCfg();
-  const netSales = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
+  // 優先用月報手動填入的淨銷售額；沒有才從每日記錄累計
+  const dailyNet = (D.revenues||[]).reduce((s,r) => s+N(r.net), 0);
+  const netSales = (FC.royalty_base && FC.royalty_base > 0) ? N(FC.royalty_base) : dailyNet;
   const rentEx   = netSales < FC.rent_threshold ? FC.rent_base : netSales * FC.rent_pct;
   const royalty  = netSales * FC.royalty_pct;
   const rows = [
@@ -2014,7 +2017,8 @@ function getFixedData() {
     { key:'insurance', label:'門店保費',     ex:exHST(FC.insurance_inc),   hst:hstOf(FC.insurance_inc),        note:'含稅$'+FC.insurance_inc },
     { key:'bank_fee',  label:'銀行手續費',   ex:FC.bank_fee,               hst:0,                              note:'金融服務免HST' },
     { key:'pos_sys',   label:'POS 系統費',   ex:exHST(FC.pos_sys_inc),     hst:hstOf(FC.pos_sys_inc),          note:'含稅$'+FC.pos_sys_inc },
-    { key:'royalty',   label:'🏷 品牌權利金 '+(FC.royalty_pct*100)+'%', ex:royalty, hst:0, note:'Net Sales×'+(FC.royalty_pct*100)+'%，自動計算', isRoyalty:true },
+    { key:'royalty_base', label:'📊 月報淨銷售額（Snappy）', ex: N(FC.royalty_base), hst:0, note: FC.royalty_base>0?'已手動填入，覆蓋每日累計':'填 0 = 改用每日累計 $'+dailyNet.toFixed(2), isInfo:true },
+    { key:'royalty',   label:'🏷 品牌權利金 '+(FC.royalty_pct*100)+'%', ex:royalty, hst:0, note:'= 淨銷售額 × '+(FC.royalty_pct*100)+'%，計算基礎: $'+netSales.toFixed(2), isRoyalty:true },
   ];
   const totalEx  = rows.reduce((s,r) => s+r.ex, 0);
   const totalITC = rows.reduce((s,r) => s+r.hst, 0);
@@ -2035,6 +2039,7 @@ const FIXED_EDIT_META = {
   bank_fee:       { label:'銀行手續費',        note:'免HST' },
   pos_sys_inc:    { label:'POS 系統費',        note:'含稅填入' },
   royalty_pct:    { label:'品牌權利金比例',    note:'例：0.05 = 5%' },
+  royalty_base:   { label:'月報淨銷售額（Snappy 月結）', note:'從 Snappy 報表填入；填 0 = 改用每日累計' },
 };
 
 function openFixedEdit(key) {
@@ -2078,7 +2083,8 @@ function renderFixedExpenses() {
     insurance: 'insurance_inc',
     bank_fee:  'bank_fee',
     pos_sys:   'pos_sys_inc',
-    royalty:   'royalty_pct',
+    royalty:       'royalty_pct',
+    royalty_base:  'royalty_base',
   };
   let html = '';
   rows.forEach(r => {
