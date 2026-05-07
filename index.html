@@ -1137,10 +1137,109 @@ function defaultItems() {
 // ═══════════════════════════════
 //  種子資料（直接燒進 HTML，不依賴 localStorage）
 // ═══════════════════════════════
-const SEED_VERSION = 2; // 每次更新 SEED_DATA 內容就遞增這個數字
+const SEED_VERSION = 3; // 每次更新 SEED_DATA 內容就遞增這個數字
 const SEED_DATA = {
+  '2026-03': {
+    _seedV: 3,
+    revenues: [], purchases: [], misc: [], platformDeps: [],
+    staff: [],
+    fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.76,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05},
+    pdfSummary: [
+      {id:'mp1',platform:'Snappy POS',desc:'3月現場刷卡',gross:12934.21,fees:-221.38,actual:12712.83,note:'Snappy對帳單，部分3月交易於4月入帳'},
+      {id:'mp2',platform:'Snappy Online',desc:'3月線上訂單',gross:805.00,fees:-35.91,actual:769.09,note:'Snappy對帳單淨額$769.09，部分於4月入帳'},
+      {id:'mp3',platform:'Fantuan',desc:'3月飯糰打款',gross:1571.86,fees:null,actual:2019.57,note:'飯糰對帳單$1,571.86，銀行實收$2,019.57（含2月跨月）'},
+      {id:'mp4',platform:'Uber Eats',desc:'3月Uber打款',gross:2384.25,fees:-1164.93,actual:1089.66,note:'3/17 $128.02+3/24 $369.85+3/31 $591.79，餘額$129.66跨月至4月'},
+      {id:'mp5',platform:'現金',desc:'3月現金營業額',gross:null,fees:null,actual:null,note:'3月現金於4月2日存入$590.15，含小費$169.00'}
+    ],
+    bank: [
+      {id:'m001',date:'2026-03-02',desc:'TRAVELERS INS INS',dep:0,wd:175.76,bal:'',note:'店面保險（3月）'},
+      {id:'m002',date:'2026-03-02',desc:'COSTCO WHOLESAL',dep:0,wd:42.76,bal:'',note:'Costco採購'},
+      {id:'m003',date:'2026-03-02',desc:"JIM'S NO FRILLS",dep:0,wd:20.00,bal:'',note:'No Frills採購'},
+      {id:'m004',date:'2026-03-02',desc:'FRESHWAY FOODMA',dep:0,wd:25.74,bal:'',note:'Freshway採購'},
+      {id:'m005',date:'2026-03-02',desc:'SNAPPY2804 EXP',dep:269.51,wd:0,bal:'23729.10',note:'Snappy POS'},
+      {id:'m006',date:'2026-03-03',desc:'GC 1078-DEPOSIT',dep:417.05,wd:0,bal:'',note:'現金存入（2月）'},
+      {id:'m007',date:'2026-03-03',desc:'GC 1078-CASH WITHDRA',dep:0,wd:169.00,bal:'',note:'現金提領（2月小費）'},
+      {id:'m008',date:'2026-03-03',desc:'SNAPPYON2804 EXP',dep:14.48,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m009',date:'2026-03-03',desc:'SNAPPY2804 EXP',dep:468.41,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m010',date:'2026-03-03',desc:'SNAPPYDEBIT EXP',dep:0,wd:201.25,bal:'24258.79',note:'Snappy POS月費（含稅）'},
+      {id:'m011',date:'2026-03-04',desc:'FANTUAN MSP',dep:46.22,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m012',date:'2026-03-04',desc:'FANTUAN MSP',dep:694.33,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m013',date:'2026-03-04',desc:'SNAPPYON2804 EXP',dep:48.61,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m014',date:'2026-03-04',desc:'SNAPPYON2804 EXP',dep:104.51,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m015',date:'2026-03-04',desc:'SNAPPY2804 EXP',dep:175.98,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m016',date:'2026-03-04',desc:'SNAPPY2804 EXP',dep:564.79,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m017',date:'2026-03-04',desc:'SNAPPY2804 EXP',dep:965.17,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m018',date:'2026-03-04',desc:'KINGLEKE INTERN',dep:0,wd:24.00,bal:'',note:'採購（待補明細）'},
+      {id:'m019',date:'2026-03-04',desc:'CHQ#00010',dep:0,wd:1130.00,bal:'25704.40',note:'租金 Upper East（3月）'},
+      {id:'m020',date:'2026-03-05',desc:'SNAPPYON2804 EXP',dep:54.15,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m021',date:'2026-03-05',desc:'SNAPPY2804 EXP',dep:206.71,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m022',date:'2026-03-05',desc:'CHQ#00116',dep:0,wd:387.79,bal:'',note:'薪資（2月 - 待補明細）'},
+      {id:'m023',date:'2026-03-05',desc:'CHQ#00114',dep:0,wd:663.98,bal:'24913.49',note:'薪資（2月 - 待補明細）'},
+      {id:'m024',date:'2026-03-06',desc:'SNAPPYON2804 EXP',dep:21.05,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m025',date:'2026-03-06',desc:'SNAPPY2804 EXP',dep:389.63,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m026',date:'2026-03-06',desc:'CHQ#00111',dep:0,wd:1441.92,bal:'23882.25',note:'薪資（2月 - 待補明細）'},
+      {id:'m027',date:'2026-03-09',desc:'SNAPPYON2804 EXP',dep:51.12,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m028',date:'2026-03-09',desc:'SNAPPY2804 EXP',dep:268.29,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m029',date:'2026-03-09',desc:'CHQ#00113',dep:0,wd:2299.48,bal:'',note:'薪資（2月 - 待補明細）'},
+      {id:'m030',date:'2026-03-09',desc:'CHQ#00115',dep:0,wd:1772.13,bal:'20130.05',note:'薪資（2月 - 待補明細）'},
+      {id:'m031',date:'2026-03-10',desc:'SNAPPYON2804 EXP',dep:63.58,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m032',date:'2026-03-10',desc:'SNAPPY2804 EXP',dep:389.20,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m033',date:'2026-03-10',desc:'WC RICHMOND HIL',dep:0,wd:51.92,bal:'20530.91',note:'WC Richmond採購'},
+      {id:'m034',date:'2026-03-11',desc:'FANTUAN MSP',dep:29.39,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m035',date:'2026-03-11',desc:'FANTUAN MSP',dep:630.16,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m036',date:'2026-03-11',desc:'CHUANGS COMPANY',dep:0,wd:16.00,bal:'',note:'莊記採購'},
+      {id:'m037',date:'2026-03-11',desc:'SNAPPYON2804 EXP',dep:58.17,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m038',date:'2026-03-11',desc:'SNAPPYON2804 EXP',dep:91.57,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m039',date:'2026-03-11',desc:'SNAPPY2804 EXP',dep:326.43,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m040',date:'2026-03-11',desc:'SNAPPY2804 EXP',dep:746.69,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m041',date:'2026-03-11',desc:'SNAPPY2804 EXP',dep:848.35,wd:0,bal:'23245.67',note:'Snappy POS'},
+      {id:'m042',date:'2026-03-12',desc:'SNAPPY2804 EXP',dep:237.21,wd:0,bal:'23482.88',note:'Snappy POS'},
+      {id:'m043',date:'2026-03-13',desc:'SNAPPY2804 EXP',dep:137.17,wd:0,bal:'23620.05',note:'Snappy POS'},
+      {id:'m044',date:'2026-03-16',desc:'METRO 712',dep:0,wd:18.98,bal:'',note:'Metro採購'},
+      {id:'m045',date:'2026-03-16',desc:'SNAPPY2804 EXP',dep:166.50,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m046',date:'2026-03-16',desc:'CHQ#00117',dep:0,wd:735.10,bal:'23032.47',note:'薪資/支出（待補明細）'},
+      {id:'m047',date:'2026-03-17',desc:'Uber Holdings C MSP',dep:128.02,wd:0,bal:'',note:'Uber打款'},
+      {id:'m048',date:'2026-03-17',desc:'SNAPPY2804 EXP',dep:252.21,wd:0,bal:'23412.70',note:'Snappy POS'},
+      {id:'m049',date:'2026-03-18',desc:'FANTUAN MSP',dep:55.84,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m050',date:'2026-03-18',desc:'FANTUAN MSP',dep:194.54,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m051',date:'2026-03-18',desc:'SNAPPY2804 EXP',dep:177.95,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m052',date:'2026-03-18',desc:'SNAPPY2804 EXP',dep:880.57,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m053',date:'2026-03-18',desc:'SNAPPY2804 EXP',dep:941.96,wd:0,bal:'25663.56',note:'Snappy POS'},
+      {id:'m054',date:'2026-03-19',desc:'SNAPPY2804 EXP',dep:561.64,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m055',date:'2026-03-19',desc:'CHQ#00039',dep:0,wd:1326.26,bal:'24898.94',note:'支出（待補明細）'},
+      {id:'m056',date:'2026-03-20',desc:'SNAPPY2804 EXP',dep:160.74,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m057',date:'2026-03-20',desc:'SEND E-TFR *3Bu EXP',dep:0,wd:671.88,bal:'',note:'電子轉帳（待補明細）'},
+      {id:'m058',date:'2026-03-20',desc:'CHUANGS COMPANY',dep:0,wd:86.40,bal:'',note:'莊記採購'},
+      {id:'m059',date:'2026-03-20',desc:'COSTCO WHOLESAL',dep:0,wd:19.98,bal:'24281.42',note:'Costco採購'},
+      {id:'m060',date:'2026-03-23',desc:'SNAPPY2804 EXP',dep:310.94,wd:0,bal:'24592.36',note:'Snappy POS'},
+      {id:'m061',date:'2026-03-24',desc:'Uber Holdings C MSP',dep:369.85,wd:0,bal:'',note:'Uber打款'},
+      {id:'m062',date:'2026-03-24',desc:'SNAPPY2804 EXP',dep:322.39,wd:0,bal:'25284.60',note:'Snappy POS'},
+      {id:'m063',date:'2026-03-25',desc:'FANTUAN MSP',dep:24.82,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m064',date:'2026-03-25',desc:'FANTUAN MSP',dep:344.27,wd:0,bal:'',note:'飯糰打款'},
+      {id:'m065',date:'2026-03-25',desc:'SNAPPYON2804 EXP',dep:63.71,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m066',date:'2026-03-25',desc:'SNAPPYON2804 EXP',dep:69.74,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m067',date:'2026-03-25',desc:'SNAPPY2804 EXP',dep:136.60,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m068',date:'2026-03-25',desc:'SNAPPY2804 EXP',dep:742.78,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m069',date:'2026-03-25',desc:'SNAPPY2804 EXP',dep:807.18,wd:0,bal:'27473.70',note:'Snappy POS'},
+      {id:'m070',date:'2026-03-26',desc:'SNAPPY2804 EXP',dep:200.64,wd:0,bal:'27674.34',note:'Snappy POS'},
+      {id:'m071',date:'2026-03-27',desc:'SNAPPY2804 EXP',dep:249.87,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m072',date:'2026-03-27',desc:'SEND E-TFR *VE7 OTHR',dep:0,wd:341.72,bal:'27582.49',note:'電子轉帳（待補明細）'},
+      {id:'m073',date:'2026-03-30',desc:'SNAPPYON2804 EXP',dep:39.36,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m074',date:'2026-03-30',desc:'SNAPPY2804 EXP',dep:253.32,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m075',date:'2026-03-30',desc:'CHEFCO KITCHEN',dep:0,wd:11.30,bal:'27863.87',note:'採購 Chefco'},
+      {id:'m076',date:'2026-03-31',desc:'Uber Holdings C MSP',dep:591.79,wd:0,bal:'',note:'Uber打款'},
+      {id:'m077',date:'2026-03-31',desc:'SNAPPYON2804 EXP',dep:28.12,wd:0,bal:'',note:'Snappy Online'},
+      {id:'m078',date:'2026-03-31',desc:'SNAPPY2804 EXP',dep:495.59,wd:0,bal:'',note:'Snappy POS'},
+      {id:'m079',date:'2026-03-31',desc:'SEND E-TFR ***xFg',dep:0,wd:101.70,bal:'',note:'電子轉帳（待補明細）'},
+      {id:'m080',date:'2026-03-31',desc:'SEND E-TFR FEE',dep:0,wd:1.50,bal:'',note:'電子轉帳手續費'},
+      {id:'m081',date:'2026-03-31',desc:'MONTHLY PLAN FEE',dep:0,wd:19.00,bal:'',note:'TD銀行月費'},
+      {id:'m082',date:'2026-03-31',desc:'ACCT BAL REBATE',dep:19.00,wd:0,bal:'',note:'銀行費用退還'},
+      {id:'m083',date:'2026-03-31',desc:'SERVICE CHARGE',dep:0,wd:6.25,bal:'28869.92',note:'電子轉帳服務費'}
+    ],
+    inventory: {open:[],close:[]}
+  },
   '2026-04': {
-    _seedV: 2,
+    _seedV: 3,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [
       {id:'s1',desc:'Ada 薪資（3月）',amt:1614.61},
@@ -1260,13 +1359,21 @@ function loadLocal() {
   let r = null;
   try { r = localStorage.getItem(lsKey(curMonth)); } catch(e) {}
   if (r) {
-    const stored = JSON.parse(r);
-    // 如果 localStorage 版本比 SEED_DATA 舊（或沒有版本號），強制用 SEED_DATA 覆蓋
-    if (SEED_DATA[curMonth] && (stored._seedV || 0) < SEED_VERSION) {
-      D = JSON.parse(JSON.stringify(SEED_DATA[curMonth]));
+    D = JSON.parse(r);
+    // 合併補齊：對有 SEED_DATA 的月份，任何空陣列/欄位都從 SEED_DATA 補回
+    if (SEED_DATA[curMonth]) {
+      const seed = SEED_DATA[curMonth];
+      if (!D.bank || D.bank.length === 0)
+        D.bank = JSON.parse(JSON.stringify(seed.bank || []));
+      if (!D.staff || D.staff.length === 0)
+        D.staff = JSON.parse(JSON.stringify(seed.staff || []));
+      if (!D.pdfSummary || D.pdfSummary.length === 0)
+        D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary || []));
+      if (!D.fixedCfg || !D.fixedCfg.rent_base)
+        D.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg || {}));
+      if (!D.inventory || !D.inventory.open || D.inventory.open.length === 0)
+        D.inventory = JSON.parse(JSON.stringify(seed.inventory || { open: [], close: [] }));
       try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {}
-    } else {
-      D = stored;
     }
   } else if (SEED_DATA[curMonth]) {
     D = JSON.parse(JSON.stringify(SEED_DATA[curMonth]));
@@ -1338,7 +1445,14 @@ async function syncDown() {
       TEMPLATE_CACHE = tJson.items;
       localStorage.setItem('mw2_template', JSON.stringify(TEMPLATE_CACHE));
     }
-    if (dJson.ok && dJson.data) { D = dJson.data; saveLocal(); }
+    if (dJson.ok && dJson.data) {
+      const srv = dJson.data;
+      // 保護本地好資料不被空的伺服器資料覆蓋
+      if ((!srv.bank || srv.bank.length === 0) && D.bank && D.bank.length > 0) srv.bank = D.bank;
+      if ((!srv.staff || srv.staff.length === 0) && D.staff && D.staff.length > 0) srv.staff = D.staff;
+      if ((!srv.pdfSummary || srv.pdfSummary.length === 0) && D.pdfSummary && D.pdfSummary.length > 0) srv.pdfSummary = D.pdfSummary;
+      D = srv; saveLocal();
+    }
     setDot('ok');
   } catch (e) { setDot('err'); }
 }
