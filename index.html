@@ -1137,8 +1137,10 @@ function defaultItems() {
 // ═══════════════════════════════
 //  種子資料（直接燒進 HTML，不依賴 localStorage）
 // ═══════════════════════════════
+const SEED_VERSION = 2; // 每次更新 SEED_DATA 內容就遞增這個數字
 const SEED_DATA = {
   '2026-04': {
+    _seedV: 2,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [
       {id:'s1',desc:'Ada 薪資（3月）',amt:1614.61},
@@ -1257,9 +1259,21 @@ function saveLocal() { try { localStorage.setItem(lsKey(curMonth), JSON.stringif
 function loadLocal() {
   let r = null;
   try { r = localStorage.getItem(lsKey(curMonth)); } catch(e) {}
-  if (r) { D = JSON.parse(r); }
-  else if (SEED_DATA[curMonth]) { D = JSON.parse(JSON.stringify(SEED_DATA[curMonth])); try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {} }
-  else { D = blankData(); }
+  if (r) {
+    const stored = JSON.parse(r);
+    // 如果 localStorage 版本比 SEED_DATA 舊（或沒有版本號），強制用 SEED_DATA 覆蓋
+    if (SEED_DATA[curMonth] && (stored._seedV || 0) < SEED_VERSION) {
+      D = JSON.parse(JSON.stringify(SEED_DATA[curMonth]));
+      try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {}
+    } else {
+      D = stored;
+    }
+  } else if (SEED_DATA[curMonth]) {
+    D = JSON.parse(JSON.stringify(SEED_DATA[curMonth]));
+    try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {}
+  } else {
+    D = blankData();
+  }
 }
 function saveCFG() { localStorage.setItem('mw2_cfg', JSON.stringify(CFG)); }
 function loadCFG() {
