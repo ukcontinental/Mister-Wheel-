@@ -1470,9 +1470,17 @@ async function syncDown() {
       const srv = dJson.data;
       // 保護本地好資料不被空的伺服器資料覆蓋
       if ((!srv.bank || srv.bank.length === 0) && D.bank && D.bank.length > 0) srv.bank = D.bank;
-      if ((!srv.staff || srv.staff.length === 0) && D.staff && D.staff.length > 0) srv.staff = D.staff;
       if ((!srv.pdfSummary || srv.pdfSummary.length === 0) && D.pdfSummary && D.pdfSummary.length > 0) srv.pdfSummary = D.pdfSummary;
-      D = srv; saveLocal();
+      D = srv;
+      // ── 同步後 staff/fixedCfg 仍以 SEED_DATA 為準（避免伺服器舊資料覆蓋）──
+      if (SEED_DATA[curMonth]) {
+        const seed = SEED_DATA[curMonth];
+        if (seed.staff && seed.staff.length > 0)
+          D.staff = JSON.parse(JSON.stringify(seed.staff));
+        if (seed.fixedCfg && seed.fixedCfg.rent_base)
+          D.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg));
+      }
+      saveLocal();
     }
     setDot('ok');
   } catch (e) { setDot('err'); }
@@ -1656,12 +1664,15 @@ function renderRevenue() {
   const totNet  = D.revenues.reduce((s, r) => s + N(r.net), 0);
   const totTax  = D.revenues.reduce((s, r) => s + N(r.tax), 0);
   const totFees = D.revenues.reduce((s, r) => s + N(r.pos) * C.POS_FEE + N(r.onl) * C.ONLINE_FEE, 0);
-  const royalty = totNet * C.ROYALTY;
+  const FC = D.fixedCfg || {};
+  const royaltyBase = (FC.royalty_base && FC.royalty_base > 0) ? N(FC.royalty_base) : totNet;
+  const royaltyPct  = FC.royalty_pct || C.ROYALTY;
+  const royalty = royaltyBase * royaltyPct;
   s2('rm-net', fmt(totNet), 'mv g');
   s2('rm-tax', fmt(totTax), 'mv o');
   s2('rm-fees', fmt(totFees), 'mv r');
   document.getElementById('rm-days').textContent = D.revenues.length + ' 天';
-  sv('rm-royalty-base', fmt(totNet), 'rn');
+  sv('rm-royalty-base', fmt(royaltyBase), 'rn');
   sv('rm-royalty', fmt(royalty), 'rn');
 
   const list = document.getElementById('rev-list');
