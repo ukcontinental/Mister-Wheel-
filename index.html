@@ -1138,12 +1138,18 @@ function defaultItems() {
 // ═══════════════════════════════
 //  種子資料（直接燒進 HTML，不依賴 localStorage）
 // ═══════════════════════════════
-const SEED_VERSION = 5; // 每次更新 SEED_DATA 內容就遞增這個數字
+const SEED_VERSION = 6; // 每次更新 SEED_DATA 內容就遞增這個數字
 const SEED_DATA = {
   '2026-03': {
-    _seedV: 5,
+    _seedV: 6,
     revenues: [], purchases: [], misc: [], platformDeps: [],
-    staff: [],
+    staff: [
+      {id:'m_s1',desc:'Willie 薪資 Net（2月）',amt:721.60},
+      {id:'m_s2',desc:'Winnie 薪資 Net（2月）',amt:1881.65},
+      {id:'m_s3',desc:'Ada 薪資 Net（2月）',amt:1614.61},
+      {id:'m_s4',desc:'Jason 薪資 Net（2月）',amt:2610.51},
+      {id:'m_s5',desc:'CPP/EI 政府扣繳（2月）',amt:1579.56}
+    ],
     fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.76,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05,royalty_base:16022.43},
     pdfSummary: [
       {id:'mp1',platform:'snappy',desc:'3月現場刷卡（POS）',gross:12934.21,fees:-221.38,actual:12712.83,note:'Snappy對帳單，部分3月交易於4月入帳'},
@@ -1240,14 +1246,14 @@ const SEED_DATA = {
     inventory: {open:[],close:[]}
   },
   '2026-04': {
-    _seedV: 5,
+    _seedV: 6,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [
-      {id:'s1',desc:'Ada 薪資（3月）',amt:1614.61},
-      {id:'s2',desc:'Jason 薪資（3月含CPP）',amt:2610.51},
-      {id:'s3',desc:'Willie 薪資（3月）',amt:721.60},
-      {id:'s4',desc:'Winnie 薪資（3月）',amt:1881.65},
-      {id:'s5',desc:'CPP/EI 3月（政府扣繳）',amt:1579.56}
+      {id:'s1',desc:'Willie 薪資 Net（3月）',amt:721.60},
+      {id:'s2',desc:'Winnie 薪資 Net（3月）',amt:1881.65},
+      {id:'s3',desc:'Ada 薪資 Net（3月）',amt:1614.61},
+      {id:'s4',desc:'Jason 薪資 Net（3月）',amt:2610.51},
+      {id:'s5',desc:'CPP/EI 政府扣繳（3月）',amt:1579.56}
     ],
     fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.75,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05,royalty_base:17864.81},
     pdfSummary: [
@@ -1366,9 +1372,14 @@ function loadLocal() {
       const seed = SEED_DATA[curMonth];
       const storedV = D._seedV || 0;
       const seedV   = seed._seedV || 0;
-      // ① 版本升級：強制更新 pdfSummary（修正平台 key 等）
-      if (storedV < seedV && seed.pdfSummary && seed.pdfSummary.length > 0) {
-        D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary));
+      // ① 版本升級：強制更新所有主要欄位
+      if (storedV < seedV) {
+        if (seed.pdfSummary && seed.pdfSummary.length > 0)
+          D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary));
+        if (seed.staff && seed.staff.length > 0)
+          D.staff = JSON.parse(JSON.stringify(seed.staff));
+        if (seed.fixedCfg && seed.fixedCfg.rent_base)
+          D.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg));
         D._seedV = seedV;
       }
       // ② 補齊空陣列
