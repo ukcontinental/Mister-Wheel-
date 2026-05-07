@@ -1137,19 +1137,19 @@ function defaultItems() {
 // ═══════════════════════════════
 //  種子資料（直接燒進 HTML，不依賴 localStorage）
 // ═══════════════════════════════
-const SEED_VERSION = 3; // 每次更新 SEED_DATA 內容就遞增這個數字
+const SEED_VERSION = 4; // 每次更新 SEED_DATA 內容就遞增這個數字
 const SEED_DATA = {
   '2026-03': {
-    _seedV: 3,
+    _seedV: 4,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [],
     fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.76,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05},
     pdfSummary: [
-      {id:'mp1',platform:'Snappy POS',desc:'3月現場刷卡',gross:12934.21,fees:-221.38,actual:12712.83,note:'Snappy對帳單，部分3月交易於4月入帳'},
-      {id:'mp2',platform:'Snappy Online',desc:'3月線上訂單',gross:805.00,fees:-35.91,actual:769.09,note:'Snappy對帳單淨額$769.09，部分於4月入帳'},
-      {id:'mp3',platform:'Fantuan',desc:'3月飯糰打款',gross:1571.86,fees:null,actual:2019.57,note:'飯糰對帳單$1,571.86，銀行實收$2,019.57（含2月跨月）'},
-      {id:'mp4',platform:'Uber Eats',desc:'3月Uber打款',gross:2384.25,fees:-1164.93,actual:1089.66,note:'3/17 $128.02+3/24 $369.85+3/31 $591.79，餘額$129.66跨月至4月'},
-      {id:'mp5',platform:'現金',desc:'3月現金營業額',gross:null,fees:null,actual:null,note:'3月現金於4月2日存入$590.15，含小費$169.00'}
+      {id:'mp1',platform:'snappy',desc:'3月現場刷卡（POS）',gross:12934.21,fees:-221.38,actual:12712.83,note:'Snappy對帳單，部分3月交易於4月入帳'},
+      {id:'mp2',platform:'snappy',desc:'3月線上訂單（Online）',gross:805.00,fees:-35.91,actual:769.09,note:'Snappy對帳單淨額$769.09，部分於4月入帳'},
+      {id:'mp3',platform:'fantuan',desc:'3月飯糰打款',gross:1571.86,fees:null,actual:2019.57,note:'飯糰對帳單$1,571.86，銀行實收$2,019.57（含2月跨月）'},
+      {id:'mp4',platform:'uber',desc:'3月Uber打款',gross:2384.25,fees:-1164.93,actual:1089.66,note:'3/17 $128.02+3/24 $369.85+3/31 $591.79，餘額$129.66跨月至4月'},
+      {id:'mp5',platform:'cash',desc:'3月現金營業額',gross:null,fees:null,actual:null,note:'3月現金於4月2日存入$590.15，含小費$169.00'}
     ],
     bank: [
       {id:'m001',date:'2026-03-02',desc:'TRAVELERS INS INS',dep:0,wd:175.76,bal:'',note:'店面保險（3月）'},
@@ -1239,7 +1239,7 @@ const SEED_DATA = {
     inventory: {open:[],close:[]}
   },
   '2026-04': {
-    _seedV: 3,
+    _seedV: 4,
     revenues: [], purchases: [], misc: [], platformDeps: [],
     staff: [
       {id:'s1',desc:'Ada 薪資（3月）',amt:1614.61},
@@ -1250,11 +1250,11 @@ const SEED_DATA = {
     ],
     fixedCfg: {rent_base:1000,rent_threshold:20000,rent_pct:0.05,parking_inc:183.95,insurance_inc:175.75,bank_fee:19,pos_sys_inc:201.25,royalty_pct:0.05},
     pdfSummary: [
-      {id:'p1',platform:'Snappy POS',desc:'4月現場刷卡',gross:null,fees:null,actual:13094.21,note:'銀行實收基準'},
-      {id:'p2',platform:'Snappy Online',desc:'4月線上訂單',gross:1427.82,fees:null,actual:1354.48,note:'對帳單$1427.82，銀行實收$1354.48，差$73.34含跨月'},
-      {id:'p3',platform:'Fantuan',desc:'4月飯糰打款',gross:1891.15,fees:null,actual:1887.10,note:'對帳單$1891.15，差$4.05為最後一筆跨月'},
-      {id:'p4',platform:'Uber Eats',desc:'4月Uber打款',gross:null,fees:null,actual:2355.05,note:'4/7 $450.44+4/14 $536.43+4/21 $482.66+4/28 $885.52'},
-      {id:'p5',platform:'現金',desc:'4月現金營業額',gross:null,fees:null,actual:583.45,note:'5/4存入$583.45，小費$217.00'}
+      {id:'p1',platform:'snappy',desc:'4月現場刷卡（POS）',gross:null,fees:null,actual:13094.21,note:'銀行實收基準'},
+      {id:'p2',platform:'snappy',desc:'4月線上訂單（Online）',gross:1427.82,fees:null,actual:1354.48,note:'對帳單$1427.82，銀行實收$1354.48，差$73.34含跨月'},
+      {id:'p3',platform:'fantuan',desc:'4月飯糰打款',gross:1891.15,fees:null,actual:1887.10,note:'對帳單$1891.15，差$4.05為最後一筆跨月'},
+      {id:'p4',platform:'uber',desc:'4月Uber打款',gross:null,fees:null,actual:2355.05,note:'4/7 $450.44+4/14 $536.43+4/21 $482.66+4/28 $885.52'},
+      {id:'p5',platform:'cash',desc:'4月現金營業額',gross:null,fees:null,actual:583.45,note:'5/4存入$583.45，小費$217.00'}
     ],
     bank: [
       {id:'b001',date:'2026-04-01',desc:'FANTUAN MSP',dep:16.69,wd:0,bal:'',note:'飯糰打款'},
@@ -1363,6 +1363,14 @@ function loadLocal() {
     // 合併補齊：對有 SEED_DATA 的月份，任何空陣列/欄位都從 SEED_DATA 補回
     if (SEED_DATA[curMonth]) {
       const seed = SEED_DATA[curMonth];
+      const storedV = D._seedV || 0;
+      const seedV   = seed._seedV || 0;
+      // ① 版本升級：強制更新 pdfSummary（修正平台 key 等）
+      if (storedV < seedV && seed.pdfSummary && seed.pdfSummary.length > 0) {
+        D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary));
+        D._seedV = seedV;
+      }
+      // ② 補齊空陣列
       if (!D.bank || D.bank.length === 0)
         D.bank = JSON.parse(JSON.stringify(seed.bank || []));
       if (!D.staff || D.staff.length === 0)
@@ -3247,14 +3255,33 @@ function renderPlatformDeps() {
         </tr>
         <tr><td colspan="3" style="padding:0">${detailHtml}</td></tr>`;
       });
-      // 合計行（不含現金）
+      // 合計區塊
       const manualNoCash = D.platformDeps.filter(d=>d.platform!=='cash').reduce((s,d)=>s+N(d.amount),0);
-      const displayTotal = pdfGrandTotal + manualNoCash;
-      shHtml += `<tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
-        <td style="padding:14px;font-size:14px;font-weight:700">合計（不含現金）</td>
-        <td style="padding:14px;text-align:right;font-size:22px;font-weight:700;color:var(--ac)">${fmt(displayTotal)}</td>
-        <td></td>
-      </tr>`;
+      const cashPdfAmt   = (pdfTotals['cash'] || 0) + (manualTotals['cash'] || 0);
+      const noCashTotal  = pdfGrandTotal + manualNoCash;
+      const grandTotal   = noCashTotal + cashPdfAmt;
+      const hstAmt       = grandTotal * 13 / 113;  // 代收 HST（13%，含於總收入中）
+      shHtml += `
+        <tr style="border-top:1px solid var(--bd2)">
+          <td style="padding:10px 14px;font-size:13px;color:var(--tx2)">各平台小計（不含現金）</td>
+          <td style="padding:10px 14px;text-align:right;font-size:16px;font-weight:600;color:var(--tx)">${fmt(noCashTotal)}</td>
+          <td></td>
+        </tr>
+        <tr style="border-top:1px solid var(--bd)">
+          <td style="padding:10px 14px;font-size:13px;color:var(--tx2)">＋ 現金收入</td>
+          <td style="padding:10px 14px;text-align:right;font-size:16px;font-weight:600;color:var(--gn)">${cashPdfAmt > 0 ? fmt(cashPdfAmt) : '—'}</td>
+          <td></td>
+        </tr>
+        <tr style="background:var(--sf2);border-top:2px solid var(--bd2)">
+          <td style="padding:14px;font-size:14px;font-weight:700">總收入合計（含現金）</td>
+          <td style="padding:14px;text-align:right;font-size:22px;font-weight:700;color:var(--ac)">${fmt(grandTotal)}</td>
+          <td></td>
+        </tr>
+        <tr style="background:#fff8e1;border-top:1px solid #f0d060">
+          <td style="padding:10px 14px;font-size:12px;color:var(--or)">其中代收 HST（13%，需繳給政府）</td>
+          <td style="padding:10px 14px;text-align:right;font-size:15px;font-weight:700;color:var(--or)">${fmt(hstAmt)}</td>
+          <td></td>
+        </tr>`;
       shHtml += `</tbody></table></div>`;
       shEl.innerHTML = shHtml;
     }
