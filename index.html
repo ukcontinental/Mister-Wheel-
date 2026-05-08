@@ -3747,11 +3747,23 @@ function toggleEditMode() {
 function renderShareholderDashboard() {
   if (!shCurMonth) shCurMonth = curMonth;
 
-  // ── 讀取該月資料（從 localStorage，與老闆版本相同的 key） ──
+  // ── 讀取該月資料（與老闆版本相同的 key） ──
   let shD = {};
-  const raw = localStorage.getItem('mw_' + shCurMonth);
+  const raw = localStorage.getItem(lsKey(shCurMonth));
   if (raw) { try { shD = JSON.parse(raw); } catch(e) {} }
   if (!shD.revenues) shD = blankData();
+  // 套用 SEED_DATA（staff / fixedCfg 以 SEED 為準）
+  if (SEED_DATA[shCurMonth]) {
+    const seed = SEED_DATA[shCurMonth];
+    if (seed.staff && seed.staff.length > 0)
+      shD.staff = JSON.parse(JSON.stringify(seed.staff));
+    if (seed.fixedCfg && seed.fixedCfg.rent_base)
+      shD.fixedCfg = JSON.parse(JSON.stringify(seed.fixedCfg));
+    if (!shD.bank || shD.bank.length === 0)
+      shD.bank = JSON.parse(JSON.stringify(seed.bank || []));
+    if (!shD.pdfSummary || shD.pdfSummary.length === 0)
+      shD.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary || []));
+  }
 
   // ── 固定費用設定 ──
   const FC = Object.assign({}, DEFAULT_FIXED_CFG, shD.fixedCfg || {});
@@ -3775,8 +3787,9 @@ function renderShareholderDashboard() {
   const cogs     = invOpen + purEx - invClose;
 
   // ── 固定費用明細（內聯計算，不依賴全域 D） ──
-  const netSalesPOS = (shD.revenues||[]).reduce((s,r)=>s+N(r.net),0);
-  const rentEx  = netSalesPOS < FC.rent_threshold ? FC.rent_base : netSalesPOS * FC.rent_pct;
+  const dailyNetSH  = (shD.revenues||[]).reduce((s,r)=>s+N(r.net),0);
+  const netSalesPOS = (FC.royalty_base && FC.royalty_base > 0) ? N(FC.royalty_base) : dailyNetSH;
+  const rentEx  = dailyNetSH < FC.rent_threshold ? FC.rent_base : dailyNetSH * FC.rent_pct;
   const royalty = netSalesPOS * FC.royalty_pct;
   const fixedItems = [
     { label:'租金',       ex: rentEx },
