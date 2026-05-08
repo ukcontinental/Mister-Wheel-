@@ -322,6 +322,7 @@ body:not(.edit-mode) .auto-collapse{display:none!important;}
     <div class="sh-header">
       <h1>🥐 不貳光 · 股東報告</h1>
       <p>財務摘要 · 月度更新</p>
+      <div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:4px">📅 選擇月份</div>
       <select id="sh-month-sel" class="sh-month-sel" onchange="onShMonthChange()"></select>
     </div>
     <!-- KPI 三大數字 -->
@@ -3692,12 +3693,17 @@ function initShMonthSel() {
   if (!sel) return;
   sel.innerHTML = '';
   const now = new Date();
+  let firstWithData = '';
   for (let i = 0; i < 13; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const v = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
     const lbl = d.getFullYear() + '年' + (d.getMonth()+1) + '月';
-    sel.appendChild(Object.assign(document.createElement('option'), {value:v, textContent:lbl}));
+    const hasData = !!localStorage.getItem(lsKey(v)) || !!SEED_DATA[v];
+    const opt = Object.assign(document.createElement('option'), {value:v, textContent: lbl + (hasData?'':' （無資料）')});
+    sel.appendChild(opt);
+    if (!firstWithData && hasData) firstWithData = v;
   }
+  if (firstWithData) sel.value = firstWithData;
   shCurMonth = sel.value;
 }
 
