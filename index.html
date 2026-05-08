@@ -165,8 +165,10 @@ select.fi{cursor:pointer;}
 .sh-section{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:14px;}
 .sh-section-title{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
 .sh-logout{display:block;text-align:center;margin-top:20px;color:var(--tx3);font-size:13px;cursor:pointer;text-decoration:underline;}
-.sh-month-sel{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:20px;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;}
-.sh-month-sel option{color:#1a2e20;background:#fff;}
+.sh-month-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;}
+.sh-month-btn{padding:7px 18px;border-radius:20px;border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;}
+.sh-month-btn.active{background:#fff;color:#1a5e34;border-color:#fff;}
+.sh-month-btn:hover{background:rgba(255,255,255,.3);}
 .sh-kv-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px;color:var(--tx2);}
 .sh-kv-row:last-child{border-bottom:none;}
 .sh-kv-sub{padding:5px 0 5px 16px;font-size:12px;color:var(--tx3);}
@@ -322,8 +324,7 @@ body:not(.edit-mode) .auto-collapse{display:none!important;}
     <div class="sh-header">
       <h1>🥐 不貳光 · 股東報告</h1>
       <p>財務摘要 · 月度更新</p>
-      <div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:4px">📅 選擇月份</div>
-      <select id="sh-month-sel" class="sh-month-sel" onchange="onShMonthChange()"></select>
+      <div id="sh-month-btns" class="sh-month-btns"></div>
     </div>
     <!-- KPI 三大數字 -->
     <div class="kpi-grid">
@@ -3689,26 +3690,35 @@ function showShareholderApp() {
 let shCurMonth = '';
 
 function initShMonthSel() {
-  const sel = document.getElementById('sh-month-sel');
-  if (!sel) return;
-  sel.innerHTML = '';
-  const now = new Date();
-  let firstWithData = '';
-  for (let i = 0; i < 13; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const v = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-    const lbl = d.getFullYear() + '年' + (d.getMonth()+1) + '月';
-    const hasData = !!localStorage.getItem(lsKey(v)) || !!SEED_DATA[v];
-    const opt = Object.assign(document.createElement('option'), {value:v, textContent: lbl + (hasData?'':' （無資料）')});
-    sel.appendChild(opt);
-    if (!firstWithData && hasData) firstWithData = v;
-  }
-  if (firstWithData) sel.value = firstWithData;
-  shCurMonth = sel.value;
+  const container = document.getElementById('sh-month-btns');
+  if (!container) return;
+  container.innerHTML = '';
+  // 取 SEED_DATA 中所有月份，由新到舊排列
+  const months = Object.keys(SEED_DATA).sort().reverse();
+  if (months.length === 0) return;
+  shCurMonth = months[0]; // 預設最新月份
+  months.forEach(v => {
+    const [yr, mo] = v.split('-');
+    const lbl = yr + '年' + parseInt(mo) + '月';
+    const btn = document.createElement('button');
+    btn.className = 'sh-month-btn' + (v === shCurMonth ? ' active' : '');
+    btn.textContent = lbl;
+    btn.onclick = () => setShMonth(v);
+    container.appendChild(btn);
+  });
+}
+
+function setShMonth(v) {
+  shCurMonth = v;
+  // 更新按鈕高亮
+  document.querySelectorAll('.sh-month-btn').forEach(btn => {
+    const [yr, mo] = v.split('-');
+    btn.classList.toggle('active', btn.textContent === yr + '年' + parseInt(mo) + '月');
+  });
+  renderShareholderDashboard();
 }
 
 function onShMonthChange() {
-  shCurMonth = document.getElementById('sh-month-sel').value;
   renderShareholderDashboard();
 }
 
