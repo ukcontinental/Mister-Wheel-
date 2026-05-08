@@ -2043,8 +2043,8 @@ function getFixedData() {
     { key:'royalty_base', label:'📊 月報淨銷售額（Snappy）', ex: N(FC.royalty_base), hst:0, note: FC.royalty_base>0?'已手動填入，覆蓋每日累計':'填 0 = 改用每日累計 $'+dailyNet.toFixed(2), isInfo:true },
     { key:'royalty',   label:'🏷 品牌權利金 '+(FC.royalty_pct*100)+'%', ex:royalty, hst:0, note:'= 淨銷售額 × '+(FC.royalty_pct*100)+'%，計算基礎: $'+netSales.toFixed(2), isRoyalty:true },
   ];
-  const totalEx  = rows.reduce((s,r) => s+r.ex, 0);
-  const totalITC = rows.reduce((s,r) => s+r.hst, 0);
+  const totalEx  = rows.reduce((s,r) => r.isInfo ? s : s+r.ex, 0);
+  const totalITC = rows.reduce((s,r) => r.isInfo ? s : s+r.hst, 0);
   const rentExtraInc = netSales>=FC.rent_threshold ? (netSales*FC.rent_pct - FC.rent_base)*1.13 : 0;
   return { rows, totalEx, totalITC, rentEx, royalty, rentExtraInc, FC };
 }
