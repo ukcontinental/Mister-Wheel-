@@ -1364,6 +1364,13 @@ const SEED_DATA = {
 // ═══════════════════════════════
 const lsKey = m => 'mw2_' + m.replace('-', '_');
 function saveLocal() { try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {} }
+// 判斷 inventory 是否「等同空殼」——物料模板可能在、但所有 qty 都是 0/空
+function isInventoryEmpty(inv) {
+  if (!inv) return true;
+  const openEmpty  = !inv.open  || inv.open.length  === 0 || !inv.open.some(it  => Number(it.qty) > 0);
+  const closeEmpty = !inv.close || inv.close.length === 0 || !inv.close.some(it => Number(it.qty) > 0);
+  return openEmpty && closeEmpty;
+}
 function loadLocal() {
   let r = null;
   try { r = localStorage.getItem(lsKey(curMonth)); } catch(e) {}
@@ -1394,8 +1401,15 @@ function loadLocal() {
         D.bank = JSON.parse(JSON.stringify(seed.bank || []));
       if (!D.pdfSummary || D.pdfSummary.length === 0)
         D.pdfSummary = JSON.parse(JSON.stringify(seed.pdfSummary || []));
-      if (!D.inventory || !D.inventory.open || D.inventory.open.length === 0)
+      // inventory 補位：
+      // (1) 完全沒結構 → 從 SEED 補
+      // (2) 本機是空殼（物料在但 qty 全 0）且 SEED 有實質資料 → 用 SEED 覆蓋
+      // 這保護用戶手填的 qty>0 資料不會被新 SEED 蓋掉
+      if (!D.inventory || !D.inventory.open || D.inventory.open.length === 0) {
         D.inventory = JSON.parse(JSON.stringify(seed.inventory || { open: [], close: [] }));
+      } else if (isInventoryEmpty(D.inventory) && !isInventoryEmpty(seed.inventory)) {
+        D.inventory = JSON.parse(JSON.stringify(seed.inventory));
+      }
       try { localStorage.setItem(lsKey(curMonth), JSON.stringify(D)); } catch(e) {}
     }
   } else if (SEED_DATA[curMonth]) {
